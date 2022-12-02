@@ -1,6 +1,5 @@
 name: "format code"
-on:
-  pull_request:
+on: push
 jobs:
   format:
     runs-on: ubuntu-latest
