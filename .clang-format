@@ -1,0 +1,10 @@
+---
+BasedOnStyle: WebKit
+BreakBeforeBraces: Stroustrup
+ColumnLimit: 170
+Cpp11BracedListStyle: true
+DerivePointerAlignment: true
+ReflowComments: false
+SortIncludes: True
+AllowShortFunctionsOnASingleLine: Empty
+---
