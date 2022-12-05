@@ -10,6 +10,7 @@ struct data {
     GtkButton *addProjects;
     GtkButton *refresh;
     GtkLabel *labeltext;
+    GtkWidget *textview;
 };
 
 char *get_text_of_textview(GtkWidget *text_view); //recup le contenu d'un "textview"
