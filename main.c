@@ -27,6 +27,7 @@ int main(int argc, char *argv[])
     user.labeltext = GTK_LABEL(gtk_builder_get_object(user.builder, "labeltext"));
     user.addProjects = GTK_BUTTON(gtk_builder_get_object(user.builder, "add_projects"));
     user.refresh = GTK_BUTTON(gtk_builder_get_object(user.builder, "refresh")); //refresh labeltext
+    user.textview = GTK_WIDGET(gtk_builder_get_object(user.builder, "test_text"));
 
     //signals
     g_signal_connect_swapped(user.addProjects, "clicked", G_CALLBACK(click_projects), user.label_test);

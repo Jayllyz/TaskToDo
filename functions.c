@@ -19,11 +19,9 @@ char *get_text_of_textview(GtkWidget *text_view) //recup le contenu d'un "textvi
 
 void refreshButton(GtkWidget *refresh, gpointer data)
 {
-    struct data *user = (struct data *)user;
+    struct data *user = data;
     char *geText;
-    GtkWidget *text;
-
-    text = GTK_WIDGET(gtk_builder_get_object(user->builder, "test_text"));
-    strcpy(geText, get_text_of_textview(text));
+    geText = malloc(sizeof(char) * strlen(get_text_of_textview(user->textview)) + 1);
+    strcpy(geText, get_text_of_textview(user->textview));
     gtk_label_set_text(user->labeltext, geText);
 }
