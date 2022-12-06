@@ -6,7 +6,6 @@
 struct data {
     GtkBuilder *builder;
     GtkWidget *window;
-    GtkLabel *label_test;
     GtkButton *addProjects;
     GtkButton *refresh;
     GtkLabel *labeltext;

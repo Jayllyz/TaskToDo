@@ -1,24 +1,22 @@
-name: "format code"
-on: push
+name: 'clang-format'
+on:
+  - push
 jobs:
-  format:
+  clang-format:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: 'Checkout codebase'
+        uses: actions/checkout@v2
         with:
-          # check out HEAD on the branch
+          fetch-depth: 0
           ref: ${{ github.head_ref }}
-          # make sure the parent commit is grabbed as well, because
-          # that's what will get formatted (i.e. the most recent commit)
-          fetch-depth: 2
-      # format the latest commit
-      - uses: Jayllyz/clang-format-action-1@main
-        # use one of clang-format's supported styles or leave this out to use the style in your .clang-format file
+      - name: 'Run clang-format'
+        uses: solarcaratuva/clang-format-action-1@f24f0b678d96ba34d523d90ed5f07a058c8a05d3
         with:
-          style: .clang-format
-      # commit the changes (if there are any)
-      - name: Commit changes
-        uses: stefanzweifel/git-auto-commit-action@v4.1.2
-        with:
-          commit_message: 🎨 apply clang-format changes
-          branch: ${{ github.head_ref }}
+          commit: 'remotes/origin/master'
+      - name: 'Commit and push changes'
+        run: |
+          sudo git config user.name "GitHub Action"
+          sudo git config user.email "actions@github.com"
+          sudo git add .
+          sudo git commit -m "Apply clang-format changes" && sudo git push || echo "No changes to commit"
