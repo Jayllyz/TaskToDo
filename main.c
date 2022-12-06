@@ -28,9 +28,16 @@ int main(int argc, char *argv[])
     user.addProjects = GTK_BUTTON(gtk_builder_get_object(user.builder, "add_projects"));
     user.refresh = GTK_BUTTON(gtk_builder_get_object(user.builder, "refresh")); //refresh labeltext
     user.textview = GTK_WIDGET(gtk_builder_get_object(user.builder, "test_text"));
+    user.boxC = GTK_BOX(gtk_builder_get_object(user.builder, "boxC"));
+    user.boxV = GTK_BOX(gtk_builder_get_object(user.builder, "boxV"));
+    user.i = 0;
+    
+    for(int j = 0; j<10; j++){
+        user.buttonAddProject[j] = NULL;
+    }
 
     //signals
-    g_signal_connect_swapped(user.addProjects, "clicked", G_CALLBACK(click_projects), user.label_test);
+    g_signal_connect(user.addProjects, "clicked", G_CALLBACK(click_projects), &user);
     g_signal_connect(user.refresh, "clicked", G_CALLBACK(refreshButton), &user);
 
     gtk_builder_connect_signals(user.builder, NULL);

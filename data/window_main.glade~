@@ -1,38 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.22.2 -->
+<!-- Generated with glade 3.38.2 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
-  <object class="GtkTextBuffer" id="textbuffer1">
-    <property name="text" translatable="yes">Placeholder</property>
-  </object>
+  <object class="GtkTextBuffer" id="textbuffer1"/>
   <object class="GtkWindow" id="window_main">
-    <property name="can_focus">False</property>
-    <property name="default_width">1920</property>
-    <property name="default_height">1080</property>
-    <child type="titlebar">
-      <placeholder/>
-    </child>
+    <property name="can-focus">False</property>
+    <property name="resizable">False</property>
+    <property name="default-width">1600</property>
+    <property name="default-height">800</property>
     <child>
-      <object class="GtkBox" id="box1">
+      <object class="GtkBox" id="boxC">
         <property name="visible">True</property>
-        <property name="can_focus">False</property>
+        <property name="can-focus">False</property>
         <child>
-          <object class="GtkBox" id="box2">
+          <object class="GtkBox" id="boxV">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
             <property name="orientation">vertical</property>
             <child>
               <object class="GtkButton" id="add_projects">
                 <property name="label" translatable="yes">button</property>
-                <property name="width_request">200</property>
-                <property name="height_request">75</property>
+                <property name="width-request">200</property>
+                <property name="height-request">75</property>
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="margin_start">30</property>
-                <property name="margin_end">30</property>
-                <property name="margin_top">50</property>
-                <property name="margin_bottom">50</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <property name="margin-start">30</property>
+                <property name="margin-end">30</property>
+                <property name="margin-top">50</property>
+                <property name="margin-bottom">50</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -43,9 +39,9 @@
             <child>
               <object class="GtkLabel" id="test_label">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="margin_top">50</property>
-                <property name="margin_bottom">50</property>
+                <property name="can-focus">False</property>
+                <property name="margin-top">50</property>
+                <property name="margin-bottom">50</property>
                 <property name="label" translatable="yes">Placeholder</property>
               </object>
               <packing>
@@ -57,21 +53,30 @@
             <child>
               <object class="GtkButton" id="finances">
                 <property name="label" translatable="yes">finances</property>
-                <property name="width_request">200</property>
-                <property name="height_request">75</property>
+                <property name="width-request">200</property>
+                <property name="height-request">75</property>
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="margin_start">30</property>
-                <property name="margin_end">30</property>
-                <property name="margin_top">50</property>
-                <property name="margin_bottom">50</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <property name="margin-start">30</property>
+                <property name="margin-end">30</property>
+                <property name="margin-top">50</property>
+                <property name="margin-bottom">50</property>
               </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
                 <property name="position">2</property>
               </packing>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
             </child>
           </object>
           <packing>
@@ -84,8 +89,8 @@
           <object class="GtkButton" id="refresh">
             <property name="label" translatable="yes">refresh label</property>
             <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
+            <property name="can-focus">True</property>
+            <property name="receives-default">True</property>
             <property name="halign">center</property>
             <property name="valign">start</property>
           </object>
@@ -98,12 +103,12 @@
         <child>
           <object class="GtkTextView" id="test_text">
             <property name="visible">True</property>
-            <property name="can_focus">True</property>
+            <property name="can-focus">True</property>
             <property name="valign">start</property>
-            <property name="left_margin">50</property>
-            <property name="right_margin">50</property>
+            <property name="left-margin">50</property>
+            <property name="right-margin">50</property>
             <property name="buffer">textbuffer1</property>
-            <property name="input_purpose">alpha</property>
+            <property name="input-purpose">alpha</property>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -114,7 +119,7 @@
         <child>
           <object class="GtkLabel" id="labeltext">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
             <property name="valign">start</property>
             <property name="label" translatable="yes">label</property>
           </object>

@@ -11,6 +11,10 @@ struct data {
     GtkButton *refresh;
     GtkLabel *labeltext;
     GtkWidget *textview;
+    GtkBox *boxC;
+    GtkBox *boxV;
+    GtkWidget *buttonAddProject[10];
+    int i;
 };
 
 char *get_text_of_textview(GtkWidget *text_view); //recup le contenu d'un "textview"

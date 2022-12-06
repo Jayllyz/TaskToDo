@@ -4,7 +4,16 @@
 
 void click_projects(GtkLabel *label, gpointer data)
 {
-    gtk_label_set_text(label, "Projet ajouté");
+    struct data *user = data;
+    gtk_label_set_text(user->label_test, "Projet ajouté");
+
+    if (user->i != 6){
+        user->buttonAddProject[user->i] = gtk_button_new_with_label ("Projet rajouté");
+        gtk_widget_show(user->buttonAddProject[user->i]);
+
+        gtk_box_pack_start (user->boxV, user->buttonAddProject[user->i], TRUE, TRUE, 0);
+        user->i++;
+    }  
 }
 
 char *get_text_of_textview(GtkWidget *text_view) //recup le contenu d'un "textview"
