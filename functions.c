@@ -12,6 +12,7 @@ void click_projects(GtkLabel *label, gpointer data)
         gtk_widget_show(user->buttonAddProject[user->i]);
 
         gtk_box_pack_start (user->boxV, user->buttonAddProject[user->i], TRUE, TRUE, 0);
+        gtk_box_reorder_child (user->boxV, user->buttonAddProject[user->i], 2);
         user->i++;
     }  
 }
