@@ -30,8 +30,8 @@ int main(int argc, char *argv[])
     user.boxC = GTK_BOX(gtk_builder_get_object(user.builder, "boxC"));
     user.boxV = GTK_BOX(gtk_builder_get_object(user.builder, "boxV"));
     user.i = 0;
-    
-    for(int j = 0; j<10; j++){
+
+    for (int j = 0; j < 10; j++) {
         user.buttonAddProject[j] = NULL;
     }
 
