@@ -6,8 +6,8 @@ void click_projects(GtkLabel *label, gpointer data)
 {
     struct data *user = data;
 
-    if (user->i != 6) {
-        user->buttonAddProject[user->i] = gtk_button_new_with_label("Projet jouté");
+    if (user->i != 6) { //Nombre de projets ajoutable
+        user->buttonAddProject[user->i] = gtk_button_new_with_label("Projet ajouté");
         gtk_widget_show(user->buttonAddProject[user->i]);
 
         gtk_box_pack_start(user->boxV, user->buttonAddProject[user->i], TRUE, TRUE, 0);
@@ -16,21 +16,19 @@ void click_projects(GtkLabel *label, gpointer data)
     }
 }
 
-char *get_text_of_textview(GtkWidget *text_view) //recup le contenu d'un "textview"
+char *get_text_of_entry(GtkWidget *inputEntry) //recup le contenu d'un "textview"
 {
-    GtkTextIter start, end;
-    GtkTextBuffer *buffer = gtk_text_view_get_buffer((GtkTextView *)text_view);
+    GtkEntryBuffer *buffer = gtk_entry_get_buffer((GtkEntry *)inputEntry);
     gchar *text;
-    gtk_text_buffer_get_bounds(buffer, &start, &end);
-    text = gtk_text_buffer_get_text(buffer, &start, &end, FALSE);
+    text = gtk_entry_buffer_get_text(buffer);
     return text;
 }
 
-void refreshButton(GtkWidget *refresh, gpointer data)
+void refreshButton(GtkWidget *outputLabel, gpointer data)
 {
     struct data *user = data;
     char *geText;
-    geText = malloc(sizeof(char) * strlen(get_text_of_textview(user->textview)) + 1);
-    strcpy(geText, get_text_of_textview(user->textview));
-    gtk_label_set_text(user->labeltext, geText);
+    geText = malloc(sizeof(char) * strlen(get_text_of_entry(user->inputEntry)) + 1);
+    strcpy(geText, get_text_of_entry(user->inputEntry));
+    gtk_label_set_text(user->outputLabel, geText);
 }

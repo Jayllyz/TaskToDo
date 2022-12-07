@@ -8,16 +8,18 @@ struct data {
     GtkWidget *window;
     GtkButton *addProjects;
     GtkButton *refresh;
-    GtkLabel *labeltext;
-    GtkWidget *textview;
     GtkBox *boxC;
     GtkBox *boxV;
     GtkWidget *buttonAddProject[10];
+    GtkWidget *windowTest;
     int i;
+
+    GtkWidget *inputEntry;
+    GtkLabel *outputLabel;
 };
 
-char *get_text_of_textview(GtkWidget *text_view); //recup le contenu d'un "textview"
 void click_projects(GtkLabel *label, gpointer data);
-void refreshButton(GtkWidget *refresh, gpointer data);
+void refreshButton(GtkWidget *testLabel2, gpointer data);
+char *get_text_of_entry(GtkWidget *testEntry);
 
 #endif
