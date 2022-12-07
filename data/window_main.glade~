@@ -37,18 +37,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="test_label">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="margin-top">50</property>
-                <property name="margin-bottom">50</property>
-                <property name="label" translatable="yes">Placeholder</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
+              <placeholder/>
             </child>
             <child>
               <object class="GtkButton" id="finances">
@@ -83,7 +72,7 @@
             <property name="can-focus">True</property>
             <property name="receives-default">True</property>
             <property name="halign">center</property>
-            <property name="valign">start</property>
+            <property name="valign">center</property>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -92,32 +81,28 @@
           </packing>
         </child>
         <child>
-          <object class="GtkTextView" id="test_text">
+          <object class="GtkEntry" id="inputEntry">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
-            <property name="valign">start</property>
-            <property name="left-margin">50</property>
-            <property name="right-margin">50</property>
-            <property name="buffer">textbuffer1</property>
-            <property name="input-purpose">alpha</property>
+            <property name="valign">center</property>
+            <property name="input-purpose">digits</property>
           </object>
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="position">2</property>
+            <property name="position">4</property>
           </packing>
         </child>
         <child>
-          <object class="GtkLabel" id="labeltext">
+          <object class="GtkLabel" id="testLabel2">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
-            <property name="valign">start</property>
             <property name="label" translatable="yes">label</property>
           </object>
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="position">3</property>
+            <property name="position">5</property>
           </packing>
         </child>
       </object>
