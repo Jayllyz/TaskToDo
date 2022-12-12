@@ -5,11 +5,11 @@
 
 void bddExist(PGconn *conn, PGresult *res)
 {
-    fprintf(stderr, "%s\n", PQerrorMessage(conn));    
+    fprintf(stderr, "%s\n", PQerrorMessage(conn));
 
     PQclear(res);
-    PQfinish(conn);    
-    
+    PQfinish(conn);
+
     exit(1);
 }
 
@@ -58,4 +58,19 @@ int createTables(PGconn *conn)
     }
 
     PQclear(res);
+
+    FILE *file = fopen("settings/config.txt", "r+");
+    char *line = NULL;
+    size_t len = 0;
+    int i = 0;
+    while ((getline(&line, &len, file)) != -1) {
+        if (i == 1) {
+            fseek(file, -1, SEEK_CUR);
+            fprintf(file, "1");
+            break;
+        }
+        ++i;
+    }
+    fclose(file);
+    return 0;
 }
