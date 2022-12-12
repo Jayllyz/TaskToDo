@@ -35,6 +35,10 @@ void refreshButton(GtkWidget *outputLabel, gpointer data)
 
 int readOneConfigValue(char *propName)
 {
+    if (propName == NULL) {
+        printf("Error: propName is null");
+        return -1;
+    }
     FILE *file = fopen("settings/config.txt", "r");
     if (file == NULL) {
         printf("Error: config file not found");
