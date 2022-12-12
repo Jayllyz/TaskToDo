@@ -42,7 +42,7 @@ int readOneConfigValue(char *propName)
     FILE *file = fopen("settings/config.txt", "r");
     if (file == NULL) {
         printf("Error: config file not found");
-        return 1;
+        return -1;
     }
     char *line = NULL;
     size_t len = 0;
