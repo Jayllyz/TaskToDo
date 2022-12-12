@@ -13,7 +13,9 @@ Description: Main file of our Todo list software
 
 int main(int argc, char *argv[])
 {
-
+    if (readOneConfigValue("init") == 0) {
+        //execute bdd script
+    }
     //Init
     gtk_init(&argc, &argv);
     struct data user;
