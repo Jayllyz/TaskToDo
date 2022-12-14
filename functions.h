@@ -14,6 +14,7 @@ struct data {
     GtkWidget *boxTask[10];
     GtkWidget *task[10];
     int i;
+    int maxTask;
     GtkWidget *inputEntry;
     GtkLabel *outputLabel;
 };

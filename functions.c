@@ -6,16 +6,21 @@ void addTasks(GtkWidget *task, gpointer data)
 {
     struct data *user = data;
 
+    int empty = 0;
     char *getText;
     getText = malloc(sizeof(char) * strlen(get_text_of_entry(user->inputEntry)) + 1);
     strcpy(getText, get_text_of_entry(user->inputEntry));
 
-    if (user->i != 6) { //Nombre de projets ajoutable
+    if (strcmp(getText, "") == 0) {
+        empty = 1;
+    }
+
+    if (user->i != user->maxTask && empty != 1) { //Nombre de projets ajoutable
         user->boxTask[user->i] = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
         gtk_box_pack_start(user->boxV, user->boxTask[user->i], FALSE, FALSE, 0);
         gtk_box_reorder_child(user->boxV, user->boxTask[user->i], user->i + 2);
 
-        user->taskStatus[user->i] = gtk_label_new("Non completé");
+        gtk_button_set_label(GTK_BUTTON(user->taskStatus[user->i]), "Non completé");
         gtk_widget_set_margin_top(user->taskStatus[user->i], 10);
         gtk_widget_set_margin_bottom(user->taskStatus[user->i], 10);
         gtk_widget_set_size_request(user->taskStatus[user->i], 150, -1);
@@ -68,4 +73,20 @@ int readOneConfigValue(char *propName)
         }
     }
     return -1;
+}
+
+void changeStatus(GtkWidget *taskStatus, gpointer data)
+{
+    if (strcmp(gtk_button_get_label(GTK_BUTTON(taskStatus)), "Non completé") == 0) {
+        gtk_button_set_label(GTK_BUTTON(taskStatus), "En cours");
+    }
+    else if (strcmp(gtk_button_get_label(GTK_BUTTON(taskStatus)), "En cours") == 0) {
+        gtk_button_set_label(GTK_BUTTON(taskStatus), "Completé");
+    }
+    else if (strcmp(gtk_button_get_label(GTK_BUTTON(taskStatus)), "Completé") == 0) {
+        gtk_button_set_label(GTK_BUTTON(taskStatus), "Abandonné");
+    }
+    else if (strcmp(gtk_button_get_label(GTK_BUTTON(taskStatus)), "Abandonné") == 0) {
+        gtk_button_set_label(GTK_BUTTON(taskStatus), "Non completé");
+    }
 }
