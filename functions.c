@@ -39,7 +39,6 @@ void addTasks(GtkWidget *task, gpointer data)
         gtk_widget_show(user->task[user->i]);
 
         gtk_entry_set_text(GTK_ENTRY(user->inputEntry), "");
-
         user->i++;
     }
 }
@@ -50,6 +49,15 @@ char *get_text_of_entry(GtkWidget *inputEntry) //recup le contenu d'un "textview
     gchar *text;
     text = gtk_entry_buffer_get_text(buffer);
     return text;
+}
+
+void refreshButton(GtkWidget *outputLabel, gpointer data)
+{
+    struct data *user = data;
+    char *geText;
+    geText = malloc(sizeof(char) * strlen(get_text_of_entry(user->inputEntry)) + 1);
+    strcpy(geText, get_text_of_entry(user->inputEntry));
+    gtk_label_set_text(user->outputLabel, geText);
 }
 
 int readOneConfigValue(char *propName)
@@ -75,6 +83,7 @@ int readOneConfigValue(char *propName)
         }
     }
     return -1;
+
 }
 
 void changeStatus(GtkWidget *taskStatus, gpointer data)
