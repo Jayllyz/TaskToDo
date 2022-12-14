@@ -26,7 +26,9 @@ PGconn *connectBdd()
 int createTables(PGconn *conn)
 {
 
-    PGresult *res = PQexec(conn, "DROP TABLE IF EXISTS Cars");
+    PGresult *res;
+
+    res = PQexec(conn, "SET TIME ZONE 'Europe/Paris'");
 
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
         bddExist(conn, res);
@@ -35,8 +37,8 @@ int createTables(PGconn *conn)
     PQclear(res);
 
     res = PQexec(conn,
-        "CREATE TABLE Cars(Id INTEGER PRIMARY KEY,"
-        "Name VARCHAR(20), Price INT)");
+        "CREATE TABLE IF NOT EXISTS Project(Id UUID PRIMARY KEY,"
+        "Name VARCHAR(20), Description VARCHAR(100), Priority INT, Date TIMESTAMPTZ DEFAULT NOW(), Deadline TIMESTAMPTZ, Color VARCHAR(20) )");
 
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
         bddExist(conn, res);
@@ -44,14 +46,10 @@ int createTables(PGconn *conn)
 
     PQclear(res);
 
-    res = PQexec(conn, "INSERT INTO Cars VALUES(1,'Audi',52642)");
-
-    if (PQresultStatus(res) != PGRES_COMMAND_OK)
-        bddExist(conn, res);
-
-    PQclear(res);
-
-    res = PQexec(conn, "INSERT INTO Cars VALUES(2,'Mercedes',57127)");
+    res = PQexec(conn,
+        "CREATE TABLE IF NOT EXISTS Task(Id UUID PRIMARY KEY,"
+        "Name VARCHAR(20), Description VARCHAR(100), Priority INT, Date TIMESTAMPTZ DEFAULT NOW(), Deadline TIMESTAMPTZ, Status INT NOT NULL DEFAULT 0, ProjectId UUID, "
+        "FOREIGN KEY (ProjectId) REFERENCES Project(id) ON DELETE CASCADE)");
 
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
         bddExist(conn, res);
