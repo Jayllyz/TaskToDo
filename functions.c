@@ -32,3 +32,28 @@ void refreshButton(GtkWidget *outputLabel, gpointer data)
     strcpy(geText, get_text_of_entry(user->inputEntry));
     gtk_label_set_text(user->outputLabel, geText);
 }
+
+int readOneConfigValue(char *propName)
+{
+    if (propName == NULL) {
+        printf("Error: propName is null");
+        return -1;
+    }
+    FILE *file = fopen("settings/config.txt", "r");
+    if (file == NULL) {
+        printf("Error: config file not found");
+        return -1;
+    }
+    char *line = NULL;
+    size_t len = 0;
+    while ((getline(&line, &len, file)) != -1) {
+        if (strstr(line, propName) != NULL) {
+            int i = 0;
+            while (line[i] != ':') {
+                i++;
+            }
+            return atoi(&line[i + 1]);
+        }
+    }
+    return -1;
+}

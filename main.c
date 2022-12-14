@@ -6,17 +6,28 @@ Description: Main file of our Todo list software
 
 #include "functions.c"
 #include "functions.h"
+#include "settings/bdd.c"
 #include <gtk/gtk.h>
+#include <libpq-fe.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 int main(int argc, char *argv[])
 {
-
+    system("clear"); //provisoire c'est jsute pour automatiquement clear le terminal
+    system("sudo service postgresql start"); //provisoire
     //Init
     gtk_init(&argc, &argv);
     struct data user;
+    if (readOneConfigValue("init") == 0) {
+        PGconn *conn = connectBdd();
+        if (conn == NULL) {
+            return EXIT_FAILURE;
+        }
+        createTables(conn);
+        PQfinish(conn);
+    }
 
     user.builder = gtk_builder_new();
     gtk_builder_add_from_file(user.builder, "data/window_main.glade", NULL);
