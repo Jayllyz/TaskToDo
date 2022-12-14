@@ -38,6 +38,8 @@ void addTasks(GtkWidget *task, gpointer data)
         gtk_widget_show(user->taskSeparator[user->i]);
         gtk_widget_show(user->task[user->i]);
 
+        gtk_entry_set_text(GTK_ENTRY(user->inputEntry), "");
+
         user->i++;
     }
 }
