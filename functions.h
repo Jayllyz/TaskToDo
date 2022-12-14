@@ -7,20 +7,19 @@
 struct data {
     GtkBuilder *builder;
     GtkWidget *window;
-    GtkButton *addProjects;
-    GtkButton *refresh;
-    GtkBox *boxC;
+    GtkButton *addTask;
+    GtkWidget *taskStatus[10];
+    GtkWidget *taskSeparator[10];
     GtkBox *boxV;
-    GtkWidget *buttonAddProject[10];
-    GtkWidget *windowTest;
+    GtkWidget *boxTask[10];
+    GtkWidget *task[10];
     int i;
-
+    int maxTask;
     GtkWidget *inputEntry;
     GtkLabel *outputLabel;
 };
 
-void click_projects(GtkLabel *label, gpointer data);
-void refreshButton(GtkWidget *testLabel2, gpointer data);
+void addTasks(GtkWidget *task, gpointer data);
 char *get_text_of_entry(GtkWidget *testEntry);
 int readOneConfigValue(char *propName);
 PGconn *connectBdd();
