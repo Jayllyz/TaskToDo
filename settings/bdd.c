@@ -1,29 +1,74 @@
+#include "../functions.h"
+#include <libpq-fe.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <libpq-fe.h>
 
-void do_exit(PGconn *conn) {
-    
+void bddExist(PGconn *conn, PGresult *res)
+{
+    fprintf(stderr, "%s\n", PQerrorMessage(conn));
+
+    PQclear(res);
     PQfinish(conn);
+
     exit(1);
 }
 
-int main() {
-    
+PGconn *connectBdd()
+{
     PGconn *conn = PQconnectdb("user=projet password=Respons11 dbname=projet-todolist");
-
     if (PQstatus(conn) == CONNECTION_BAD) {
-        
-        fprintf(stderr, "Connection to database failed: %s\n",
-            PQerrorMessage(conn));
-        do_exit(conn);
+
+        return NULL;
+    }
+    return conn;
+}
+
+int createTables(PGconn *conn)
+{
+
+    PGresult *res;
+
+    res = PQexec(conn, "SET TIME ZONE 'Europe/Paris'");
+
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        bddExist(conn, res);
     }
 
-    int ver = PQserverVersion(conn);
+    PQclear(res);
 
-    printf("Server version: %d\n", ver);
-    
-    PQfinish(conn);
+    res = PQexec(conn,
+        "CREATE TABLE IF NOT EXISTS Project(Id UUID PRIMARY KEY,"
+        "Name VARCHAR(20), Description VARCHAR(100), Priority INT, Date TIMESTAMPTZ DEFAULT NOW(), Deadline TIMESTAMPTZ, Color VARCHAR(20) )");
 
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        bddExist(conn, res);
+    }
+
+    PQclear(res);
+
+    res = PQexec(conn,
+        "CREATE TABLE IF NOT EXISTS Task(Id UUID PRIMARY KEY,"
+        "Name VARCHAR(20), Description VARCHAR(100), Priority INT, Date TIMESTAMPTZ DEFAULT NOW(), Deadline TIMESTAMPTZ, Status INT NOT NULL DEFAULT 0, ProjectId UUID, "
+        "FOREIGN KEY (ProjectId) REFERENCES Project(id) ON DELETE CASCADE)");
+
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        bddExist(conn, res);
+    }
+
+    PQclear(res);
+
+    FILE *file = fopen("settings/config.txt", "r+");
+    char *line = NULL;
+    size_t len = 0;
+    int i = 0;
+    while ((getline(&line, &len, file)) != -1) {
+        if (i == 1) {
+            fseek(file, -1, SEEK_CUR);
+            fprintf(file, "1");
+            break;
+        }
+        ++i;
+    }
+    fclose(file);
     return 0;
 }

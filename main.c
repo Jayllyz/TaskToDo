@@ -4,43 +4,59 @@ Date: 24-11-2022
 Description: Main file of our Todo list software
 */
 
+#include "functions.c"
+#include "functions.h"
+#include "settings/bdd.c"
 #include <gtk/gtk.h>
+#include <libpq-fe.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-    //J'ai declare une variable en global, faut surement pas faire mais je sais pas comment envoyer cette
-    //variable en parametre dans la fonction click_projects en appuyant dans le bouton
-    //je verrai surement plus tard
-    GtkLabel *label_test;
+int main(int argc, char *argv[])
+{
+    system("clear"); //provisoire c'est jsute pour automatiquement clear le terminal
+    system("sudo service postgresql start"); //provisoire
+    //Init
+    gtk_init(&argc, &argv);
+    struct data user;
+    if (readOneConfigValue("init") == 0) {
+        PGconn *conn = connectBdd();
+        if (conn == NULL) {
+            return EXIT_FAILURE;
+        }
+        createTables(conn);
+        PQfinish(conn);
+    }
 
-int main(int argc, char *argv[]) {
-   GtkBuilder *builder;
+    user.builder = gtk_builder_new();
+    gtk_builder_add_from_file(user.builder, "data/window_main.glade", NULL);
 
-   gtk_init(&argc, &argv);
+    //Datas
+    user.window = GTK_WIDGET(gtk_builder_get_object(user.builder, "window_main"));
+    user.addTask = GTK_BUTTON(gtk_builder_get_object(user.builder, "addTask"));
+    user.boxV = GTK_BOX(gtk_builder_get_object(user.builder, "boxV"));
+    user.i = 0;
 
-   builder = gtk_builder_new();
-   gtk_builder_add_from_file(builder, "data/window_main.glade", NULL);
+    user.inputEntry = GTK_WIDGET(gtk_builder_get_object(user.builder, "inputEntry"));
+    //signals
 
-    //Variables
-    
-    GtkWidget *window;
-    window = GTK_WIDGET(gtk_builder_get_object(builder, "window_main"));
-    label_test = GTK_LABEL(gtk_builder_get_object(builder, "test_label"));
+    gtk_entry_set_max_length(GTK_ENTRY(user.inputEntry), 20); //limit char input
 
-   gtk_builder_connect_signals(builder, NULL);
+    g_signal_connect(user.addTask, "clicked", G_CALLBACK(addTasks), &user);
 
-   g_object_unref(builder);
+    gtk_builder_connect_signals(user.builder, NULL);
 
-   gtk_widget_show(window);
-   gtk_main();
+    g_object_unref(user.builder);
 
-   return 0;
+    gtk_widget_show(user.window);
+    gtk_main();
+
+    return 0;
 }
 
 // called when window is closed
-void on_window_main_destroy() { gtk_main_quit(); }
-
-void click_projects(){
-    printf("test");
-    gtk_label_set_text(label_test, "Projet ajouté");
+void on_window_main_destroy()
+{
+    gtk_main_quit();
 }
