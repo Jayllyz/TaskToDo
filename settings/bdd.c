@@ -72,3 +72,35 @@ int createTables(PGconn *conn)
     fclose(file);
     return 0;
 }
+
+int insertTask(PGconn *conn, char *name, char *description, int priority, char *deadline, int status, char *projectId)
+{
+    PGresult *res;
+    char *query = malloc(sizeof(char) * 1000);
+    sprintf(query, "INSERT INTO Task (Id, Name, Description, Priority, Deadline, Status, ProjectId) VALUES ('%s','%s', '%s', %d, '%s', %d, '%s')", 'uuid_generate_v4()',
+        name, description, priority, deadline, status, projectId);
+    res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        bddExist(conn, res);
+        return -1;
+    }
+    free(query);
+    PQclear(res);
+    return 0;
+}
+
+int insertProject(PGconn *conn, char *name, char *description, int priority, char *deadline, char *color)
+{
+    PGresult *res;
+    char *query = malloc(sizeof(char) * 1000);
+    sprintf(query, "INSERT INTO Project (Id, Name, Description, Priority, Deadline, Color) VALUES ('%s', %s', '%s', %d, '%s', '%s')", 'uuid_generate_v4()', name,
+        description, priority, deadline, color);
+    res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        bddExist(conn, res);
+        return -1;
+    }
+    free(query);
+    PQclear(res);
+    return 0;
+}

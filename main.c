@@ -20,13 +20,14 @@ int main(int argc, char *argv[])
     //Init
     gtk_init(&argc, &argv);
     struct data user;
+    user.conn = connectBdd();
     if (readOneConfigValue("init") == 0) {
-        PGconn *conn = connectBdd();
-        if (conn == NULL) {
+        user.conn = connectBdd();
+        if (user.conn == NULL) {
             return EXIT_FAILURE;
         }
-        createTables(conn);
-        PQfinish(conn);
+        createTables(user.conn);
+        PQfinish(user.conn);
     }
 
     user.builder = gtk_builder_new();

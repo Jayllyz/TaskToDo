@@ -40,6 +40,11 @@ void addTasks(GtkWidget *task, gpointer data)
 
         gtk_entry_set_text(GTK_ENTRY(user->inputEntry), "");
         user->i++;
+        int queryResult = insertTask(user->conn, getText, "test", 0, "now()", 0, "db1c0f9f-dedb-459e-b267-d56ff06e6714");
+        if (queryResult == -1) {
+            printf("Error: insertTask failed");
+        }
+        //insertTask(PGconn *conn, char *name, char *description, int priority, char *deadline, int status, char *projectId)
     }
 }
 
@@ -83,7 +88,6 @@ int readOneConfigValue(char *propName)
         }
     }
     return -1;
-
 }
 
 void changeStatus(GtkWidget *taskStatus, gpointer data)
