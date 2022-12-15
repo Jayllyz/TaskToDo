@@ -9,7 +9,7 @@
     <property name="default-width">1600</property>
     <property name="default-height">800</property>
     <child>
-      <object class="GtkNotebook">
+      <object class="GtkNotebook" id="project_notebook">
         <property name="visible">True</property>
         <property name="can-focus">True</property>
         <property name="tab-pos">left</property>
