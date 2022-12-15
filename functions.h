@@ -17,6 +17,7 @@ struct data {
     int maxTask;
     GtkWidget *inputEntry;
     GtkLabel *outputLabel;
+    PGconn *conn;
 };
 
 void addTasks(GtkWidget *task, gpointer data);
@@ -25,4 +26,7 @@ int readOneConfigValue(char *propName);
 PGconn *connectBdd();
 int createTables(PGconn *conn);
 void bddExist(PGconn *conn, PGresult *res);
+int insertTask(PGconn *conn, char *name, char *description, int priority, char *deadline, int status, char *projectId);
+int insertProject(PGconn *conn, char *name, char *description, int priority, char *deadline, char *color);
+
 #endif
