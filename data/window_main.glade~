@@ -106,7 +106,7 @@
                 <property name="baseline-position">bottom</property>
                 <child>
                   <object class="GtkButton" id="addTask">
-                    <property name="label" translatable="yes">Ajouté la tâche</property>
+                    <property name="label" translatable="yes">Ajouter la tâche</property>
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="receives-default">True</property>
