@@ -38,9 +38,15 @@ void deleteTask(GtkWidget *taskDelete, gpointer data)
 {
     struct data *user = data;
     GtkWidget *taskToDelete = gtk_widget_get_parent(taskDelete);
+    GList *boxChildren = gtk_container_get_children(GTK_CONTAINER(taskToDelete));
+    GtkWidget *numberToFree = g_list_nth_data(boxChildren, 5);
+    g_list_free(boxChildren);
+
+    int numberToChange = atoi(gtk_button_get_label(GTK_BUTTON(numberToFree)));
+    user->taskNumber[numberToChange] = numberToChange;
 
     gtk_widget_destroy(taskToDelete);
-
+    user->task[numberToChange] = gtk_label_new("");
     user->unusedTaskSpace++;
 }
 
@@ -60,10 +66,15 @@ void addTasks(GtkWidget *task, gpointer data)
     }
 
     for (user->i = 0; user->i < user->maxTask; user->i++) {
-        if (strcmp(gtk_label_get_label(GTK_LABEL(user->task[user->i])), "") == 0) {
+        if (user->taskNumber[user->i] != -1) {
+            user->taskNumber[user->i] = -1;
             break;
         }
     }
+
+    char temp[3];
+    sprintf(temp, "%d", user->taskNumber[0]);
+    gtk_window_set_title(GTK_WINDOW(user->window), temp);
 
     user->boxTask[user->i] = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_box_pack_start(user->boxV, user->boxTask[user->i], FALSE, FALSE, 0);
@@ -74,22 +85,27 @@ void addTasks(GtkWidget *task, gpointer data)
     gtk_widget_set_margin_bottom(user->taskStatus[user->i], 10);
     gtk_widget_set_size_request(user->taskStatus[user->i], 150, -1);
     gtk_box_pack_start(GTK_BOX(user->boxTask[user->i]), user->taskStatus[user->i], FALSE, FALSE, 0);
-    g_signal_connect(user->taskStatus[user->i], "clicked", G_CALLBACK(changeTaskStatus), &user);
+    g_signal_connect(user->taskStatus[user->i], "clicked", G_CALLBACK(changeTaskStatus), user);
 
     user->taskSeparator[user->i] = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
     gtk_widget_set_size_request(user->taskSeparator[user->i], 5, -1);
     gtk_box_pack_start(GTK_BOX(user->boxTask[user->i]), user->taskSeparator[user->i], FALSE, FALSE, 0);
 
-    user->task[user->i] = gtk_label_new(getText);
+    gtk_label_set_text(GTK_LABEL(user->task[user->i]), getText);
     gtk_box_pack_start(GTK_BOX(user->boxTask[user->i]), user->task[user->i], TRUE, FALSE, 0);
 
     user->taskPriority[user->i] = gtk_button_new_with_label("+");
     gtk_box_pack_start(GTK_BOX(user->boxTask[user->i]), user->taskPriority[user->i], FALSE, FALSE, 0);
-    g_signal_connect(user->taskPriority[user->i], "clicked", G_CALLBACK(changeTaskPriority), &user);
+    g_signal_connect(user->taskPriority[user->i], "clicked", G_CALLBACK(changeTaskPriority), user);
 
     user->taskDelete[user->i] = gtk_button_new_with_label("X");
     gtk_box_pack_start(GTK_BOX(user->boxTask[user->i]), user->taskDelete[user->i], FALSE, FALSE, 0);
-    g_signal_connect(user->taskDelete[user->i], "clicked", G_CALLBACK(deleteTask), &user);
+    g_signal_connect(user->taskDelete[user->i], "clicked", G_CALLBACK(deleteTask), user);
+
+    char numberToTransfer[3];
+    sprintf(numberToTransfer, "%d", user->i);
+    user->taskNumberMarker[user->i] = gtk_button_new_with_label(numberToTransfer);
+    gtk_box_pack_start(GTK_BOX(user->boxTask[user->i]), user->taskNumberMarker[user->i], FALSE, FALSE, 0);
 
     gtk_widget_show(user->boxTask[user->i]);
     gtk_widget_show(user->taskStatus[user->i]);
@@ -98,8 +114,8 @@ void addTasks(GtkWidget *task, gpointer data)
     gtk_widget_show(user->taskPriority[user->i]);
     gtk_widget_show(user->taskDelete[user->i]);
 
-    user->unusedTaskSpace--;
     gtk_entry_set_text(GTK_ENTRY(user->inputEntry), "");
+    user->unusedTaskSpace--;
 }
 
 char *get_text_of_entry(GtkWidget *inputEntry) //recup le contenu d'un "textview"

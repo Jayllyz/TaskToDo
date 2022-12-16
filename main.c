@@ -42,6 +42,7 @@ int main(int argc, char *argv[])
     user.inputEntry = GTK_WIDGET(gtk_builder_get_object(user.builder, "inputEntry"));
     for (int i = 0; i < user.maxTask; i++) {
         user.task[i] = gtk_label_new("");
+        user.taskNumber[i] = i;
     }
 
     //signals

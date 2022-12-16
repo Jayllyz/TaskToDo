@@ -15,6 +15,8 @@ struct data {
     GtkWidget *task[10];
     GtkWidget *taskPriority[10];
     GtkWidget *taskDelete[10];
+    int taskNumber[10];
+    GtkWidget *taskNumberMarker[10];
     int i;
     int maxTask;
     GtkWidget *inputEntry;
@@ -25,6 +27,8 @@ void addTasks(GtkWidget *task, gpointer data);
 char *get_text_of_entry(GtkWidget *testEntry);
 int readOneConfigValue(char *propName);
 void changeTaskStatus(GtkWidget *taskStatus, gpointer data);
+void changeTaskPriority(GtkWidget *taskPriority, gpointer data);
+void deleteTask(GtkWidget *taskDelete, gpointer data);
 PGconn *connectBdd();
 int createTables(PGconn *conn);
 void bddExist(PGconn *conn, PGresult *res);
