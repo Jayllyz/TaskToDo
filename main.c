@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     user.boxV = GTK_BOX(gtk_builder_get_object(user.builder, "boxV"));
     user.i = 0;
     user.inputEntry = GTK_WIDGET(gtk_builder_get_object(user.builder, "inputEntry"));
-    user.notebook = GTK_WIDGET(gtk_builder_get_object(user.builder, "project_notebook"));
+    user.notebook = GTK_NOTEBOOK(gtk_builder_get_object(user.builder, "project_notebook"));
     for (int i = 0; i < user.maxTask; i++) {
         user.taskStatus[i] = gtk_button_new();
     }

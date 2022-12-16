@@ -106,11 +106,11 @@ int insertProject(PGconn *conn, char *name, char *description, int priority, cha
     return 0;
 }
 
-int getId(PGconn *conn, int pos)
+int getProjectId(PGconn *conn, const gchar *name)
 {
     PGresult *res;
     char *query = malloc(sizeof(char) * 1000);
-    sprintf(query, "SELECT id FROM Project WHERE id = %d", pos);
+    sprintf(query, "SELECT id FROM Project WHERE name = '%s'", name);
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
         printf("No data retrieved\n");
@@ -120,7 +120,6 @@ int getId(PGconn *conn, int pos)
     int rows = PQntuples(res);
 
     for (int i = 0; i < rows; i++) {
-
         int id = atoi(PQgetvalue(res, i, 0));
         free(query);
         PQclear(res);
