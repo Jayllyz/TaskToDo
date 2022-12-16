@@ -37,8 +37,8 @@ int createTables(PGconn *conn)
     PQclear(res);
 
     res = PQexec(conn,
-        "CREATE TABLE IF NOT EXISTS Project(Id SERIAL PRIMARY KEY,"
-        "Name VARCHAR(20), Description VARCHAR(100), Priority INT, Date TIMESTAMPTZ DEFAULT NOW(), Deadline TIMESTAMPTZ, Color VARCHAR(20) )");
+        "CREATE TABLE IF NOT EXISTS Project(Id SERIAL,"
+        "Name VARCHAR(20), Description VARCHAR(100), Priority INT, Date TIMESTAMPTZ DEFAULT NOW(), Deadline TIMESTAMPTZ, Color VARCHAR(20), PRIMARY KEY (Id, Name) )");
 
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
         bddExist(conn, res);
