@@ -72,10 +72,6 @@ void addTasks(GtkWidget *task, gpointer data)
         }
     }
 
-    char temp[3];
-    sprintf(temp, "%d", user->taskNumber[0]);
-    gtk_window_set_title(GTK_WINDOW(user->window), temp);
-
     user->boxTask[user->i] = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_box_pack_start(user->boxV, user->boxTask[user->i], FALSE, FALSE, 0);
     gtk_box_reorder_child(user->boxV, user->boxTask[user->i], user->maxTask - user->unusedTaskSpace + 2);
