@@ -40,10 +40,20 @@ void deleteTask(GtkWidget *taskDelete, gpointer data)
     GtkWidget *taskToDelete = gtk_widget_get_parent(taskDelete);
     GList *boxChildren = gtk_container_get_children(GTK_CONTAINER(taskToDelete));
     GtkWidget *numberToFree = g_list_nth_data(boxChildren, 5);
+    GtkWidget *labelOfTask = g_list_nth_data(boxChildren, 2);
     g_list_free(boxChildren);
 
     int numberToChange = atoi(gtk_button_get_label(GTK_BUTTON(numberToFree)));
     user->taskNumber[numberToChange] = numberToChange;
+
+    const gchar *nameOfTask = gtk_label_get_text(GTK_LABEL(labelOfTask));
+
+    int queryResult = deleteTaskDB(user->conn, nameOfTask);
+
+    if (queryResult == -1) {
+        g_print("Error: insertTask failed");
+        return;
+    }
 
     gtk_widget_destroy(taskToDelete);
     user->task[numberToChange] = gtk_label_new("");
@@ -116,7 +126,15 @@ void addTasks(GtkWidget *task, gpointer data)
     int currentPos = gtk_notebook_get_current_page(user->notebook); //recupere la position de l'onglet actif
     GtkWidget *child = gtk_notebook_get_nth_page(user->notebook, currentPos); //recupere le widget de l'onglet actif
     const gchar *name = gtk_notebook_get_tab_label_text(user->notebook, child); //recupere le nom de l'onglet actif
-    int queryResult = insertTask(user->conn, getText, "test", 0, "now()", 0, name);
+    int queryResult = insertTask(user->conn, getText, "test", 0, "now()", 0, name); //insert in db
+
+    if (taskExist(user->conn, getText, name) == 1) {
+        GtkDialog *dialog = GTK_DIALOG(gtk_message_dialog_new(GTK_WINDOW(user->window), GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "Cette tâche existe déjà"));
+        gtk_dialog_run(dialog);
+        gtk_widget_destroy(GTK_WIDGET(dialog));
+        return;
+    }
+
     if (queryResult == -1) {
         printf("Error: insertTask failed");
     }
@@ -155,18 +173,21 @@ int readOneConfigValue(char *propName)
     return -1;
 }
 
-void changeStatus(GtkWidget *taskStatus, gpointer data)
+int taskExist(PGconn *conn, char *input, const gchar *ProjectName)
 {
-    if (strcmp(gtk_button_get_label(GTK_BUTTON(taskStatus)), "Non completé") == 0) {
-        gtk_button_set_label(GTK_BUTTON(taskStatus), "En cours");
+    int size = strlen("SELECT Name FROM task WHERE ProjectName = ''") + strlen(ProjectName) + 1;
+    char *query = malloc(size * sizeof(char));
+    sprintf(query, "SELECT Name FROM task WHERE ProjectName = '%s'", ProjectName);
+    PGresult *res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        printf("Error: taskExist failed");
+        return -1;
     }
-    else if (strcmp(gtk_button_get_label(GTK_BUTTON(taskStatus)), "En cours") == 0) {
-        gtk_button_set_label(GTK_BUTTON(taskStatus), "Completé");
+    int nbTuples = PQntuples(res);
+    for (int i = 0; i < nbTuples; i++) {
+        if (strcmp(PQgetvalue(res, i, 0), input) == 0) {
+            return 1; //Une tache avec le meme nom existe deja dans le projet
+        }
     }
-    else if (strcmp(gtk_button_get_label(GTK_BUTTON(taskStatus)), "Completé") == 0) {
-        gtk_button_set_label(GTK_BUTTON(taskStatus), "Abandonné");
-    }
-    else if (strcmp(gtk_button_get_label(GTK_BUTTON(taskStatus)), "Abandonné") == 0) {
-        gtk_button_set_label(GTK_BUTTON(taskStatus), "Non completé");
-    }
+    return 0;
 }
