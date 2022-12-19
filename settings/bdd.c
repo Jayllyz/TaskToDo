@@ -37,8 +37,9 @@ int createTables(PGconn *conn)
     PQclear(res);
 
     res = PQexec(conn,
-        "CREATE TABLE IF NOT EXISTS Project(Id SERIAL,"
-        "Name VARCHAR(20), Description VARCHAR(100), Priority INT, Date TIMESTAMPTZ DEFAULT NOW(), Deadline TIMESTAMPTZ, Color VARCHAR(20), PRIMARY KEY (Id, Name) )");
+        "CREATE TABLE IF NOT EXISTS Project(Name VARCHAR(20) PRIMARY KEY, Description VARCHAR(100), Priority INT, Date TIMESTAMPTZ DEFAULT NOW(), Deadline TIMESTAMPTZ, "
+        "Color "
+        "VARCHAR(20), )");
 
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
         bddExist(conn, res);
@@ -47,10 +48,10 @@ int createTables(PGconn *conn)
     PQclear(res);
 
     res = PQexec(conn,
-        "CREATE TABLE IF NOT EXISTS Task(Id SERIAL PRIMARY KEY,"
-        "Name VARCHAR(20), Description VARCHAR(100), Priority INT, Date TIMESTAMPTZ DEFAULT NOW(), Deadline TIMESTAMPTZ, Status INT NOT NULL DEFAULT 0, ProjectId "
-        "SERIAL, "
-        "FOREIGN KEY (ProjectId) REFERENCES Project(id) ON DELETE CASCADE)");
+        "CREATE TABLE IF NOT EXISTS Task(Name VARCHAR(20) PRIMARY KEY, Description VARCHAR(100), Priority INT, Date TIMESTAMPTZ DEFAULT NOW(), Deadline TIMESTAMPTZ, "
+        "Status INT NOT NULL DEFAULT 0, ProjectName "
+        "VARCHAR(20), "
+        "FOREIGN KEY (ProjectName) REFERENCES Project(Name) ON DELETE CASCADE)");
 
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
         bddExist(conn, res);
@@ -104,25 +105,4 @@ int insertProject(PGconn *conn, char *name, char *description, int priority, cha
     free(query);
     PQclear(res);
     return 0;
-}
-
-int getProjectId(PGconn *conn, const gchar *name)
-{
-    PGresult *res;
-    char *query = malloc(sizeof(char) * 1000);
-    sprintf(query, "SELECT id FROM Project WHERE name = '%s'", name);
-    res = PQexec(conn, query);
-    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
-        printf("No data retrieved\n");
-        PQclear(res);
-        return -1;
-    }
-    int rows = PQntuples(res);
-
-    for (int i = 0; i < rows; i++) {
-        int id = atoi(PQgetvalue(res, i, 0));
-        free(query);
-        PQclear(res);
-        return id;
-    }
 }

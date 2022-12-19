@@ -29,6 +29,5 @@ int createTables(PGconn *conn);
 void bddExist(PGconn *conn, PGresult *res);
 int insertTask(PGconn *conn, char *name, char *description, int priority, char *deadline, int status, int projectId);
 int insertProject(PGconn *conn, char *name, char *description, int priority, char *deadline, char *color);
-int getProjectId(PGconn *conn, const gchar *name);
 
 #endif

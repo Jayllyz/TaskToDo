@@ -42,9 +42,8 @@ void addTasks(GtkWidget *task, gpointer data)
         user->i++;
         int currentPos = gtk_notebook_get_current_page(user->notebook); //recupere la position de l'onglet actif
         GtkWidget *child = gtk_notebook_get_nth_page(user->notebook, currentPos); //recupere le widget de l'onglet actif
-        const gchar *taskName = gtk_notebook_get_tab_label_text(user->notebook, child); //recupere le nom de l'onglet actif
-        int id = getProjectId(user->conn, taskName); //recupere l'id du projet qui a le nom de l'onglet actif
-        int queryResult = insertTask(user->conn, getText, "test", 0, "now()", 0, id);
+        const gchar *name = gtk_notebook_get_tab_label_text(user->notebook, child); //recupere le nom de l'onglet actif
+        int queryResult = insertTask(user->conn, getText, "test", 0, "now()", 0, name);
         if (queryResult == -1) {
             printf("Error: insertTask failed");
         }
