@@ -16,17 +16,18 @@ Description: Main file of our Todo list software
 int main(int argc, char *argv[])
 {
     system("clear"); //provisoire c'est jsute pour automatiquement clear le terminal
-    //system("sudo service postgresql start"); //provisoire
+    system("sudo service postgresql start"); //provisoire
     //Init
     gtk_init(&argc, &argv);
     struct data user;
+    user.conn = connectBdd();
     if (readOneConfigValue("init") == 0) {
-        PGconn *conn = connectBdd();
-        if (conn == NULL) {
+        user.conn = connectBdd();
+        if (user.conn == NULL) {
             return EXIT_FAILURE;
         }
-        createTables(conn);
-        PQfinish(conn);
+        createTables(user.conn);
+        PQfinish(user.conn);
     }
 
     user.builder = gtk_builder_new();
@@ -40,6 +41,8 @@ int main(int argc, char *argv[])
     user.boxV = GTK_BOX(gtk_builder_get_object(user.builder, "boxV"));
     user.i = 0;
     user.inputEntry = GTK_WIDGET(gtk_builder_get_object(user.builder, "inputEntry"));
+    user.notebook = GTK_NOTEBOOK(gtk_builder_get_object(user.builder, "project_notebook"));
+    user.repopulated = 0;
     for (int i = 0; i < user.maxTask; i++) {
         user.task[i] = gtk_label_new("");
         user.taskNumber[i] = i;
@@ -48,12 +51,17 @@ int main(int argc, char *argv[])
     //signals
     gtk_entry_set_max_length(GTK_ENTRY(user.inputEntry), 35); //limit char input
 
-    g_signal_connect(user.addTask, "clicked", G_CALLBACK(addTasks), &user);
-    for (int i = 0; i < user.maxTask; i++) {
-        // g_signal_connect(user.taskStatus[i], "clicked", G_CALLBACK(changeTaskStatus), &user);
-        // g_signal_connect(user.taskPriority[i], "clicked", G_CALLBACK(changeTaskPriority), &user);
-        // g_signal_connect(user.taskDelete[i], "clicked", G_CALLBACK(deleteTask), &user);
+    int queryResult = allTask(user.conn);
+    if (queryResult == -1) {
+        printf("Error: can't collect all tasks");
     }
+    for (int i = 0; i < queryResult; i++) {
+        addTasks(GTK_WIDGET(user.addTask), &user, i);
+    }
+    user.repopulated = 1;
+
+    g_signal_connect(user.addTask, "clicked", G_CALLBACK(addTasks), &user);
+
     gtk_builder_connect_signals(user.builder, NULL);
 
     g_object_unref(user.builder);
