@@ -56,8 +56,7 @@ int main(int argc, char *argv[])
         printf("Error: can't collect all tasks");
     }
     for (int i = 0; i < queryResult; i++) {
-        const gchar *taskName = selectTask(user.conn, i);
-        addTasks(GTK_WIDGET(user.addTask), &user, taskName);
+        addTasks(GTK_WIDGET(user.addTask), &user, i);
     }
     user.repopulated = 1;
 
