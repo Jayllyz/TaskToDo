@@ -87,16 +87,16 @@ void addTasks(GtkWidget *task, gpointer data)
     gtk_widget_set_size_request(user->taskSeparator[user->i], 5, -1);
     gtk_box_pack_start(GTK_BOX(user->boxTask[user->i]), user->taskSeparator[user->i], FALSE, FALSE, 0);
 
-        gtk_entry_set_text(GTK_ENTRY(user->inputEntry), "");
-        user->i++;
-        int currentPos = gtk_notebook_get_current_page(user->notebook); //recupere la position de l'onglet actif
-        GtkWidget *child = gtk_notebook_get_nth_page(user->notebook, currentPos); //recupere le widget de l'onglet actif
-        const gchar *name = gtk_notebook_get_tab_label_text(user->notebook, child); //recupere le nom de l'onglet actif
-        int queryResult = insertTask(user->conn, getText, "test", 0, "now()", 0, name);
-        if (queryResult == -1) {
-            printf("Error: insertTask failed");
-        }
+    gtk_entry_set_text(GTK_ENTRY(user->inputEntry), "");
+    user->i++;
+    int currentPos = gtk_notebook_get_current_page(user->notebook); //recupere la position de l'onglet actif
+    GtkWidget *child = gtk_notebook_get_nth_page(user->notebook, currentPos); //recupere le widget de l'onglet actif
+    const gchar *name = gtk_notebook_get_tab_label_text(user->notebook, child); //recupere le nom de l'onglet actif
+    int queryResult = insertTask(user->conn, getText, "test", 0, "now()", 0, name);
+    if (queryResult == -1) {
+        printf("Error: insertTask failed");
     }
+
     gtk_label_set_text(GTK_LABEL(user->task[user->i]), getText);
     gtk_box_pack_start(GTK_BOX(user->boxTask[user->i]), user->task[user->i], TRUE, FALSE, 0);
 

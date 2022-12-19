@@ -16,7 +16,7 @@ Description: Main file of our Todo list software
 int main(int argc, char *argv[])
 {
     system("clear"); //provisoire c'est jsute pour automatiquement clear le terminal
-    //system("sudo service postgresql start"); //provisoire
+    system("sudo service postgresql start"); //provisoire
     //Init
     gtk_init(&argc, &argv);
     struct data user;
