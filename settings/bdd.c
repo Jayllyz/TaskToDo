@@ -143,7 +143,7 @@ char *selectTask(PGconn *conn, int row)
 {
     PGresult *res;
     char *query = malloc(sizeof(char) * 1000);
-    sprintf(query, "SELECT * FROM Task LIMIT 1 OFFSET %d", row);
+    sprintf(query, "SELECT name FROM Task ORDER BY date LIMIT 1 OFFSET %d", row);
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
         return "Error: Can't get the task";
@@ -155,4 +155,70 @@ char *selectTask(PGconn *conn, int row)
     PQclear(res);
 
     return name;
+}
+
+char *selectDescription(PGconn *conn, const gchar *name)
+{
+    PGresult *res;
+    char *query = malloc(sizeof(char) * 1000);
+    sprintf(query, "SELECT description FROM Task WHERE name = '%s'", name);
+    res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        return "Error: Can't get the task";
+    }
+
+    char *description = PQgetvalue(res, 0, 0);
+
+    free(query);
+    PQclear(res);
+
+    return description;
+}
+
+int selectPriority(PGconn *conn, const gchar *name)
+{
+    PGresult *res;
+    char *query = malloc(sizeof(char) * 1000);
+    sprintf(query, "SELECT priority FROM Task WHERE name = '%s'", name);
+    res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        return -1;
+    }
+
+    int priority = atoi(PQgetvalue(res, 0, 0));
+
+    free(query);
+    PQclear(res);
+
+    return priority;
+}
+
+int updateDescription(PGconn *conn, const gchar *description, const gchar *name)
+{
+    PGresult *res;
+    char *query = malloc(sizeof(char) * 1000);
+    sprintf(query, "UPDATE Task SET description = '%s' WHERE name = '%s'", description, name);
+    res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        bddExist(conn, res);
+        return -1;
+    }
+    free(query);
+    PQclear(res);
+    return 0;
+}
+
+int updatePriority(PGconn *conn, int priority, const gchar *name)
+{
+    PGresult *res;
+    char *query = malloc(sizeof(char) * 1000);
+    sprintf(query, "UPDATE Task SET priority = '%d' WHERE name = '%s'", priority, name);
+    res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        bddExist(conn, res);
+        return -1;
+    }
+    free(query);
+    PQclear(res);
+    return 0;
 }

@@ -20,17 +20,101 @@ void changeTaskStatus(GtkWidget *taskStatus, gpointer data)
 
 void changeTaskPriority(GtkWidget *taskPriority, gpointer data)
 {
-    if (strcmp(gtk_button_get_label(GTK_BUTTON(taskPriority)), "+") == 0) {
-        gtk_button_set_label(GTK_BUTTON(taskPriority), "++");
+    if (strcmp(gtk_button_get_label(GTK_BUTTON(taskPriority)), "Mineure") == 0) {
+        gtk_button_set_label(GTK_BUTTON(taskPriority), "Normale");
     }
-    else if (strcmp(gtk_button_get_label(GTK_BUTTON(taskPriority)), "++") == 0) {
-        gtk_button_set_label(GTK_BUTTON(taskPriority), "!");
+    else if (strcmp(gtk_button_get_label(GTK_BUTTON(taskPriority)), "Normale") == 0) {
+        gtk_button_set_label(GTK_BUTTON(taskPriority), "Importante");
     }
-    else if (strcmp(gtk_button_get_label(GTK_BUTTON(taskPriority)), "!") == 0) {
-        gtk_button_set_label(GTK_BUTTON(taskPriority), "-");
+    else if (strcmp(gtk_button_get_label(GTK_BUTTON(taskPriority)), "Importante") == 0) {
+        gtk_button_set_label(GTK_BUTTON(taskPriority), "Urgente");
     }
-    else if (strcmp(gtk_button_get_label(GTK_BUTTON(taskPriority)), "-") == 0) {
-        gtk_button_set_label(GTK_BUTTON(taskPriority), "+");
+    else if (strcmp(gtk_button_get_label(GTK_BUTTON(taskPriority)), "Urgente") == 0) {
+        gtk_button_set_label(GTK_BUTTON(taskPriority), "Mineure");
+    }
+}
+
+void editTaskWindow(GtkWidget *taskEdit, gpointer data)
+{
+    PGconn *conn = connectBdd();
+
+    GtkWidget *parent = gtk_widget_get_parent(taskEdit);
+    GList *children = gtk_container_get_children(GTK_CONTAINER(parent));
+    GtkWidget *taskWidget = g_list_nth_data(children, 2);
+    const gchar *taskName = gtk_label_get_text(GTK_LABEL(taskWidget));
+
+    GtkWidget *editWindow = gtk_dialog_new_with_buttons(taskName, NULL, GTK_DIALOG_MODAL, "Confirmer", GTK_RESPONSE_OK, "Annuler", GTK_RESPONSE_CANCEL, NULL);
+    GtkWidget *descriptionLabel = gtk_label_new("Description de la tâche");
+    GtkWidget *descriptionEntry = gtk_entry_new();
+    gtk_widget_set_size_request(descriptionEntry, 200, 50);
+
+    GtkWidget *priorityButton = gtk_button_new();
+    int priority = selectPriority(conn, taskName);
+
+    if (priority == 0) {
+        gtk_button_set_label(GTK_BUTTON(priorityButton), "Mineure");
+    }
+    else if (priority == 1) {
+        gtk_button_set_label(GTK_BUTTON(priorityButton), "Normale");
+    }
+    else if (priority == 2) {
+        gtk_button_set_label(GTK_BUTTON(priorityButton), "Importante");
+    }
+    else if (priority == 3) {
+        gtk_button_set_label(GTK_BUTTON(priorityButton), "Urgente");
+    }
+    else {
+        gtk_button_set_label(GTK_BUTTON(priorityButton), "Erreur");
+    }
+    g_signal_connect(priorityButton, "clicked", G_CALLBACK(changeTaskPriority), descriptionEntry);
+
+    gtk_entry_set_text(GTK_ENTRY(descriptionEntry), selectDescription(conn, taskName));
+
+    gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(editWindow))), descriptionLabel);
+    gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(editWindow))), descriptionEntry);
+    gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(editWindow))), priorityButton);
+    gtk_widget_show_all(editWindow);
+
+    g_signal_connect(editWindow, "response", G_CALLBACK(editTaskDB), descriptionEntry);
+}
+
+void editTaskDB(GtkDialog *window, gint clicked, gpointer entry)
+{
+    if (clicked == GTK_RESPONSE_OK) {
+        PGconn *conn = connectBdd();
+        GtkWidget *input = GTK_WIDGET(entry);
+        const gchar *text = gtk_entry_get_text(GTK_ENTRY(input));
+        const gchar *taskName = gtk_window_get_title(GTK_WINDOW(window));
+        int queryResult;
+
+        GtkWidget *parent = gtk_widget_get_parent(GTK_WIDGET(entry));
+        GList *children = gtk_container_get_children(GTK_CONTAINER(parent));
+        GtkWidget *priorityButton = g_list_nth_data(children, 2);
+        const gchar *setPriority = gtk_button_get_label(GTK_BUTTON(priorityButton));
+
+        queryResult = updateDescription(conn, text, taskName);
+        if (queryResult != 0) {
+            g_print("Erreur de la modification de la base");
+        }
+
+        if (strcmp(setPriority, "Mineure") == 0) {
+            queryResult = updatePriority(conn, 0, taskName);
+        }
+        else if (strcmp(setPriority, "Normale") == 0) {
+            queryResult = updatePriority(conn, 1, taskName);
+        }
+        else if (strcmp(setPriority, "Importante") == 0) {
+            queryResult = updatePriority(conn, 2, taskName);
+        }
+        else if (strcmp(setPriority, "Urgente") == 0) {
+            queryResult = updatePriority(conn, 3, taskName);
+        }
+
+        if (queryResult != 0) {
+            g_print("Erreur de la modification de la base");
+        }
+
+        gtk_widget_destroy(GTK_WIDGET(window));
     }
 }
 
@@ -47,15 +131,11 @@ void deleteTask(GtkWidget *taskDelete, gpointer data)
     user->taskNumber[numberToChange] = numberToChange;
 
     const gchar *nameOfTask = gtk_label_get_text(GTK_LABEL(labelOfTask));
-
     int queryResult = deleteTaskDB(user->conn, nameOfTask);
 
     if (queryResult == -1) {
         g_print("Error: insertTask failed");
         return;
-    }
-    else {
-        g_print("%d", queryResult);
     }
 
     gtk_widget_destroy(taskToDelete);
@@ -63,7 +143,7 @@ void deleteTask(GtkWidget *taskDelete, gpointer data)
     user->unusedTaskSpace++;
 }
 
-void addTasks(GtkWidget *task, gpointer data, const gchar *presentTask)
+void addTasks(GtkWidget *task, gpointer data, int presentTask)
 {
     struct data *user = data;
     char *getText;
@@ -84,6 +164,7 @@ void addTasks(GtkWidget *task, gpointer data, const gchar *presentTask)
             break;
         }
     }
+
     int currentPos = gtk_notebook_get_current_page(user->notebook); //recupere la position de l'onglet actif
     GtkWidget *child = gtk_notebook_get_nth_page(user->notebook, currentPos); //recupere le widget de l'onglet actif
     const gchar *name = gtk_notebook_get_tab_label_text(user->notebook, child); //recupere le nom de l'onglet actif
@@ -111,16 +192,16 @@ void addTasks(GtkWidget *task, gpointer data, const gchar *presentTask)
     gtk_box_pack_start(GTK_BOX(user->boxTask[user->i]), user->taskSeparator[user->i], FALSE, FALSE, 0);
 
     if (user->repopulated == 0) {
-        gtk_label_set_text(GTK_LABEL(user->task[user->i]), presentTask);
+        gtk_label_set_text(GTK_LABEL(user->task[user->i]), selectTask(user->conn, presentTask));
     }
     else {
         gtk_label_set_text(GTK_LABEL(user->task[user->i]), getText);
     }
     gtk_box_pack_start(GTK_BOX(user->boxTask[user->i]), user->task[user->i], TRUE, FALSE, 0);
 
-    user->taskPriority[user->i] = gtk_button_new_with_label("+");
-    gtk_box_pack_start(GTK_BOX(user->boxTask[user->i]), user->taskPriority[user->i], FALSE, FALSE, 0);
-    g_signal_connect(user->taskPriority[user->i], "clicked", G_CALLBACK(changeTaskPriority), user);
+    user->taskEdit[user->i] = gtk_button_new_with_label("Editer");
+    gtk_box_pack_start(GTK_BOX(user->boxTask[user->i]), user->taskEdit[user->i], FALSE, FALSE, 0);
+    g_signal_connect(user->taskEdit[user->i], "clicked", G_CALLBACK(editTaskWindow), user);
 
     user->taskDelete[user->i] = gtk_button_new_with_label("X");
     gtk_box_pack_start(GTK_BOX(user->boxTask[user->i]), user->taskDelete[user->i], FALSE, FALSE, 0);
@@ -135,14 +216,14 @@ void addTasks(GtkWidget *task, gpointer data, const gchar *presentTask)
     gtk_widget_show(user->taskStatus[user->i]);
     gtk_widget_show(user->taskSeparator[user->i]);
     gtk_widget_show(user->task[user->i]);
-    gtk_widget_show(user->taskPriority[user->i]);
+    gtk_widget_show(user->taskEdit[user->i]);
     gtk_widget_show(user->taskDelete[user->i]);
 
     gtk_entry_set_text(GTK_ENTRY(user->inputEntry), "");
     user->unusedTaskSpace--;
 
     if (user->repopulated == 1) {
-        int queryResult = insertTask(user->conn, getText, "test", 0, "now()", 0, name); //insert in db
+        int queryResult = insertTask(user->conn, getText, "", 1, "now()", 0, name); //insert in db
         if (queryResult == -1) {
             printf("Error: insertTask failed");
         }
