@@ -51,11 +51,7 @@ int main(int argc, char *argv[])
     gtk_entry_set_max_length(GTK_ENTRY(user.inputEntry), 35); //limit char input
 
     g_signal_connect(user.addTask, "clicked", G_CALLBACK(addTasks), &user);
-    for (int i = 0; i < user.maxTask; i++) {
-        // g_signal_connect(user.taskStatus[i], "clicked", G_CALLBACK(changeTaskStatus), &user);
-        // g_signal_connect(user.taskPriority[i], "clicked", G_CALLBACK(changeTaskPriority), &user);
-        // g_signal_connect(user.taskDelete[i], "clicked", G_CALLBACK(deleteTask), &user);
-    }
+
     gtk_builder_connect_signals(user.builder, NULL);
 
     g_object_unref(user.builder);
