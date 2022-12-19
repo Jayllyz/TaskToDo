@@ -42,6 +42,7 @@ int main(int argc, char *argv[])
     user.i = 0;
     user.inputEntry = GTK_WIDGET(gtk_builder_get_object(user.builder, "inputEntry"));
     user.notebook = GTK_NOTEBOOK(gtk_builder_get_object(user.builder, "project_notebook"));
+    user.repopulated = 0;
     for (int i = 0; i < user.maxTask; i++) {
         user.task[i] = gtk_label_new("");
         user.taskNumber[i] = i;
@@ -49,6 +50,16 @@ int main(int argc, char *argv[])
 
     //signals
     gtk_entry_set_max_length(GTK_ENTRY(user.inputEntry), 35); //limit char input
+
+    int queryResult = allTask(user.conn);
+    if (queryResult == -1) {
+        printf("Error: can't collect all tasks");
+    }
+    for (int i = 0; i < queryResult; i++) {
+        const gchar *taskName = selectTask(user.conn, i);
+        addTasks(GTK_WIDGET(user.addTask), &user, taskName);
+    }
+    user.repopulated = 1;
 
     g_signal_connect(user.addTask, "clicked", G_CALLBACK(addTasks), &user);
 
