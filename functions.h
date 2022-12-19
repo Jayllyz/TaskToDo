@@ -20,6 +20,9 @@ struct data {
     int i;
     int maxTask;
     GtkWidget *inputEntry;
+    GtkLabel *outputLabel;
+    PGconn *conn;
+    GtkNotebook *notebook;
     int unusedTaskSpace;
 };
 
@@ -32,4 +35,7 @@ void deleteTask(GtkWidget *taskDelete, gpointer data);
 PGconn *connectBdd();
 int createTables(PGconn *conn);
 void bddExist(PGconn *conn, PGresult *res);
+int insertTask(PGconn *conn, char *name, char *description, int priority, char *deadline, int status, const gchar *projectName);
+int insertProject(PGconn *conn, char *name, char *description, int priority, char *deadline, char *color);
+
 #endif

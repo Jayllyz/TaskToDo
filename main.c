@@ -20,13 +20,14 @@ int main(int argc, char *argv[])
     //Init
     gtk_init(&argc, &argv);
     struct data user;
+    user.conn = connectBdd();
     if (readOneConfigValue("init") == 0) {
-        PGconn *conn = connectBdd();
-        if (conn == NULL) {
+        user.conn = connectBdd();
+        if (user.conn == NULL) {
             return EXIT_FAILURE;
         }
-        createTables(conn);
-        PQfinish(conn);
+        createTables(user.conn);
+        PQfinish(user.conn);
     }
 
     user.builder = gtk_builder_new();
@@ -40,6 +41,7 @@ int main(int argc, char *argv[])
     user.boxV = GTK_BOX(gtk_builder_get_object(user.builder, "boxV"));
     user.i = 0;
     user.inputEntry = GTK_WIDGET(gtk_builder_get_object(user.builder, "inputEntry"));
+    user.notebook = GTK_NOTEBOOK(gtk_builder_get_object(user.builder, "project_notebook"));
     for (int i = 0; i < user.maxTask; i++) {
         user.task[i] = gtk_label_new("");
         user.taskNumber[i] = i;
