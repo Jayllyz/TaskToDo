@@ -24,9 +24,10 @@ struct data {
     PGconn *conn;
     GtkNotebook *notebook;
     int unusedTaskSpace;
+    int repopulated;
 };
 
-void addTasks(GtkWidget *task, gpointer data);
+void addTasks(GtkWidget *task, gpointer data, const gchar *presentTask);
 char *get_text_of_entry(GtkWidget *testEntry);
 int readOneConfigValue(char *propName);
 void changeTaskStatus(GtkWidget *taskStatus, gpointer data);
@@ -39,5 +40,6 @@ int insertTask(PGconn *conn, char *name, char *description, int priority, char *
 int insertProject(PGconn *conn, char *name, char *description, int priority, char *deadline, char *color);
 int deleteTaskDB(PGconn *conn, const gchar *name);
 int taskExist(PGconn *conn, char *input, const gchar *name);
+int allTask(PGconn *conn);
 
 #endif

@@ -54,20 +54,23 @@ void deleteTask(GtkWidget *taskDelete, gpointer data)
         g_print("Error: insertTask failed");
         return;
     }
+    else {
+        g_print("%d", queryResult);
+    }
 
     gtk_widget_destroy(taskToDelete);
     user->task[numberToChange] = gtk_label_new("");
     user->unusedTaskSpace++;
 }
 
-void addTasks(GtkWidget *task, gpointer data)
+void addTasks(GtkWidget *task, gpointer data, const gchar *presentTask)
 {
     struct data *user = data;
     char *getText;
     getText = malloc(sizeof(char) * strlen(get_text_of_entry(user->inputEntry)) + 1);
     strcpy(getText, get_text_of_entry(user->inputEntry));
 
-    if (strcmp(getText, "") == 0) {
+    if (strcmp(getText, "") == 0 && user->repopulated == 1) {
         return;
     }
 
@@ -80,6 +83,16 @@ void addTasks(GtkWidget *task, gpointer data)
             user->taskNumber[user->i] = -1;
             break;
         }
+    }
+    int currentPos = gtk_notebook_get_current_page(user->notebook); //recupere la position de l'onglet actif
+    GtkWidget *child = gtk_notebook_get_nth_page(user->notebook, currentPos); //recupere le widget de l'onglet actif
+    const gchar *name = gtk_notebook_get_tab_label_text(user->notebook, child); //recupere le nom de l'onglet actif
+
+    if (taskExist(user->conn, getText, name) == 1 && user->repopulated == 1) {
+        GtkDialog *dialog = GTK_DIALOG(gtk_message_dialog_new(GTK_WINDOW(user->window), GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "Cette tâche existe déjà"));
+        gtk_dialog_run(dialog);
+        gtk_widget_destroy(GTK_WIDGET(dialog));
+        return;
     }
 
     user->boxTask[user->i] = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
@@ -97,7 +110,12 @@ void addTasks(GtkWidget *task, gpointer data)
     gtk_widget_set_size_request(user->taskSeparator[user->i], 5, -1);
     gtk_box_pack_start(GTK_BOX(user->boxTask[user->i]), user->taskSeparator[user->i], FALSE, FALSE, 0);
 
-    gtk_label_set_text(GTK_LABEL(user->task[user->i]), getText);
+    if (user->repopulated == 0) {
+        gtk_label_set_text(GTK_LABEL(user->task[user->i]), presentTask);
+    }
+    else {
+        gtk_label_set_text(GTK_LABEL(user->task[user->i]), getText);
+    }
     gtk_box_pack_start(GTK_BOX(user->boxTask[user->i]), user->task[user->i], TRUE, FALSE, 0);
 
     user->taskPriority[user->i] = gtk_button_new_with_label("+");
@@ -123,20 +141,11 @@ void addTasks(GtkWidget *task, gpointer data)
     gtk_entry_set_text(GTK_ENTRY(user->inputEntry), "");
     user->unusedTaskSpace--;
 
-    int currentPos = gtk_notebook_get_current_page(user->notebook); //recupere la position de l'onglet actif
-    GtkWidget *child = gtk_notebook_get_nth_page(user->notebook, currentPos); //recupere le widget de l'onglet actif
-    const gchar *name = gtk_notebook_get_tab_label_text(user->notebook, child); //recupere le nom de l'onglet actif
-    int queryResult = insertTask(user->conn, getText, "test", 0, "now()", 0, name); //insert in db
-
-    if (taskExist(user->conn, getText, name) == 1) {
-        GtkDialog *dialog = GTK_DIALOG(gtk_message_dialog_new(GTK_WINDOW(user->window), GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "Cette tâche existe déjà"));
-        gtk_dialog_run(dialog);
-        gtk_widget_destroy(GTK_WIDGET(dialog));
-        return;
-    }
-
-    if (queryResult == -1) {
-        printf("Error: insertTask failed");
+    if (user->repopulated == 1) {
+        int queryResult = insertTask(user->conn, getText, "test", 0, "now()", 0, name); //insert in db
+        if (queryResult == -1) {
+            printf("Error: insertTask failed");
+        }
     }
 }
 

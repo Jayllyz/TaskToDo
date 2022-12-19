@@ -120,3 +120,39 @@ int deleteTaskDB(PGconn *conn, const gchar *name)
     PQclear(res);
     return 0;
 }
+
+int allTask(PGconn *conn)
+{
+    PGresult *res;
+    char *query = malloc(sizeof(char) * 1000);
+    sprintf(query, "SELECT * FROM Task");
+    res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        printf("Error: Can't get all task");
+        return -1;
+    }
+
+    int amountOfTask = PQntuples(res);
+
+    free(query);
+    PQclear(res);
+    return amountOfTask;
+}
+
+char *selectTask(PGconn *conn, int row)
+{
+    PGresult *res;
+    char *query = malloc(sizeof(char) * 1000);
+    sprintf(query, "SELECT * FROM Task LIMIT 1 OFFSET %d", row);
+    res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        return "Error: Can't get the task";
+    }
+
+    char *name = PQgetvalue(res, 0, 0);
+
+    free(query);
+    PQclear(res);
+
+    return name;
+}
