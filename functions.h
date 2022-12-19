@@ -26,6 +26,8 @@ struct data {
     GtkNotebook *notebook;
     int unusedTaskSpace;
     int repopulated;
+    GtkWidget *descriptionEntry;
+    GtkWidget *inEditing;
 };
 
 //function.c
