@@ -36,6 +36,90 @@ void changeTaskPriority(GtkWidget *taskPriority, gpointer data)
 
 void editTaskWindow(GtkWidget *taskEdit, gpointer data)
 {
+    PGconn *conn = connectBdd();
+
+    GtkWidget *parent = gtk_widget_get_parent(taskEdit);
+    GList *children = gtk_container_get_children(GTK_CONTAINER(parent));
+    GtkWidget *taskWidget = g_list_nth_data(children, 2);
+    const gchar *taskName = gtk_label_get_text(GTK_LABEL(taskWidget));
+
+    GtkWidget *editWindow = gtk_dialog_new_with_buttons(taskName, NULL, GTK_DIALOG_MODAL, "Confirmer", GTK_RESPONSE_OK, "Annuler", GTK_RESPONSE_CANCEL, NULL);
+    GtkWidget *descriptionLabel = gtk_label_new("Description de la tâche");
+    GtkWidget *descriptionEntry = gtk_entry_new();
+    gtk_widget_set_size_request(descriptionEntry, 200, 50);
+
+    GtkWidget *priorityButton = gtk_button_new();
+    int priority = selectPriority(conn, taskName);
+
+    if (priority == 0) {
+        gtk_button_set_label(GTK_BUTTON(priorityButton), "Mineure");
+    }
+    else if (priority == 1) {
+        gtk_button_set_label(GTK_BUTTON(priorityButton), "Normale");
+    }
+    else if (priority == 2) {
+        gtk_button_set_label(GTK_BUTTON(priorityButton), "Importante");
+    }
+    else if (priority == 3) {
+        gtk_button_set_label(GTK_BUTTON(priorityButton), "Urgente");
+    }
+    else {
+        gtk_button_set_label(GTK_BUTTON(priorityButton), "Erreur");
+    }
+    g_signal_connect(priorityButton, "clicked", G_CALLBACK(changeTaskPriority), descriptionEntry);
+
+    gtk_entry_set_text(GTK_ENTRY(descriptionEntry), selectDescription(conn, taskName));
+
+    gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(editWindow))), descriptionLabel);
+    gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(editWindow))), descriptionEntry);
+    gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(editWindow))), priorityButton);
+    gtk_widget_show_all(editWindow);
+
+    g_signal_connect(editWindow, "response", G_CALLBACK(editTaskDB), descriptionEntry);
+}
+
+void editTaskDB(GtkDialog *window, gint clicked, gpointer entry)
+{
+    if (clicked == GTK_RESPONSE_OK) {
+        PGconn *conn = connectBdd();
+        GtkWidget *input = GTK_WIDGET(entry);
+        const gchar *text = gtk_entry_get_text(GTK_ENTRY(input));
+        const gchar *taskName = gtk_window_get_title(GTK_WINDOW(window));
+        int queryResult;
+
+        GtkWidget *parent = gtk_widget_get_parent(GTK_WIDGET(entry));
+        GList *children = gtk_container_get_children(GTK_CONTAINER(parent));
+        GtkWidget *priorityButton = g_list_nth_data(children, 2);
+        const gchar *setPriority = gtk_button_get_label(GTK_BUTTON(priorityButton));
+
+        queryResult = updateDescription(conn, text, taskName);
+        if (queryResult != 0) {
+            g_print("Erreur de la modification de la base");
+        }
+
+        if (strcmp(setPriority, "Mineure") == 0) {
+            queryResult = updatePriority(conn, 0, taskName);
+        }
+        else if (strcmp(setPriority, "Normale") == 0) {
+            queryResult = updatePriority(conn, 1, taskName);
+        }
+        else if (strcmp(setPriority, "Importante") == 0) {
+            queryResult = updatePriority(conn, 2, taskName);
+        }
+        else if (strcmp(setPriority, "Urgente") == 0) {
+            queryResult = updatePriority(conn, 3, taskName);
+        }
+
+        if (queryResult != 0) {
+            g_print("Erreur de la modification de la base");
+        }
+
+        gtk_widget_destroy(GTK_WIDGET(window));
+    }
+}
+
+void editTaskWindow(GtkWidget *taskEdit, gpointer data)
+{
     struct data *user = data;
 
     GtkWidget *parent = gtk_widget_get_parent(taskEdit);
