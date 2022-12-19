@@ -38,8 +38,7 @@ int createTables(PGconn *conn)
 
     res = PQexec(conn,
         "CREATE TABLE IF NOT EXISTS Project(Name VARCHAR(20) PRIMARY KEY, Description VARCHAR(100), Priority INT, Date TIMESTAMPTZ DEFAULT NOW(), Deadline TIMESTAMPTZ, "
-        "Color "
-        "VARCHAR(20), )");
+        "Color VARCHAR(20))");
 
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
         bddExist(conn, res);
@@ -75,12 +74,12 @@ int createTables(PGconn *conn)
     return 0;
 }
 
-int insertTask(PGconn *conn, char *name, char *description, int priority, char *deadline, int status, int projectId)
+int insertTask(PGconn *conn, char *name, char *description, int priority, char *deadline, int status, const gchar *projectName)
 {
     PGresult *res;
     char *query = malloc(sizeof(char) * 1000);
-    sprintf(query, "INSERT INTO Task ( Name, Description, Priority, Deadline, Status, ProjectId) VALUES ('%s', '%s', %d, '%s', %d, '%d')", name, description, priority,
-        deadline, status, projectId);
+    sprintf(query, "INSERT INTO Task ( Name, Description, Priority, Deadline, Status, ProjectName) VALUES ('%s', '%s', %d, '%s', %d, '%s')", name, description, priority,
+        deadline, status, projectName);
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
         bddExist(conn, res);

@@ -1,2 +1,2 @@
 #bdd
-init value:0
+init value:1
