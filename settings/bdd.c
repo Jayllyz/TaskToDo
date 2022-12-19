@@ -105,3 +105,18 @@ int insertProject(PGconn *conn, char *name, char *description, int priority, cha
     PQclear(res);
     return 0;
 }
+
+int deleteTaskDB(PGconn *conn, const gchar *name)
+{
+    PGresult *res;
+    char *query = malloc(sizeof(char) * 1000);
+    sprintf(query, "DELETE FROM Task WHERE name='%s'", name);
+    res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        bddExist(conn, res);
+        return -1;
+    }
+    free(query);
+    PQclear(res);
+    return 0;
+}

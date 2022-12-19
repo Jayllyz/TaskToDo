@@ -35,6 +35,7 @@ int main(int argc, char *argv[])
 
     //Datas
     user.maxTask = 6;
+    user.unusedTaskSpace = user.maxTask;
     user.window = GTK_WIDGET(gtk_builder_get_object(user.builder, "window_main"));
     user.addTask = GTK_BUTTON(gtk_builder_get_object(user.builder, "addTask"));
     user.boxV = GTK_BOX(gtk_builder_get_object(user.builder, "boxV"));
@@ -42,22 +43,22 @@ int main(int argc, char *argv[])
     user.inputEntry = GTK_WIDGET(gtk_builder_get_object(user.builder, "inputEntry"));
     user.notebook = GTK_NOTEBOOK(gtk_builder_get_object(user.builder, "project_notebook"));
     for (int i = 0; i < user.maxTask; i++) {
-        user.taskStatus[i] = gtk_button_new();
+        user.task[i] = gtk_label_new("");
+        user.taskNumber[i] = i;
     }
-    //signals
 
+    //signals
     gtk_entry_set_max_length(GTK_ENTRY(user.inputEntry), 35); //limit char input
 
     g_signal_connect(user.addTask, "clicked", G_CALLBACK(addTasks), &user);
-    for (int i = 0; i < user.maxTask; i++) {
-        g_signal_connect(user.taskStatus[i], "clicked", G_CALLBACK(changeStatus), &user);
-    }
+
     gtk_builder_connect_signals(user.builder, NULL);
 
     g_object_unref(user.builder);
 
     gtk_widget_show(user.window);
     gtk_main();
+
     return 0;
 }
 
