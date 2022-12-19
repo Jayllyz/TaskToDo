@@ -76,7 +76,9 @@ void addTasks(GtkWidget *task, gpointer data)
     const gchar *name = gtk_notebook_get_tab_label_text(user->notebook, child); //recupere le nom de l'onglet actif
 
     if (taskExist(user->conn, getText, name) == 1) {
-        g_print("Task already exist\n");
+        GtkDialog *dialog = GTK_DIALOG(gtk_message_dialog_new(GTK_WINDOW(user->window), GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "Cette tâche existe déjà"));
+        gtk_dialog_run(dialog);
+        gtk_widget_destroy(GTK_WIDGET(dialog));
         return;
     }
 
