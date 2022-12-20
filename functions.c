@@ -349,7 +349,8 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data)
         PQclear(res);
         GtkWidget *title = gtk_label_new((const gchar *)projectName);
         GtkWidget *box = gtk_label_new((const gchar *)projectName);
-        gtk_notebook_prepend_page(GTK_NOTEBOOK(user->notebook), title, box);
+        gint numberOfPage = gtk_notebook_get_n_pages(GTK_NOTEBOOK(user->notebook));
+        gtk_notebook_insert_page(GTK_NOTEBOOK(user->notebook), title, box, numberOfPage - 1);
         gtk_widget_show_all(GTK_WIDGET(user->notebook));
     }
     gtk_widget_destroy(projet);
