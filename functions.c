@@ -320,29 +320,31 @@ void addProjectWindow(GtkWidget *project, gpointer data)
     user->projectNameEntry = gtk_entry_new();
     gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(addProjectDialog))), nameLabel);
     gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(addProjectDialog))), user->projectNameEntry);
-    gtk_widget_show_all(GTK_WIDGET(GTK_DIALOG(addProjectDialog)));
+    gtk_widget_show_all(addProjectDialog);
 
     g_signal_connect(addProjectDialog, "response", G_CALLBACK(addProject), user);
 }
 
-void addProject(GtkWidget *projet, gpointer data)
+void addProject(GtkWidget *projet, gint clicked, gpointer data)
 {
     struct data *user = data;
-    char *projectName = get_text_of_entry(user->projectNameEntry);
-    g_print("%s", projectName);
-    if (projectExist(user->conn, projectName) == 1 || projectName == NULL) {
-        g_print("Error: project already exist");
-        return;
+    if (clicked == GTK_RESPONSE_OK) {
+        char *projectName = get_text_of_entry(user->projectNameEntry);
+        if (projectExist(user->conn, projectName) == 1 || projectName == NULL) {
+            g_print("Error: project already exist");
+            return;
+        }
+        char *query = malloc((strlen("INSERT INTO project VALUES ('','Placeholder', 0, 'now()', 'now()', 0)") + strlen(projectName) + 1) * sizeof(char));
+        g_print("%s", query);
+        sprintf(query, "INSERT INTO project VALUES ('%s','Placeholder', 0, 'now()', 'now()', 0)", projectName);
+        PGresult *res = PQexec(user->conn, query);
+        if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+            g_print("Error: addProject failed");
+            return;
+        }
+        free(query);
+        PQclear(res);
+        gtk_widget_destroy(user->projectNameEntry);
+        gtk_widget_destroy(projet);
     }
-    char *query = malloc((strlen("INSERT INTO project VALUES ('','Placeholder', 0, 'now()', 'now()', 0)") + strlen(projectName) + 1) * sizeof(char));
-    g_print("%s", query);
-    sprintf(query, "INSERT INTO project VALUES ('%s','Placeholder', 0, 'now()', 'now()', 0)", projectName);
-    PGresult *res = PQexec(user->conn, query);
-    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
-        g_print("Error: addProject failed");
-        return;
-    }
-    free(query);
-    PQclear(res);
-    gtk_widget_destroy(user->projectNameEntry);
 }

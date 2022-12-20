@@ -46,7 +46,7 @@ int readOneConfigValue(char *propName);
 int taskExist(PGconn *conn, char *input, const gchar *name);
 int projectExist(PGconn *conn, const gchar *name);
 void addProjectWindow(GtkWidget *project, gpointer data);
-void addProject(GtkWidget *projet, gpointer data);
+void addProject(GtkWidget *projet, gint clicked, gpointer data);
 
 //bdd.c
 PGconn *connectBdd();
