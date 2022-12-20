@@ -335,7 +335,6 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data)
             return;
         }
         char *query = malloc((strlen("INSERT INTO project VALUES ('','Placeholder', 0, 'now()', 'now()', 0)") + strlen(projectName) + 1) * sizeof(char));
-        g_print("%s", query);
         sprintf(query, "INSERT INTO project VALUES ('%s','Placeholder', 0, 'now()', 'now()', 0)", projectName);
         PGresult *res = PQexec(user->conn, query);
         if (PQresultStatus(res) != PGRES_COMMAND_OK) {
@@ -344,7 +343,10 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data)
         }
         free(query);
         PQclear(res);
-        gtk_widget_destroy(user->projectNameEntry);
-        gtk_widget_destroy(projet);
+        GtkWidget *title = gtk_label_new((const gchar *)projectName);
+        GtkWidget *box = gtk_label_new((const gchar *)projectName);
+        gtk_notebook_prepend_page(GTK_NOTEBOOK(user->notebook), title, box);
+        gtk_widget_show_all(GTK_WIDGET(user->notebook));
     }
+    gtk_widget_destroy(projet);
 }
