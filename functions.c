@@ -331,7 +331,11 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data)
     if (clicked == GTK_RESPONSE_OK) {
         char *projectName = get_text_of_entry(user->projectNameEntry);
         if (projectExist(user->conn, projectName) == 1 || projectName == NULL) {
-            g_print("Error: project already exist");
+            gtk_widget_destroy(projet);
+            GtkDialog *dialog
+                = GTK_DIALOG(gtk_message_dialog_new(GTK_WINDOW(user->window), GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "Ce projet existe déjà"));
+            gtk_dialog_run(dialog);
+            gtk_widget_destroy(GTK_WIDGET(dialog));
             return;
         }
         char *query = malloc((strlen("INSERT INTO project VALUES ('','Placeholder', 0, 'now()', 'now()', 0)") + strlen(projectName) + 1) * sizeof(char));
