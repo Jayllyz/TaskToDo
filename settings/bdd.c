@@ -150,6 +150,24 @@ int allTask(PGconn *conn)
     return amountOfTask;
 }
 
+int allProject(PGconn *conn)
+{
+    PGresult *res;
+    char *query = malloc(sizeof(char) * 1000);
+    sprintf(query, "SELECT * FROM Project");
+    res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        printf("Error: Can't get all projects");
+        return -1;
+    }
+
+    int amountOfProject = PQntuples(res);
+
+    free(query);
+    PQclear(res);
+    return amountOfProject - 6;
+}
+
 char *selectTask(PGconn *conn, int row)
 {
     PGresult *res;
@@ -158,6 +176,24 @@ char *selectTask(PGconn *conn, int row)
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
         return "Error: Can't get the task";
+    }
+
+    char *name = PQgetvalue(res, 0, 0);
+
+    free(query);
+    PQclear(res);
+
+    return name;
+}
+
+char *selectProject(PGconn *conn, int row)
+{
+    PGresult *res;
+    char *query = malloc(sizeof(char) * 1000);
+    sprintf(query, "SELECT name FROM Project ORDER BY date LIMIT 1 OFFSET %d", 6 + row);
+    res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        return "Error: Can't get the Project";
     }
 
     char *name = PQgetvalue(res, 0, 0);

@@ -157,7 +157,7 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask)
     getText = malloc(sizeof(char) * strlen(get_text_of_entry(user->inputEntry)) + 1);
     strcpy(getText, get_text_of_entry(user->inputEntry));
 
-    if (strcmp(getText, "") == 0 && user->repopulated == 1) {
+    if (strcmp(getText, "") == 0 && user->repopulatedTask == 1) {
         return;
     }
 
@@ -176,7 +176,7 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask)
     GtkWidget *child = gtk_notebook_get_nth_page(user->notebook, currentPos); //recupere le widget de l'onglet actif
     const gchar *name = gtk_notebook_get_tab_label_text(user->notebook, child); //recupere le nom de l'onglet actif
 
-    if (taskExist(user->conn, getText, name) == 1 && user->repopulated == 1) {
+    if (taskExist(user->conn, getText, name) == 1 && user->repopulatedTask == 1) {
         GtkDialog *dialog = GTK_DIALOG(gtk_message_dialog_new(GTK_WINDOW(user->window), GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "Cette tâche existe déjà"));
         gtk_dialog_run(dialog);
         gtk_widget_destroy(GTK_WIDGET(dialog));
@@ -198,7 +198,7 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask)
     gtk_widget_set_size_request(user->taskSeparator[user->i], 5, -1);
     gtk_box_pack_start(GTK_BOX(user->boxTask[user->i]), user->taskSeparator[user->i], FALSE, FALSE, 0);
 
-    if (user->repopulated == 0) {
+    if (user->repopulatedTask == 0) {
         gtk_label_set_text(GTK_LABEL(user->task[user->i]), selectTask(user->conn, presentTask));
         gtk_widget_set_tooltip_text(user->task[user->i], selectDescription(user->conn, selectTask(user->conn, presentTask)));
     }
@@ -231,7 +231,7 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask)
     gtk_entry_set_text(GTK_ENTRY(user->inputEntry), "");
     user->unusedTaskSpace--;
 
-    if (user->repopulated == 1) {
+    if (user->repopulatedTask == 1) {
         int queryResult = insertTask(user->conn, getText, "", 1, "now()", 0, name); //insert in db
         if (queryResult == -1) {
             printf("Error: insertTask failed");
@@ -325,33 +325,56 @@ void addProjectWindow(GtkWidget *project, gpointer data)
     g_signal_connect(addProjectDialog, "response", G_CALLBACK(addProject), user);
 }
 
-void addProject(GtkWidget *projet, gint clicked, gpointer data)
+void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProject)
 {
     struct data *user = data;
     if (clicked == GTK_RESPONSE_OK) {
-        char *projectName = get_text_of_entry(user->projectNameEntry);
-        if (projectExist(user->conn, projectName) == 1 || projectName == NULL) {
-            gtk_widget_destroy(projet);
-            GtkDialog *dialog
-                = GTK_DIALOG(gtk_message_dialog_new(GTK_WINDOW(user->window), GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "Ce projet existe déjà"));
-            gtk_dialog_run(dialog);
-            gtk_widget_destroy(GTK_WIDGET(dialog));
-            return;
+        char *projectName;
+        if (user->repopulatedProject == 1) {
+            projectName = get_text_of_entry(user->projectNameEntry);
+            if (projectExist(user->conn, projectName) == 1 || projectName == NULL) {
+                gtk_widget_destroy(projet);
+                GtkDialog *dialog
+                    = GTK_DIALOG(gtk_message_dialog_new(GTK_WINDOW(user->window), GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "Ce projet existe déjà"));
+                gtk_dialog_run(dialog);
+                gtk_widget_destroy(GTK_WIDGET(dialog));
+                return;
+            }
+
+            char *query = malloc((strlen("INSERT INTO project VALUES ('','Placeholder', 0, 'now()', 'now()', 0)") + strlen(projectName) + 1) * sizeof(char));
+            sprintf(query, "INSERT INTO project VALUES ('%s','Placeholder', 0, 'now()', 'now()', 0)", projectName);
+            PGresult *res = PQexec(user->conn, query);
+            if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+                g_print("Error: addProject failed");
+                return;
+            }
+            free(query);
+            PQclear(res);
         }
-        char *query = malloc((strlen("INSERT INTO project VALUES ('','Placeholder', 0, 'now()', 'now()', 0)") + strlen(projectName) + 1) * sizeof(char));
-        sprintf(query, "INSERT INTO project VALUES ('%s','Placeholder', 0, 'now()', 'now()', 0)", projectName);
-        PGresult *res = PQexec(user->conn, query);
-        if (PQresultStatus(res) != PGRES_COMMAND_OK) {
-            g_print("Error: addProject failed");
-            return;
+
+        user->pageTitleBox[user->projectCount] = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+        GtkWidget *title = gtk_label_new("");
+        if (user->repopulatedProject == 1) {
+            gtk_label_set_text(GTK_LABEL(title), (const gchar *)projectName);
         }
-        free(query);
-        PQclear(res);
-        GtkWidget *title = gtk_label_new((const gchar *)projectName);
-        GtkWidget *box = gtk_label_new((const gchar *)projectName);
+        else if (user->repopulatedProject == 0) {
+            gtk_label_set_text(GTK_LABEL(title), selectProject(user->conn, presentProject));
+        }
+        GtkWidget *titleButton = gtk_button_new_with_label("X");
+
+        GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+        gtk_box_pack_start(GTK_BOX(user->pageTitleBox[user->projectCount]), title, TRUE, FALSE, 0);
+        gtk_box_pack_start(GTK_BOX(user->pageTitleBox[user->projectCount]), titleButton, FALSE, FALSE, 0);
+        gtk_widget_show_all(GTK_WIDGET(user->pageTitleBox[user->projectCount]));
+
         gint numberOfPage = gtk_notebook_get_n_pages(GTK_NOTEBOOK(user->notebook));
-        gtk_notebook_insert_page(GTK_NOTEBOOK(user->notebook), title, box, numberOfPage - 1);
-        gtk_widget_show_all(GTK_WIDGET(user->notebook));
+
+        gtk_notebook_insert_page(GTK_NOTEBOOK(user->notebook), box, GTK_WIDGET(user->pageTitleBox[user->projectCount]), numberOfPage - 1);
+        gtk_widget_show(GTK_WIDGET(user->pageTitleBox[user->projectCount]));
+        gtk_widget_show(box);
+        user->projectCount++;
     }
-    gtk_widget_destroy(projet);
+    if (user->repopulatedProject == 1) {
+        gtk_widget_destroy(projet);
+    }
 }

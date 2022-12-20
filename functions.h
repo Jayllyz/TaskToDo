@@ -28,10 +28,12 @@ struct data {
     PGconn *conn;
     GtkNotebook *notebook;
     int unusedTaskSpace;
-    int repopulated;
+    int repopulatedTask;
+    int repopulatedProject;
     GtkWidget *descriptionEntry;
     GtkWidget *inEditing;
     GtkWidget *projectNameEntry;
+    GtkWidget *pageTitleBox[10];
 };
 
 //function.c
@@ -46,7 +48,7 @@ int readOneConfigValue(char *propName);
 int taskExist(PGconn *conn, char *input, const gchar *name);
 int projectExist(PGconn *conn, const gchar *name);
 void addProjectWindow(GtkWidget *project, gpointer data);
-void addProject(GtkWidget *projet, gint clicked, gpointer data);
+void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProject);
 
 //bdd.c
 PGconn *connectBdd();
@@ -56,7 +58,9 @@ int insertTask(PGconn *conn, char *name, char *description, int priority, char *
 int insertProject(PGconn *conn, char *name, char *description, int priority, char *deadline, char *color);
 int deleteTaskDB(PGconn *conn, const gchar *name);
 int allTask(PGconn *conn);
+int allProject(PGconn *conn);
 char *selectTask(PGconn *conn, int row);
+char *selectProject(PGconn *conn, int row);
 char *selectDescription(PGconn *conn, const gchar *name);
 int selectPriority(PGconn *conn, const gchar *name);
 int updateDescription(PGconn *conn, const gchar *description, const gchar *name);
