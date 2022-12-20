@@ -150,6 +150,47 @@ void deleteTask(GtkWidget *taskDelete, gpointer data)
     user->unusedTaskSpace++;
 }
 
+void deleteProject(GtkWidget *projectDelete, gpointer data)
+{
+    struct data *user = data;
+
+    GtkWidget *projectBox = gtk_widget_get_parent(projectDelete);
+    GList *boxChildren = gtk_container_get_children(GTK_CONTAINER(projectBox));
+    GtkWidget *child = g_list_nth_data(boxChildren, 0);
+    GtkWidget *numberToFree = g_list_nth_data(boxChildren, 2);
+
+    int numberToChange = atoi(gtk_button_get_label(GTK_BUTTON(numberToFree)));
+    user->projectNumber[numberToChange] = numberToChange;
+
+    gint totalPage = gtk_notebook_get_n_pages(GTK_NOTEBOOK(user->notebook));
+    const gchar *nameOfProject = gtk_label_get_text(GTK_LABEL(child));
+    int numberToDelete;
+
+    for (int i = 0; i < totalPage; i++) {
+        GtkWidget *curPage = gtk_notebook_get_nth_page(GTK_NOTEBOOK(user->notebook), i);
+        GtkWidget *boxPage = gtk_notebook_get_tab_label(GTK_NOTEBOOK(user->notebook), curPage);
+        if (GTK_IS_BOX(boxPage)) {
+            boxChildren = gtk_container_get_children(GTK_CONTAINER(boxPage));
+            const gchar *nameToSeek = gtk_label_get_text(g_list_nth_data(boxChildren, 0));
+            if (g_strcmp0(nameToSeek, nameOfProject) == 0) {
+                numberToDelete = i;
+            }
+        }
+    }
+
+    g_list_free(boxChildren);
+
+    int queryResult = deleteProjectDB(user->conn, nameOfProject);
+    if (queryResult == -1) {
+        g_print("Error: deleteProject failed");
+        return;
+    }
+
+    gtk_notebook_remove_page(GTK_NOTEBOOK(user->notebook), numberToDelete);
+    gtk_notebook_set_current_page(user->notebook, 0);
+    user->projectCount--;
+}
+
 void addTasks(GtkWidget *task, gpointer data, int presentTask)
 {
     struct data *user = data;
@@ -221,12 +262,8 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask)
     user->taskNumberMarker[user->i] = gtk_button_new_with_label(numberToTransfer);
     gtk_box_pack_start(GTK_BOX(user->boxTask[user->i]), user->taskNumberMarker[user->i], FALSE, FALSE, 0);
 
-    gtk_widget_show(user->boxTask[user->i]);
-    gtk_widget_show(user->taskStatus[user->i]);
-    gtk_widget_show(user->taskSeparator[user->i]);
-    gtk_widget_show(user->task[user->i]);
-    gtk_widget_show(user->taskEdit[user->i]);
-    gtk_widget_show(user->taskDelete[user->i]);
+    gtk_widget_show_all(user->boxTask[user->i]);
+    gtk_widget_hide(user->taskNumberMarker[user->i]);
 
     gtk_entry_set_text(GTK_ENTRY(user->inputEntry), "");
     user->unusedTaskSpace--;
@@ -314,6 +351,10 @@ void addProjectWindow(GtkWidget *project, gpointer data)
 {
     struct data *user = data;
 
+    if (user->projectCount >= user->maxProject) {
+        return;
+    }
+
     GtkWidget *addProjectDialog
         = gtk_dialog_new_with_buttons("Nouveau projet", NULL, GTK_DIALOG_MODAL, "Confirmer", GTK_RESPONSE_OK, "Annuler", GTK_RESPONSE_CANCEL, NULL);
     GtkWidget *nameLabel = gtk_label_new("Nom du projet");
@@ -352,7 +393,14 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProje
             PQclear(res);
         }
 
-        user->pageTitleBox[user->projectCount] = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+        for (user->i = 0; user->i < user->maxProject; user->i++) {
+            if (user->projectNumber[user->i] != -1) {
+                user->projectNumber[user->i] = -1;
+                break;
+            }
+        }
+
+        user->pageTitleBox[user->i] = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
         GtkWidget *title = gtk_label_new("");
         if (user->repopulatedProject == 1) {
             gtk_label_set_text(GTK_LABEL(title), (const gchar *)projectName);
@@ -360,17 +408,25 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProje
         else if (user->repopulatedProject == 0) {
             gtk_label_set_text(GTK_LABEL(title), selectProject(user->conn, presentProject));
         }
+
         GtkWidget *titleButton = gtk_button_new_with_label("X");
+        char numberToTransfer[3];
+        sprintf(numberToTransfer, "%d", user->i);
+        GtkWidget *projectNumberMarker = gtk_button_new_with_label(numberToTransfer);
 
         GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-        gtk_box_pack_start(GTK_BOX(user->pageTitleBox[user->projectCount]), title, TRUE, FALSE, 0);
-        gtk_box_pack_start(GTK_BOX(user->pageTitleBox[user->projectCount]), titleButton, FALSE, FALSE, 0);
-        gtk_widget_show_all(GTK_WIDGET(user->pageTitleBox[user->projectCount]));
+        gtk_box_pack_start(GTK_BOX(user->pageTitleBox[user->i]), title, TRUE, FALSE, 0);
+        gtk_box_pack_start(GTK_BOX(user->pageTitleBox[user->i]), titleButton, FALSE, FALSE, 0);
+        gtk_box_pack_start(GTK_BOX(user->pageTitleBox[user->i]), projectNumberMarker, FALSE, FALSE, 0);
+        gtk_widget_show_all(GTK_WIDGET(user->pageTitleBox[user->i]));
+        gtk_widget_hide(projectNumberMarker);
 
         gint numberOfPage = gtk_notebook_get_n_pages(GTK_NOTEBOOK(user->notebook));
 
-        gtk_notebook_insert_page(GTK_NOTEBOOK(user->notebook), box, GTK_WIDGET(user->pageTitleBox[user->projectCount]), numberOfPage - 1);
-        gtk_widget_show(GTK_WIDGET(user->pageTitleBox[user->projectCount]));
+        g_signal_connect(titleButton, "clicked", G_CALLBACK(deleteProject), user);
+
+        gtk_notebook_insert_page(GTK_NOTEBOOK(user->notebook), box, GTK_WIDGET(user->pageTitleBox[user->i]), numberOfPage - 1);
+        gtk_widget_show(GTK_WIDGET(user->pageTitleBox[user->i]));
         gtk_widget_show(box);
         user->projectCount++;
     }

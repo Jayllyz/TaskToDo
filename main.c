@@ -35,6 +35,7 @@ int main(int argc, char *argv[])
 
     //Datas
     user.maxTask = 6;
+    user.maxProject = 3;
     user.unusedTaskSpace = user.maxTask;
     user.window = GTK_WIDGET(gtk_builder_get_object(user.builder, "window_main"));
     user.addTask = GTK_BUTTON(gtk_builder_get_object(user.builder, "addTask"));
@@ -49,6 +50,9 @@ int main(int argc, char *argv[])
     for (int i = 0; i < user.maxTask; i++) {
         user.task[i] = gtk_label_new("");
         user.taskNumber[i] = i;
+    }
+    for (int i = 0; i < user.maxProject; i++) {
+        user.projectNumber[i] = i;
     }
 
     //signals
