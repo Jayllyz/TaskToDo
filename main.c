@@ -38,6 +38,7 @@ int main(int argc, char *argv[])
     user.unusedTaskSpace = user.maxTask;
     user.window = GTK_WIDGET(gtk_builder_get_object(user.builder, "window_main"));
     user.addTask = GTK_BUTTON(gtk_builder_get_object(user.builder, "addTask"));
+    user.addProject = GTK_BUTTON(gtk_builder_get_object(user.builder, "addProject"));
     user.boxV = GTK_BOX(gtk_builder_get_object(user.builder, "boxV"));
     user.i = 0;
     user.inputEntry = GTK_WIDGET(gtk_builder_get_object(user.builder, "inputEntry"));
@@ -61,6 +62,7 @@ int main(int argc, char *argv[])
     user.repopulated = 1;
 
     g_signal_connect(user.addTask, "clicked", G_CALLBACK(addTasks), &user);
+    g_signal_connect(user.addProject, "clicked", G_CALLBACK(addProjectWindow), &user);
 
     gtk_builder_connect_signals(user.builder, NULL);
 

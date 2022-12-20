@@ -58,6 +58,17 @@ int createTables(PGconn *conn)
 
     PQclear(res);
 
+    res = PQexec(conn,
+        "INSERT INTO Project (Name, Description, Priority, Date, Deadline, Color) VALUES ('Ma journée', 'placeholder', 0, 'now()', 'now()', 'black'), ('Important', "
+        "'placeholder', 0, 'now()', 'now()', 'red'), ('Prévu', 'placeholder', 0, 'now()', 'now()', 'blue'), ('Tâches', 'placeholder', 0, 'now()', 'now()', "
+        "'green'), ('Projets', 'placeholder', 0, 'now()', 'now()', 'grey') , ('Finance', 'placeholder', 0, 'now()', 'now()', 'orange')");
+
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        bddExist(conn, res);
+    }
+
+    PQclear(res);
+
     FILE *file = fopen("settings/config.txt", "r+");
     char *line = NULL;
     size_t len = 0;

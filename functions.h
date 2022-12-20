@@ -8,6 +8,7 @@ struct data {
     GtkBuilder *builder;
     GtkWidget *window;
     GtkButton *addTask;
+    GtkButton *addProject;
     GtkWidget *taskStatus[10];
     GtkWidget *taskSeparator[10];
     GtkBox *boxV;
@@ -17,9 +18,11 @@ struct data {
     GtkWidget *taskEdit[10];
     GtkWidget *taskDelete[10];
     int taskNumber[10];
+    int projectNumber[20];
     GtkWidget *taskNumberMarker[10];
     int i;
     int maxTask;
+    int projectCount;
     GtkWidget *inputEntry;
     GtkLabel *outputLabel;
     PGconn *conn;
@@ -28,6 +31,7 @@ struct data {
     int repopulated;
     GtkWidget *descriptionEntry;
     GtkWidget *inEditing;
+    GtkWidget *projectNameEntry;
 };
 
 //function.c
@@ -40,6 +44,9 @@ void deleteTask(GtkWidget *taskDelete, gpointer data);
 char *get_text_of_entry(GtkWidget *testEntry);
 int readOneConfigValue(char *propName);
 int taskExist(PGconn *conn, char *input, const gchar *name);
+int projectExist(PGconn *conn, const gchar *name);
+void addProjectWindow(GtkWidget *project, gpointer data);
+void addProject(GtkWidget *projet, gpointer data);
 
 //bdd.c
 PGconn *connectBdd();
