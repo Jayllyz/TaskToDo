@@ -4,7 +4,7 @@
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
 
-struct data {
+struct GTKTools {
     GtkBuilder *builder;
     GtkWidget *window;
     GtkButton *addTask;
@@ -17,24 +17,32 @@ struct data {
     GtkWidget *taskPriority[10];
     GtkWidget *taskEdit[10];
     GtkWidget *taskDelete[10];
-    int taskNumber[10];
-    int projectNumber[10];
-    GtkWidget *taskNumberMarker[10];
-    int i;
-    int maxTask;
-    int maxProject;
-    int projectCount;
     GtkWidget *inputEntry;
     GtkLabel *outputLabel;
-    PGconn *conn;
     GtkNotebook *notebook;
-    int unusedTaskSpace;
-    int repopulatedTask;
-    int repopulatedProject;
     GtkWidget *descriptionEntry;
     GtkWidget *inEditing;
     GtkWidget *projectNameEntry;
     GtkWidget *pageTitleBox[10];
+    GtkWidget *taskNumberMarker[10];
+};
+
+struct TaskProjectState {
+    int taskNumber[10];
+    int projectNumber[10];
+    int i;
+    int maxTask;
+    int maxProject;
+    int projectCount;
+    int unusedTaskSpace;
+    int repopulatedTask;
+    int repopulatedProject;
+};
+
+struct data {
+    struct GTKTools tools;
+    struct TaskProjectState state;
+    PGconn *conn;
 };
 
 //function.c

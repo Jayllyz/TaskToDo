@@ -15,75 +15,75 @@ Description: Main file of our Todo list software
 
 int main(int argc, char *argv[])
 {
-    system("clear"); //provisoire c'est jsute pour automatiquement clear le terminal
+    system("clear"); //provisoire
     system("sudo service postgresql start"); //provisoire
     //Init
     gtk_init(&argc, &argv);
-    struct data user;
-    user.conn = connectBdd();
+    struct data data;
+    data.conn = connectBdd();
     if (readOneConfigValue("init") == 0) {
-        user.conn = connectBdd();
-        if (user.conn == NULL) {
+        data.conn = connectBdd();
+        if (data.conn == NULL) {
             return EXIT_FAILURE;
         }
-        createTables(user.conn);
-        PQfinish(user.conn);
+        createTables(data.conn);
+        PQfinish(data.conn);
     }
 
-    user.builder = gtk_builder_new();
-    gtk_builder_add_from_file(user.builder, "data/window_main.glade", NULL);
+    data.tools.builder = gtk_builder_new();
+    gtk_builder_add_from_file(data.tools.builder, "data/window_main.glade", NULL);
 
     //Datas
-    user.maxTask = 6;
-    user.maxProject = 3;
-    user.unusedTaskSpace = user.maxTask;
-    user.window = GTK_WIDGET(gtk_builder_get_object(user.builder, "window_main"));
-    user.addTask = GTK_BUTTON(gtk_builder_get_object(user.builder, "addTask"));
-    user.addProject = GTK_BUTTON(gtk_builder_get_object(user.builder, "addProject"));
-    user.boxV = GTK_BOX(gtk_builder_get_object(user.builder, "boxV"));
-    user.i = 0;
-    user.inputEntry = GTK_WIDGET(gtk_builder_get_object(user.builder, "inputEntry"));
-    user.notebook = GTK_NOTEBOOK(gtk_builder_get_object(user.builder, "project_notebook"));
-    user.repopulatedTask = 0;
-    user.repopulatedProject = 0;
-    user.projectCount = 0;
-    for (int i = 0; i < user.maxTask; i++) {
-        user.task[i] = gtk_label_new("");
-        user.taskNumber[i] = i;
+    data.state.maxTask = 6;
+    data.state.maxProject = 3;
+    data.state.unusedTaskSpace = data.state.maxTask;
+    data.tools.window = GTK_WIDGET(gtk_builder_get_object(data.tools.builder, "window_main"));
+    data.tools.addTask = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "addTask"));
+    data.tools.addProject = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "addProject"));
+    data.tools.boxV = GTK_BOX(gtk_builder_get_object(data.tools.builder, "boxV"));
+    data.state.i = 0;
+    data.tools.inputEntry = GTK_WIDGET(gtk_builder_get_object(data.tools.builder, "inputEntry"));
+    data.tools.notebook = GTK_NOTEBOOK(gtk_builder_get_object(data.tools.builder, "project_notebook"));
+    data.state.repopulatedTask = 0;
+    data.state.repopulatedProject = 0;
+    data.state.projectCount = 0;
+    for (int i = 0; i < data.state.maxTask; i++) {
+        data.tools.task[i] = gtk_label_new("");
+        data.state.taskNumber[i] = i;
     }
-    for (int i = 0; i < user.maxProject; i++) {
-        user.projectNumber[i] = i;
+    for (int i = 0; i < data.state.maxProject; i++) {
+        data.state.projectNumber[i] = i;
     }
 
     //signals
-    gtk_entry_set_max_length(GTK_ENTRY(user.inputEntry), 35); //limit char input
+    gtk_entry_set_max_length(GTK_ENTRY(data.tools.inputEntry), 35); //limit char input
 
-    int queryResult = allTask(user.conn);
+    int queryResult = allTask(data.conn);
     if (queryResult == -1) {
         g_print("Error: can't collect all tasks");
     }
     for (int i = 0; i < queryResult; i++) {
-        addTasks(GTK_WIDGET(user.addTask), &user, i);
+        addTasks(GTK_WIDGET(data.tools.addTask), &data, i);
     }
-    user.repopulatedTask = 1;
+    data.state.repopulatedTask = 1;
 
-    queryResult = allProject(user.conn);
+    queryResult = allProject(data.conn);
     if (queryResult == -1) {
         g_print("Error: can't collect all projects");
     }
     for (int i = 0; i < queryResult; i++) {
-        addProject(GTK_WIDGET(user.addProject), GTK_RESPONSE_OK, &user, i);
+        addProject(GTK_WIDGET(data.tools.addProject), GTK_RESPONSE_OK, &data, i);
     }
-    user.repopulatedProject = 1;
+    data.state.repopulatedProject = 1;
 
-    g_signal_connect(user.addTask, "clicked", G_CALLBACK(addTasks), &user);
-    g_signal_connect(user.addProject, "clicked", G_CALLBACK(addProjectWindow), &user);
+    g_signal_connect(data.tools.addTask, "clicked", G_CALLBACK(addTasks), &data);
+    g_signal_connect(data.tools.addProject, "clicked", G_CALLBACK(addProjectWindow), &data);
 
-    gtk_builder_connect_signals(user.builder, NULL);
+    gtk_builder_connect_signals(data.tools.builder, NULL);
 
-    g_object_unref(user.builder);
+    g_object_unref(data.tools.builder);
 
-    gtk_widget_show(user.window);
+    gtk_widget_show(data.tools.window);
     gtk_main();
 
     return 0;
