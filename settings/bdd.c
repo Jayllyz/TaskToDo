@@ -150,16 +150,15 @@ int deleteProjectDB(PGconn *conn, const gchar *name)
 int allTask(PGconn *conn)
 {
     PGresult *res;
-    char *query = malloc(sizeof(char) * 1000);
+    char *query = malloc(sizeof(char) * strlen("SELECT * FROM Task"));
     sprintf(query, "SELECT * FROM Task");
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
-        printf("Error: Can't get all task");
+        g_print("Error: Can't get all task");
         return -1;
     }
 
     int amountOfTask = PQntuples(res);
-
     free(query);
     PQclear(res);
     return amountOfTask;
@@ -168,16 +167,15 @@ int allTask(PGconn *conn)
 int allProject(PGconn *conn)
 {
     PGresult *res;
-    char *query = malloc(sizeof(char) * 1000);
+    char *query = malloc(sizeof(char) * strlen("SELECT * FROM Project"));
     sprintf(query, "SELECT * FROM Project");
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
-        printf("Error: Can't get all projects");
+        g_print("Error: Can't get all projects");
         return -1;
     }
 
     int amountOfProject = PQntuples(res);
-
     free(query);
     PQclear(res);
     return amountOfProject - 6;
