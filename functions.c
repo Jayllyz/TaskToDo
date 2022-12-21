@@ -195,11 +195,10 @@ void deleteProject(GtkWidget *projectDelete, gpointer data)
 void addTasks(GtkWidget *task, gpointer data, int presentTask)
 {
     struct data *dataP = data;
-    char *getText;
+    gchar *getText;
     getText = malloc(sizeof(char) * strlen(get_text_of_entry(dataP->tools.inputEntry)) + 1);
     strcpy(getText, get_text_of_entry(dataP->tools.inputEntry));
 
-    g_print("ok");
     g_print("%s", getText);
 
     // if (strcmp(getText, "") == 0 && dataP->state.repopulatedTask == 1) {
@@ -281,7 +280,7 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask)
     // }
 }
 
-char *get_text_of_entry(GtkWidget *inputEntry) //recup le contenu d'un "textview"
+gchar *get_text_of_entry(GtkWidget *inputEntry) //recup le contenu d'un "textview"
 {
     GtkEntryBuffer *buffer = gtk_entry_get_buffer((GtkEntry *)inputEntry);
     gchar *text;
@@ -375,7 +374,7 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProje
 {
     struct data *dataP = data;
     if (clicked == GTK_RESPONSE_OK) {
-        char *projectName;
+        gchar *projectName;
         if (dataP->state.repopulatedProject == 1) {
             projectName = get_text_of_entry(dataP->tools.projectNameEntry);
             if (projectExist(dataP->conn, projectName) == 1 || projectName == NULL) {

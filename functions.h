@@ -53,7 +53,7 @@ void editTaskDB(GtkDialog *window, gint clicked, gpointer entry);
 void addTasks(GtkWidget *task, gpointer data, int presentTask);
 void deleteTask(GtkWidget *taskDelete, gpointer data);
 void deleteProject(GtkWidget *projectDelete, gpointer data);
-char *get_text_of_entry(GtkWidget *testEntry);
+gchar *get_text_of_entry(GtkWidget *testEntry);
 int readOneConfigValue(char *propName);
 int taskExist(PGconn *conn, char *input, const gchar *name);
 int projectExist(PGconn *conn, const gchar *name);
