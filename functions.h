@@ -24,7 +24,7 @@ struct GTKTools {
     GtkWidget *inEditing;
     GtkWidget *projectNameEntry;
     GtkWidget *pageTitleBox[10];
-    GtkWidget *taskNumberMarker[10];
+    GtkWidget *projectTaskBox[10];
 };
 
 struct TaskProjectState {

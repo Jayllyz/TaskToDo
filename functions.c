@@ -1,6 +1,7 @@
 #include "functions.h"
 #include <gtk/gtk.h>
 #include <stdio.h>
+#include <string.h>
 
 void changeTaskStatus(GtkWidget *taskStatus, gpointer data)
 {
@@ -260,11 +261,11 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask)
 
     char numberToTransfer[3];
     sprintf(numberToTransfer, "%d", dataP->state.i);
-    dataP->tools.taskNumberMarker[dataP->state.i] = gtk_button_new_with_label(numberToTransfer);
-    gtk_box_pack_start(GTK_BOX(dataP->tools.boxTask[dataP->state.i]), dataP->tools.taskNumberMarker[dataP->state.i], FALSE, FALSE, 0);
+    GtkWidget *taskNumberMarker = gtk_button_new_with_label(numberToTransfer);
+    gtk_box_pack_start(GTK_BOX(dataP->tools.boxTask[dataP->state.i]), taskNumberMarker, FALSE, FALSE, 0);
 
     gtk_widget_show_all(dataP->tools.boxTask[dataP->state.i]);
-    gtk_widget_hide(dataP->tools.taskNumberMarker[dataP->state.i]);
+    gtk_widget_hide(taskNumberMarker);
 
     gtk_entry_set_text(GTK_ENTRY(dataP->tools.inputEntry), "");
     dataP->state.unusedTaskSpace--;
@@ -416,6 +417,34 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProje
         GtkWidget *projectNumberMarker = gtk_button_new_with_label(numberToTransfer);
 
         GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+
+        dataP->tools.projectTaskBox[dataP->state.i] = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+        gtk_box_pack_start(GTK_BOX(box), dataP->tools.projectTaskBox[dataP->state.i], FALSE, FALSE, 0);
+        GtkWidget *separatorH = gtk_separator_new(GTK_ORIENTATION_HORIZONTAL);
+        gtk_widget_set_size_request(separatorH, -1, 5);
+        gtk_box_pack_start(GTK_BOX(box), separatorH, FALSE, FALSE, 0);
+
+        GtkWidget *status = gtk_label_new("Status");
+        gtk_widget_set_margin_top(status, 10);
+        gtk_widget_set_margin_bottom(status, 10);
+        gtk_widget_set_size_request(status, 150, -1);
+        gtk_box_pack_start(GTK_BOX(dataP->tools.projectTaskBox[dataP->state.i]), status, FALSE, FALSE, 0);
+
+        GtkWidget *separatorV = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
+        gtk_widget_set_size_request(separatorV, 5, -1);
+        gtk_box_pack_start(GTK_BOX(dataP->tools.projectTaskBox[dataP->state.i]), separatorV, FALSE, FALSE, 0);
+
+        GtkWidget *projectTitle;
+        if (dataP->state.repopulatedProject == 1) {
+            projectTitle = gtk_label_new(projectName);
+        }
+        else if (dataP->state.repopulatedProject == 0) {
+            projectTitle = gtk_label_new(selectProject(dataP->conn, presentProject));
+        }
+        gtk_box_pack_start(GTK_BOX(dataP->tools.projectTaskBox[dataP->state.i]), projectTitle, TRUE, FALSE, 0);
+        gtk_widget_show_all(dataP->tools.projectTaskBox[dataP->state.i]);
+        gtk_widget_show_all(box);
+
         gtk_box_pack_start(GTK_BOX(dataP->tools.pageTitleBox[dataP->state.i]), title, TRUE, FALSE, 0);
         gtk_box_pack_start(GTK_BOX(dataP->tools.pageTitleBox[dataP->state.i]), titleButton, FALSE, FALSE, 0);
         gtk_box_pack_start(GTK_BOX(dataP->tools.pageTitleBox[dataP->state.i]), projectNumberMarker, FALSE, FALSE, 0);
