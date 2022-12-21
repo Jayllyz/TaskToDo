@@ -58,6 +58,17 @@ int createTables(PGconn *conn)
 
     PQclear(res);
 
+    res = PQexec(conn,
+        "INSERT INTO Project (Name, Description, Priority, Date, Deadline, Color) VALUES ('Ma journée', 'placeholder', 0, 'now()', 'now()', 'black'), ('Important', "
+        "'placeholder', 0, 'now()', 'now()', 'red'), ('Prévu', 'placeholder', 0, 'now()', 'now()', 'blue'), ('Tâches', 'placeholder', 0, 'now()', 'now()', "
+        "'green'), ('Projets', 'placeholder', 0, 'now()', 'now()', 'grey') , ('Finance', 'placeholder', 0, 'now()', 'now()', 'orange')");
+
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        bddExist(conn, res);
+    }
+
+    PQclear(res);
+
     FILE *file = fopen("settings/config.txt", "r+");
     char *line = NULL;
     size_t len = 0;
@@ -121,6 +132,21 @@ int deleteTaskDB(PGconn *conn, const gchar *name)
     return 0;
 }
 
+int deleteProjectDB(PGconn *conn, const gchar *name)
+{
+    PGresult *res;
+    char *query = malloc(sizeof(char) * 1000);
+    sprintf(query, "DELETE FROM Project WHERE name='%s'", name);
+    res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        bddExist(conn, res);
+        return -1;
+    }
+    free(query);
+    PQclear(res);
+    return 0;
+}
+
 int allTask(PGconn *conn)
 {
     PGresult *res;
@@ -139,6 +165,24 @@ int allTask(PGconn *conn)
     return amountOfTask;
 }
 
+int allProject(PGconn *conn)
+{
+    PGresult *res;
+    char *query = malloc(sizeof(char) * 1000);
+    sprintf(query, "SELECT * FROM Project");
+    res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        printf("Error: Can't get all projects");
+        return -1;
+    }
+
+    int amountOfProject = PQntuples(res);
+
+    free(query);
+    PQclear(res);
+    return amountOfProject - 6;
+}
+
 char *selectTask(PGconn *conn, int row)
 {
     PGresult *res;
@@ -147,6 +191,24 @@ char *selectTask(PGconn *conn, int row)
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
         return "Error: Can't get the task";
+    }
+
+    char *name = PQgetvalue(res, 0, 0);
+
+    free(query);
+    PQclear(res);
+
+    return name;
+}
+
+char *selectProject(PGconn *conn, int row)
+{
+    PGresult *res;
+    char *query = malloc(sizeof(char) * 1000);
+    sprintf(query, "SELECT name FROM Project ORDER BY date LIMIT 1 OFFSET %d", 6 + row);
+    res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        return "Error: Can't get the Project";
     }
 
     char *name = PQgetvalue(res, 0, 0);

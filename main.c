@@ -35,17 +35,24 @@ int main(int argc, char *argv[])
 
     //Datas
     user.maxTask = 6;
+    user.maxProject = 3;
     user.unusedTaskSpace = user.maxTask;
     user.window = GTK_WIDGET(gtk_builder_get_object(user.builder, "window_main"));
     user.addTask = GTK_BUTTON(gtk_builder_get_object(user.builder, "addTask"));
+    user.addProject = GTK_BUTTON(gtk_builder_get_object(user.builder, "addProject"));
     user.boxV = GTK_BOX(gtk_builder_get_object(user.builder, "boxV"));
     user.i = 0;
     user.inputEntry = GTK_WIDGET(gtk_builder_get_object(user.builder, "inputEntry"));
     user.notebook = GTK_NOTEBOOK(gtk_builder_get_object(user.builder, "project_notebook"));
-    user.repopulated = 0;
+    user.repopulatedTask = 0;
+    user.repopulatedProject = 0;
+    user.projectCount = 0;
     for (int i = 0; i < user.maxTask; i++) {
         user.task[i] = gtk_label_new("");
         user.taskNumber[i] = i;
+    }
+    for (int i = 0; i < user.maxProject; i++) {
+        user.projectNumber[i] = i;
     }
 
     //signals
@@ -53,14 +60,24 @@ int main(int argc, char *argv[])
 
     int queryResult = allTask(user.conn);
     if (queryResult == -1) {
-        printf("Error: can't collect all tasks");
+        g_print("Error: can't collect all tasks");
     }
     for (int i = 0; i < queryResult; i++) {
         addTasks(GTK_WIDGET(user.addTask), &user, i);
     }
-    user.repopulated = 1;
+    user.repopulatedTask = 1;
+
+    queryResult = allProject(user.conn);
+    if (queryResult == -1) {
+        g_print("Error: can't collect all projects");
+    }
+    for (int i = 0; i < queryResult; i++) {
+        addProject(GTK_WIDGET(user.addProject), GTK_RESPONSE_OK, &user, i);
+    }
+    user.repopulatedProject = 1;
 
     g_signal_connect(user.addTask, "clicked", G_CALLBACK(addTasks), &user);
+    g_signal_connect(user.addProject, "clicked", G_CALLBACK(addProjectWindow), &user);
 
     gtk_builder_connect_signals(user.builder, NULL);
 
