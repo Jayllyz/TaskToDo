@@ -196,7 +196,7 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask)
 {
     struct data *dataP = data;
     gchar *getText;
-    getText = malloc(sizeof(char) * strlen(get_text_of_entry(dataP->tools.inputEntry)) + 1);
+    getText = malloc(sizeof(gchar) * strlen(get_text_of_entry(dataP->tools.inputEntry)) + 1);
     strcpy(getText, get_text_of_entry(dataP->tools.inputEntry));
 
     g_print("%s", getText);
