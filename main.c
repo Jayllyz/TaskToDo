@@ -34,9 +34,9 @@ int main(int argc, char *argv[])
     gtk_builder_add_from_file(data.tools.builder, "data/window_main.glade", NULL);
 
     //Datas
-    data.state.maxTask = 6;
+    data.state.maxTaskTotal = 50;
+    data.state.maxTaskPerProject = 6;
     data.state.maxProject = 3;
-    data.state.unusedTaskSpace = data.state.maxTask;
     data.tools.window = GTK_WIDGET(gtk_builder_get_object(data.tools.builder, "window_main"));
     data.tools.addTask = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "addTask"));
     data.tools.addProject = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "addProject"));
@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
     data.state.repopulatedTask = 0;
     data.state.repopulatedProject = 0;
     data.state.projectCount = 0;
-    for (int i = 0; i < data.state.maxTask; i++) {
+    for (int i = 0; i < data.state.maxTaskTotal; i++) {
         data.tools.task[i] = gtk_label_new("");
         data.state.taskNumber[i] = i;
     }
@@ -58,16 +58,7 @@ int main(int argc, char *argv[])
     //signals
     gtk_entry_set_max_length(GTK_ENTRY(data.tools.inputEntry), 35); //limit char input
 
-    int queryResult = allTask(data.conn);
-    if (queryResult == -1) {
-        g_print("Error: can't collect all tasks");
-    }
-    for (int i = 0; i < queryResult; i++) {
-        addTasks(GTK_WIDGET(data.tools.addTask), &data, i);
-    }
-    data.state.repopulatedTask = 1;
-
-    queryResult = allProject(data.conn);
+    int queryResult = allProject(data.conn);
     if (queryResult == -1) {
         g_print("Error: can't collect all projects");
     }
@@ -75,6 +66,19 @@ int main(int argc, char *argv[])
         addProject(GTK_WIDGET(data.tools.addProject), GTK_RESPONSE_OK, &data, i);
     }
     data.state.repopulatedProject = 1;
+
+    queryResult = allTask(data.conn);
+    if (queryResult == -1) {
+        g_print("Error: can't collect all tasks");
+    }
+    for (int i = 0; i < queryResult; i++) {
+        int taskToAdd = selectTaskId(data.conn, i);
+        data.state.taskNumber[taskToAdd] = -1;
+        char *project = selectProjectName(data.conn, taskToAdd);
+        addTasks(GTK_WIDGET(data.tools.addTask), &data, taskToAdd, project);
+    }
+    data.state.repopulatedTask = 1;
+    gtk_notebook_set_current_page(data.tools.notebook, 0);
 
     g_signal_connect(data.tools.addTask, "clicked", G_CALLBACK(addTasks), &data);
     g_signal_connect(data.tools.addProject, "clicked", G_CALLBACK(addProjectWindow), &data);
