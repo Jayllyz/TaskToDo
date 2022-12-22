@@ -34,9 +34,10 @@ int main(int argc, char *argv[])
     gtk_builder_add_from_file(data.tools.builder, "data/window_main.glade", NULL);
 
     //Datas
-    data.state.maxTask = 6;
+    data.state.maxTaskTotal = 50;
+    data.state.maxTaskPerProject = 6;
     data.state.maxProject = 3;
-    data.state.unusedTaskSpace = data.state.maxTask;
+    data.state.unusedTaskSpace = data.state.maxTaskPerProject;
     data.tools.window = GTK_WIDGET(gtk_builder_get_object(data.tools.builder, "window_main"));
     data.tools.addTask = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "addTask"));
     data.tools.addProject = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "addProject"));
@@ -47,7 +48,7 @@ int main(int argc, char *argv[])
     data.state.repopulatedTask = 0;
     data.state.repopulatedProject = 0;
     data.state.projectCount = 0;
-    for (int i = 0; i < data.state.maxTask; i++) {
+    for (int i = 0; i < data.state.maxTaskTotal; i++) {
         data.tools.task[i] = gtk_label_new("");
         data.state.taskNumber[i] = i;
     }
