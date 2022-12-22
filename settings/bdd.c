@@ -86,12 +86,12 @@ int createTables(PGconn *conn)
     return 0;
 }
 
-int insertTask(PGconn *conn, int id, char *name, char *description, int priority, char *deadline, int status, const gchar *projectName)
+int insertTask(PGconn *conn, char *name, char *description, int priority, char *deadline, int status, const gchar *projectName)
 {
     PGresult *res;
     char *query = malloc(sizeof(char) * 1000);
-    sprintf(query, "INSERT INTO Task ( Id, Name, Description, Priority, Deadline, Status, ProjectName) VALUES ( %d,'%s', '%s', %d, '%s', %d, '%s')", id, name,
-        description, priority, deadline, status, projectName);
+    sprintf(query, "INSERT INTO Task ( Name, Description, Priority, Deadline, Status, ProjectName) VALUES ('%s', '%s', %d, '%s', %d, '%s')", name, description, priority,
+        deadline, status, projectName);
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
         bddExist(conn, res);
