@@ -290,7 +290,7 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask)
     dataP->state.unusedTaskSpace--;
 
     if (dataP->state.repopulatedTask == 1) {
-        int queryResult = insertTask(dataP->conn, getText, "", 1, "now()", 0, name); //insert in db
+        int queryResult = insertTask(dataP->conn, dataP->state.i, getText, "", 1, "now()", 0, name); //insert in db
         if (queryResult == -1) {
             g_print("Error: insertTask failed");
         }
