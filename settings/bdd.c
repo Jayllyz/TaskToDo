@@ -272,6 +272,24 @@ int selectPriority(PGconn *conn, int id)
     return priority;
 }
 
+char *selectProjectName(PGconn *conn, int id)
+{
+    PGresult *res;
+    char *query = malloc(sizeof(char) * 1000);
+    sprintf(query, "SELECT projectName FROM Task WHERE id = '%d'", id);
+    res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        return "Error: Can't get the task";
+    }
+
+    char *projectName = PQgetvalue(res, 0, 0);
+
+    free(query);
+    PQclear(res);
+
+    return projectName;
+}
+
 int updateDescription(PGconn *conn, const gchar *description, int id)
 {
     PGresult *res;

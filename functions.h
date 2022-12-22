@@ -28,14 +28,13 @@ struct GTKTools {
 };
 
 struct TaskProjectState {
-    int taskNumber[10];
+    int taskNumber[50];
     int projectNumber[10];
     int i;
     int maxTaskPerProject;
     int maxTaskTotal;
     int maxProject;
     int projectCount;
-    int unusedTaskSpace;
     int repopulatedTask;
     int repopulatedProject;
     int inEditingId;
@@ -52,7 +51,7 @@ void changeTaskStatus(GtkWidget *taskStatus, gpointer data);
 void changeTaskPriority(GtkWidget *taskPriority, gpointer data);
 void editTaskWindow(GtkWidget *taskEdit, gpointer data);
 void editTaskDB(GtkDialog *window, gint clicked, gpointer entry);
-void addTasks(GtkWidget *task, gpointer data, int presentTask);
+void addTasks(GtkWidget *task, gpointer data, int presentTask, gchar *projectName);
 void deleteTask(GtkWidget *taskDelete, gpointer data);
 void deleteProject(GtkWidget *projectDelete, gpointer data);
 gchar *get_text_of_entry(GtkWidget *testEntry);
@@ -76,6 +75,7 @@ int selectTaskId(PGconn *conn, int row);
 char *selectProject(PGconn *conn, int row);
 char *selectDescription(PGconn *conn, int id);
 int selectPriority(PGconn *conn, int id);
+char *selectProjectName(PGconn *conn, int id);
 int updateDescription(PGconn *conn, const gchar *description, int id);
 int updatePriority(PGconn *conn, int priority, int id);
 

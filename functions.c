@@ -150,7 +150,6 @@ void deleteTask(GtkWidget *taskDelete, gpointer data)
 
     gtk_widget_destroy(taskToDelete);
     dataP->tools.task[numberToChange] = gtk_label_new("");
-    dataP->state.unusedTaskSpace++;
 }
 
 void deleteProject(GtkWidget *projectDelete, gpointer data)
@@ -194,20 +193,43 @@ void deleteProject(GtkWidget *projectDelete, gpointer data)
     dataP->state.projectCount--;
 }
 
-void addTasks(GtkWidget *task, gpointer data, int presentTask)
+void addTasks(GtkWidget *task, gpointer data, int presentTask, gchar *presentProjectName)
 {
     struct data *dataP = data;
     gchar *getText;
+
+    if (dataP->state.repopulatedTask == 0) {
+
+        gtk_notebook_set_current_page(dataP->tools.notebook, 0);
+
+        for (int i = 0; i < allProject(dataP->conn); i++) {
+
+            GtkWidget *projectPageBox = gtk_notebook_get_nth_page(GTK_NOTEBOOK(dataP->tools.notebook), i + 6);
+            GtkWidget *projectLabelBox = gtk_notebook_get_tab_label(GTK_NOTEBOOK(dataP->tools.notebook), projectPageBox);
+            GList *projectBoxChildren = gtk_container_get_children(GTK_CONTAINER(projectLabelBox));
+            GtkWidget *projectLabel = g_list_nth_data(projectBoxChildren, 0);
+            const gchar *projectLabelName = gtk_label_get_label(GTK_LABEL(projectLabel));
+
+            g_print("%s\n", projectLabelName);
+            g_print("%s\n", presentProjectName);
+
+            if (strcmp(projectLabelName, presentProjectName) == 0) {
+                g_print("ok\n");
+                gtk_notebook_set_current_page(dataP->tools.notebook, i + 6);
+            }
+            g_list_free(projectBoxChildren);
+        }
+    }
 
     gint currentPage = gtk_notebook_get_current_page(GTK_NOTEBOOK(dataP->tools.notebook));
     GtkWidget *pageBox = gtk_notebook_get_nth_page(GTK_NOTEBOOK(dataP->tools.notebook), currentPage); //boxV
     GList *children = gtk_container_get_children(GTK_CONTAINER(pageBox));
     int numberOfTask = g_list_length(children) - 3;
-    GtkWidget *addProjectBox = g_list_last(children)->data; //boxAdd
+    GtkWidget *addProjectBox = g_list_last(children)->data;
     g_list_free(children);
 
     children = gtk_container_get_children(GTK_CONTAINER(addProjectBox));
-    GtkWidget *entry = g_list_last(children)->data; //entry
+    GtkWidget *entry = g_list_last(children)->data;
     g_list_free(children);
 
     getText = malloc(sizeof(gchar) * strlen(get_text_of_entry(entry)) + 1);
@@ -221,11 +243,18 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask)
         return;
     }
 
-    for (dataP->state.i = 0; dataP->state.i < dataP->state.maxTaskTotal; dataP->state.i++) {
-        if (dataP->state.taskNumber[dataP->state.i] != -1) {
-            dataP->state.taskNumber[dataP->state.i] = -1;
-            break;
+    //Attribution de l'id
+    if (dataP->state.repopulatedTask == 1) {
+        for (dataP->state.i = 0; dataP->state.i < dataP->state.maxTaskTotal; dataP->state.i++) {
+            if (dataP->state.taskNumber[dataP->state.i] != -1) {
+                dataP->state.taskNumber[dataP->state.i] = -1;
+                break;
+            }
         }
+    }
+    else if (dataP->state.repopulatedTask == 0) {
+        dataP->state.taskNumber[presentTask] = -1;
+        dataP->state.i = presentTask;
     }
 
     const gchar *name;
@@ -283,10 +312,9 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask)
     gtk_box_pack_start(GTK_BOX(dataP->tools.boxTask[dataP->state.i]), taskNumberMarker, FALSE, FALSE, 0);
 
     gtk_widget_show_all(dataP->tools.boxTask[dataP->state.i]);
-    //gtk_widget_hide(taskNumberMarker);
+    gtk_widget_hide(taskNumberMarker);
 
     gtk_entry_set_text(GTK_ENTRY(entry), "");
-    dataP->state.unusedTaskSpace--;
 
     if (dataP->state.repopulatedTask == 1) {
         int queryResult = insertTask(dataP->conn, dataP->state.i, getText, "", 1, "now()", 0, name); //insert in db

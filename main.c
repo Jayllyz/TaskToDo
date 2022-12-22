@@ -37,7 +37,6 @@ int main(int argc, char *argv[])
     data.state.maxTaskTotal = 50;
     data.state.maxTaskPerProject = 6;
     data.state.maxProject = 3;
-    data.state.unusedTaskSpace = data.state.maxTaskPerProject;
     data.tools.window = GTK_WIDGET(gtk_builder_get_object(data.tools.builder, "window_main"));
     data.tools.addTask = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "addTask"));
     data.tools.addProject = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "addProject"));
@@ -59,17 +58,7 @@ int main(int argc, char *argv[])
     //signals
     gtk_entry_set_max_length(GTK_ENTRY(data.tools.inputEntry), 35); //limit char input
 
-    int queryResult = allTask(data.conn);
-    if (queryResult == -1) {
-        g_print("Error: can't collect all tasks");
-    }
-    for (int i = 0; i < queryResult; i++) {
-        int taskToAdd = selectTaskId(data.conn, i);
-        addTasks(GTK_WIDGET(data.tools.addTask), &data, taskToAdd);
-    }
-    data.state.repopulatedTask = 1;
-
-    queryResult = allProject(data.conn);
+    int queryResult = allProject(data.conn);
     if (queryResult == -1) {
         g_print("Error: can't collect all projects");
     }
@@ -77,6 +66,18 @@ int main(int argc, char *argv[])
         addProject(GTK_WIDGET(data.tools.addProject), GTK_RESPONSE_OK, &data, i);
     }
     data.state.repopulatedProject = 1;
+
+    queryResult = allTask(data.conn);
+    if (queryResult == -1) {
+        g_print("Error: can't collect all tasks");
+    }
+    for (int i = 0; i < queryResult; i++) {
+        int taskToAdd = selectTaskId(data.conn, i);
+        data.state.taskNumber[taskToAdd] = -1;
+        gchar *project = selectProjectName(data.conn, taskToAdd);
+        addTasks(GTK_WIDGET(data.tools.addTask), &data, taskToAdd, project);
+    }
+    data.state.repopulatedTask = 1;
 
     g_signal_connect(data.tools.addTask, "clicked", G_CALLBACK(addTasks), &data);
     g_signal_connect(data.tools.addProject, "clicked", G_CALLBACK(addProjectWindow), &data);
