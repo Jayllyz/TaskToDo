@@ -47,7 +47,8 @@ int createTables(PGconn *conn)
     PQclear(res);
 
     res = PQexec(conn,
-        "CREATE TABLE IF NOT EXISTS Task(Name VARCHAR(20) PRIMARY KEY, Description VARCHAR(100), Priority INT, Date TIMESTAMPTZ DEFAULT NOW(), Deadline TIMESTAMPTZ, "
+        "CREATE TABLE IF NOT EXISTS Task(Id SERIAL PRIMARY KEY, Name VARCHAR(20), Description VARCHAR(100), Priority INT, Date TIMESTAMPTZ DEFAULT NOW(), Deadline "
+        "TIMESTAMPTZ, "
         "Status INT NOT NULL DEFAULT 0, ProjectName "
         "VARCHAR(20), "
         "FOREIGN KEY (ProjectName) REFERENCES Project(Name) ON DELETE CASCADE)");
