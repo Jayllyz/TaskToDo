@@ -64,7 +64,8 @@ int main(int argc, char *argv[])
         g_print("Error: can't collect all tasks");
     }
     for (int i = 0; i < queryResult; i++) {
-        addTasks(GTK_WIDGET(data.tools.addTask), &data, i);
+        int taskToAdd = selectTaskId(data.conn, i);
+        addTasks(GTK_WIDGET(data.tools.addTask), &data, taskToAdd);
     }
     data.state.repopulatedTask = 1;
 

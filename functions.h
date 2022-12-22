@@ -38,6 +38,7 @@ struct TaskProjectState {
     int unusedTaskSpace;
     int repopulatedTask;
     int repopulatedProject;
+    int inEditingId;
 };
 
 struct data {
@@ -66,15 +67,16 @@ int createTables(PGconn *conn);
 void bddExist(PGconn *conn, PGresult *res);
 int insertTask(PGconn *conn, int id, char *name, char *description, int priority, char *deadline, int status, const gchar *projectName);
 int insertProject(PGconn *conn, char *name, char *description, int priority, char *deadline, char *color);
-int deleteTaskDB(PGconn *conn, const gchar *name);
+int deleteTaskDB(PGconn *conn, int id);
 int deleteProjectDB(PGconn *conn, const gchar *name);
 int allTask(PGconn *conn);
 int allProject(PGconn *conn);
 char *selectTask(PGconn *conn, int row);
+int selectTaskId(PGconn *conn, int row);
 char *selectProject(PGconn *conn, int row);
-char *selectDescription(PGconn *conn, const gchar *name);
-int selectPriority(PGconn *conn, const gchar *name);
-int updateDescription(PGconn *conn, const gchar *description, const gchar *name);
-int updatePriority(PGconn *conn, int priority, const gchar *name);
+char *selectDescription(PGconn *conn, int id);
+int selectPriority(PGconn *conn, int id);
+int updateDescription(PGconn *conn, const gchar *description, int id);
+int updatePriority(PGconn *conn, int priority, int id);
 
 #endif

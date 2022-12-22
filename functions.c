@@ -45,13 +45,17 @@ void editTaskWindow(GtkWidget *taskEdit, gpointer data)
     const gchar *taskName = gtk_label_get_text(GTK_LABEL(taskWidget));
     dataP->tools.inEditing = taskWidget;
 
+    GtkWidget *idWidget = g_list_nth_data(children, 5);
+    int id = atoi(gtk_button_get_label(GTK_BUTTON(idWidget)));
+    dataP->state.inEditingId = id;
+
     GtkWidget *editWindow = gtk_dialog_new_with_buttons(taskName, NULL, GTK_DIALOG_MODAL, "Confirmer", GTK_RESPONSE_OK, "Annuler", GTK_RESPONSE_CANCEL, NULL);
     GtkWidget *descriptionLabel = gtk_label_new("Description de la tâche");
     dataP->tools.descriptionEntry = gtk_entry_new();
     gtk_widget_set_size_request(dataP->tools.descriptionEntry, 200, 50);
 
     GtkWidget *priorityButton = gtk_button_new();
-    int priority = selectPriority(dataP->conn, taskName);
+    int priority = selectPriority(dataP->conn, id);
 
     if (priority == 0) {
         gtk_button_set_label(GTK_BUTTON(priorityButton), "Mineure");
@@ -70,7 +74,7 @@ void editTaskWindow(GtkWidget *taskEdit, gpointer data)
     }
     g_signal_connect(priorityButton, "clicked", G_CALLBACK(changeTaskPriority), dataP->tools.descriptionEntry);
 
-    gtk_entry_set_text(GTK_ENTRY(dataP->tools.descriptionEntry), selectDescription(dataP->conn, taskName));
+    gtk_entry_set_text(GTK_ENTRY(dataP->tools.descriptionEntry), selectDescription(dataP->conn, id));
 
     gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(editWindow))), descriptionLabel);
     gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(editWindow))), dataP->tools.descriptionEntry);
@@ -79,7 +83,7 @@ void editTaskWindow(GtkWidget *taskEdit, gpointer data)
 
     g_signal_connect(editWindow, "response", G_CALLBACK(editTaskDB), dataP);
 
-    gtk_widget_set_tooltip_text(taskWidget, selectDescription(dataP->conn, taskName));
+    gtk_widget_set_tooltip_text(taskWidget, selectDescription(dataP->conn, id));
 }
 
 void editTaskDB(GtkDialog *window, gint clicked, gpointer data)
@@ -97,23 +101,23 @@ void editTaskDB(GtkDialog *window, gint clicked, gpointer data)
         GtkWidget *priorityButton = g_list_nth_data(children, 2);
         const gchar *setPriority = gtk_button_get_label(GTK_BUTTON(priorityButton));
 
-        queryResult = updateDescription(dataP->conn, text, taskName);
+        queryResult = updateDescription(dataP->conn, text, dataP->state.inEditingId);
         if (queryResult != 0) {
             g_print("Erreur de la modification de la base");
             return;
         }
 
         if (strcmp(setPriority, "Mineure") == 0) {
-            queryResult = updatePriority(dataP->conn, 0, taskName);
+            queryResult = updatePriority(dataP->conn, 0, dataP->state.inEditingId);
         }
         else if (strcmp(setPriority, "Normale") == 0) {
-            queryResult = updatePriority(dataP->conn, 1, taskName);
+            queryResult = updatePriority(dataP->conn, 1, dataP->state.inEditingId);
         }
         else if (strcmp(setPriority, "Importante") == 0) {
-            queryResult = updatePriority(dataP->conn, 2, taskName);
+            queryResult = updatePriority(dataP->conn, 2, dataP->state.inEditingId);
         }
         else if (strcmp(setPriority, "Urgente") == 0) {
-            queryResult = updatePriority(dataP->conn, 3, taskName);
+            queryResult = updatePriority(dataP->conn, 3, dataP->state.inEditingId);
         }
 
         if (queryResult != 0) {
@@ -121,7 +125,7 @@ void editTaskDB(GtkDialog *window, gint clicked, gpointer data)
             return;
         }
 
-        gtk_widget_set_tooltip_text(dataP->tools.inEditing, selectDescription(dataP->conn, taskName));
+        gtk_widget_set_tooltip_text(dataP->tools.inEditing, selectDescription(dataP->conn, dataP->state.inEditingId));
     }
     gtk_widget_destroy(GTK_WIDGET(window));
 }
@@ -132,14 +136,12 @@ void deleteTask(GtkWidget *taskDelete, gpointer data)
     GtkWidget *taskToDelete = gtk_widget_get_parent(taskDelete);
     GList *boxChildren = gtk_container_get_children(GTK_CONTAINER(taskToDelete));
     GtkWidget *numberToFree = g_list_nth_data(boxChildren, 5);
-    GtkWidget *labelOfTask = g_list_nth_data(boxChildren, 2);
     g_list_free(boxChildren);
 
     int numberToChange = atoi(gtk_button_get_label(GTK_BUTTON(numberToFree)));
     dataP->state.taskNumber[numberToChange] = numberToChange;
 
-    const gchar *nameOfTask = gtk_label_get_text(GTK_LABEL(labelOfTask));
-    int queryResult = deleteTaskDB(dataP->conn, nameOfTask);
+    int queryResult = deleteTaskDB(dataP->conn, numberToChange);
 
     if (queryResult == -1) {
         g_print("Error: insertTask failed");
@@ -254,7 +256,7 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask)
 
     if (dataP->state.repopulatedTask == 0) {
         gtk_label_set_text(GTK_LABEL(dataP->tools.task[dataP->state.i]), selectTask(dataP->conn, presentTask));
-        gtk_widget_set_tooltip_text(dataP->tools.task[dataP->state.i], selectDescription(dataP->conn, selectTask(dataP->conn, presentTask)));
+        gtk_widget_set_tooltip_text(dataP->tools.task[dataP->state.i], selectDescription(dataP->conn, presentTask));
     }
     else {
         gtk_label_set_text(GTK_LABEL(dataP->tools.task[dataP->state.i]), getText);
@@ -271,12 +273,17 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask)
     g_signal_connect(dataP->tools.taskDelete[dataP->state.i], "clicked", G_CALLBACK(deleteTask), dataP);
 
     char numberToTransfer[3];
-    sprintf(numberToTransfer, "%d", dataP->state.i);
+    if (dataP->state.repopulatedTask == 0) {
+        sprintf(numberToTransfer, "%d", presentTask);
+    }
+    else if (dataP->state.repopulatedTask == 1) {
+        sprintf(numberToTransfer, "%d", dataP->state.i);
+    }
     GtkWidget *taskNumberMarker = gtk_button_new_with_label(numberToTransfer);
     gtk_box_pack_start(GTK_BOX(dataP->tools.boxTask[dataP->state.i]), taskNumberMarker, FALSE, FALSE, 0);
 
     gtk_widget_show_all(dataP->tools.boxTask[dataP->state.i]);
-    gtk_widget_hide(taskNumberMarker);
+    //gtk_widget_hide(taskNumberMarker);
 
     gtk_entry_set_text(GTK_ENTRY(entry), "");
     dataP->state.unusedTaskSpace--;
