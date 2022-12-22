@@ -4,30 +4,46 @@
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
 
-struct data {
+struct GTKTools {
     GtkBuilder *builder;
     GtkWidget *window;
     GtkButton *addTask;
-    GtkWidget *taskStatus[10];
-    GtkWidget *taskSeparator[10];
+    GtkButton *addProject;
+    GtkWidget *taskStatus[50];
+    GtkWidget *taskSeparator[50];
     GtkBox *boxV;
-    GtkWidget *boxTask[10];
-    GtkWidget *task[10];
-    GtkWidget *taskPriority[10];
-    GtkWidget *taskEdit[10];
-    GtkWidget *taskDelete[10];
-    int taskNumber[10];
-    GtkWidget *taskNumberMarker[10];
-    int i;
-    int maxTask;
+    GtkWidget *boxTask[50];
+    GtkWidget *task[50];
+    GtkWidget *taskPriority[50];
+    GtkWidget *taskEdit[50];
+    GtkWidget *taskDelete[50];
     GtkWidget *inputEntry;
     GtkLabel *outputLabel;
-    PGconn *conn;
     GtkNotebook *notebook;
-    int unusedTaskSpace;
-    int repopulated;
     GtkWidget *descriptionEntry;
     GtkWidget *inEditing;
+    GtkWidget *projectNameEntry;
+    GtkWidget *pageTitleBox[10];
+    GtkWidget *projectTaskBox[10];
+};
+
+struct TaskProjectState {
+    int taskNumber[50];
+    int projectNumber[10];
+    int i;
+    int maxTaskPerProject;
+    int maxTaskTotal;
+    int maxProject;
+    int projectCount;
+    int repopulatedTask;
+    int repopulatedProject;
+    int inEditingId;
+};
+
+struct data {
+    struct GTKTools tools;
+    struct TaskProjectState state;
+    PGconn *conn;
 };
 
 //function.c
@@ -35,27 +51,27 @@ void changeTaskStatus(GtkWidget *taskStatus, gpointer data);
 void changeTaskPriority(GtkWidget *taskPriority, gpointer data);
 void editTaskWindow(GtkWidget *taskEdit, gpointer data);
 void editTaskDB(GtkDialog *window, gint clicked, gpointer entry);
-void addTasks(GtkWidget *task, gpointer data, int presentTask);
+void addTasks(GtkWidget *task, gpointer data, int presentTask, char *projectName);
 void deleteTask(GtkWidget *taskDelete, gpointer data);
-char *get_text_of_entry(GtkWidget *testEntry);
+void deleteProject(GtkWidget *projectDelete, gpointer data);
+gchar *get_text_of_entry(GtkWidget *testEntry);
 int readOneConfigValue(char *propName);
-int taskExist(PGconn *conn, char *input, const gchar *name);
+int projectExist(PGconn *conn, const gchar *name);
+void addProjectWindow(GtkWidget *project, gpointer data);
+void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProject);
 
 //bdd.c
 PGconn *connectBdd();
 int createTables(PGconn *conn);
 void bddExist(PGconn *conn, PGresult *res);
-int insertTask(PGconn *conn, char *name, char *description, int priority, char *deadline, int status, const gchar *projectName);
+int insertTask(PGconn *conn, int id, char *name, char *description, int priority, char *deadline, int status, const gchar *projectName);
 int insertProject(PGconn *conn, char *name, char *description, int priority, char *deadline, char *color);
-int deleteTaskDB(PGconn *conn, const gchar *name);
+int deleteTaskDB(PGconn *conn, int id);
+int deleteProjectDB(PGconn *conn, const gchar *name);
+int deleteAllTaskFromProject(PGconn *conn, const gchar *name);
 int allTask(PGconn *conn);
+int allProject(PGconn *conn);
 char *selectTask(PGconn *conn, int row);
-<<<<<<< Updated upstream
-char *selectDescription(PGconn *conn, const gchar *name);
-int selectPriority(PGconn *conn, const gchar *name);
-int updateDescription(PGconn *conn, const gchar *description, const gchar *name);
-int updatePriority(PGconn *conn, int priority, const gchar *name);
-=======
 int selectTaskId(PGconn *conn, int row);
 char *selectProject(PGconn *conn, int row);
 char *selectDescription(PGconn *conn, int id);
@@ -65,6 +81,5 @@ char *selectProjectName(PGconn *conn, int id);
 int updateDescription(PGconn *conn, const gchar *description, int id);
 int updatePriority(PGconn *conn, int priority, int id);
 int updateStatus(PGconn *conn, int status, int id);
->>>>>>> Stashed changes
 
 #endif
