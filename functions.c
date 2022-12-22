@@ -217,9 +217,6 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask, char *presentProj
             GtkWidget *projectLabel = g_list_nth_data(projectBoxChildren, 0);
             const gchar *projectLabelName = gtk_label_get_label(GTK_LABEL(projectLabel));
 
-            g_print("%s\n", projectLabelName);
-            g_print("%s\n", projectName);
-
             if (strcmp(projectLabelName, projectName) == 0) {
                 g_print("ok\n");
                 gtk_notebook_set_current_page(dataP->tools.notebook, i + 6);

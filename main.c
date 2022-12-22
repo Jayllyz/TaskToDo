@@ -75,7 +75,6 @@ int main(int argc, char *argv[])
         int taskToAdd = selectTaskId(data.conn, i);
         data.state.taskNumber[taskToAdd] = -1;
         char *project = selectProjectName(data.conn, taskToAdd);
-        g_print("project: %s", project);
         addTasks(GTK_WIDGET(data.tools.addTask), &data, taskToAdd, project);
     }
     data.state.repopulatedTask = 1;
