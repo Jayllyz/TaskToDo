@@ -237,14 +237,6 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask)
         name = gtk_label_get_label(GTK_LABEL(projectLabel));
     }
 
-    if (taskExist(dataP->conn, getText, name) == 1 && dataP->state.repopulatedTask == 1) {
-        GtkDialog *dialog
-            = GTK_DIALOG(gtk_message_dialog_new(GTK_WINDOW(dataP->tools.window), GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "Cette tâche existe déjà"));
-        gtk_dialog_run(dialog);
-        gtk_widget_destroy(GTK_WIDGET(dialog));
-        return;
-    }
-
     dataP->tools.boxTask[dataP->state.i] = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_box_pack_start(GTK_BOX(pageBox), dataP->tools.boxTask[dataP->state.i], FALSE, FALSE, 0);
     gtk_box_reorder_child(GTK_BOX(pageBox), dataP->tools.boxTask[dataP->state.i], numberOfTask + 2);
@@ -328,26 +320,6 @@ int readOneConfigValue(char *propName)
         }
     }
     return -1;
-}
-
-int taskExist(PGconn *conn, char *input, const gchar *projectName)
-{
-    // g_print("%s", projectName);
-    int size = strlen("SELECT Name FROM task WHERE ProjectName = ''") + strlen(projectName) + 1;
-    char *query = malloc(size * sizeof(char));
-    sprintf(query, "SELECT Name FROM task WHERE ProjectName = '%s'", projectName);
-    PGresult *res = PQexec(conn, query);
-    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
-        g_print("Error: taskExist failed");
-        return -1;
-    }
-    int nbTuples = PQntuples(res);
-    for (int i = 0; i < nbTuples; i++) {
-        if (strcmp(PQgetvalue(res, i, 0), input) == 0) {
-            return 1; //Une tache avec le meme nom existe deja dans le projet
-        }
-    }
-    return 0;
 }
 
 int projectExist(PGconn *conn, const gchar *ProjectName)
