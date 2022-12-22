@@ -50,9 +50,21 @@ int insertProject(PGconn *conn, char *name, char *description, int priority, cha
 int deleteTaskDB(PGconn *conn, const gchar *name);
 int allTask(PGconn *conn);
 char *selectTask(PGconn *conn, int row);
+<<<<<<< Updated upstream
 char *selectDescription(PGconn *conn, const gchar *name);
 int selectPriority(PGconn *conn, const gchar *name);
 int updateDescription(PGconn *conn, const gchar *description, const gchar *name);
 int updatePriority(PGconn *conn, int priority, const gchar *name);
+=======
+int selectTaskId(PGconn *conn, int row);
+char *selectProject(PGconn *conn, int row);
+char *selectDescription(PGconn *conn, int id);
+int selectPriority(PGconn *conn, int id);
+int selectStatus(PGconn *conn, int id);
+char *selectProjectName(PGconn *conn, int id);
+int updateDescription(PGconn *conn, const gchar *description, int id);
+int updatePriority(PGconn *conn, int priority, int id);
+int updateStatus(PGconn *conn, int status, int id);
+>>>>>>> Stashed changes
 
 #endif

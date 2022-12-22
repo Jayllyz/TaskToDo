@@ -193,7 +193,47 @@ int selectPriority(PGconn *conn, const gchar *name)
     return priority;
 }
 
+<<<<<<< Updated upstream
 int updateDescription(PGconn *conn, const gchar *description, const gchar *name)
+=======
+int selectStatus(PGconn *conn, int id)
+{
+    PGresult *res;
+    char *query = malloc(sizeof(char) * 1000);
+    sprintf(query, "SELECT status FROM Task WHERE id = '%d'", id);
+    res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        return -1;
+    }
+
+    int status = atoi(PQgetvalue(res, 0, 0));
+
+    free(query);
+    PQclear(res);
+
+    return status;
+}
+
+char *selectProjectName(PGconn *conn, int id)
+{
+    PGresult *res;
+    char *query = malloc(sizeof(char) * 1000);
+    sprintf(query, "SELECT projectName FROM Task WHERE id = '%d'", id);
+    res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        return "Error: Can't get the task";
+    }
+
+    char *projectName = PQgetvalue(res, 0, 0);
+
+    free(query);
+    PQclear(res);
+
+    return projectName;
+}
+
+int updateDescription(PGconn *conn, const gchar *description, int id)
+>>>>>>> Stashed changes
 {
     PGresult *res;
     char *query = malloc(sizeof(char) * 1000);
@@ -213,6 +253,21 @@ int updatePriority(PGconn *conn, int priority, const gchar *name)
     PGresult *res;
     char *query = malloc(sizeof(char) * 1000);
     sprintf(query, "UPDATE Task SET priority = '%d' WHERE name = '%s'", priority, name);
+    res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        bddExist(conn, res);
+        return -1;
+    }
+    free(query);
+    PQclear(res);
+    return 0;
+}
+
+int updateStatus(PGconn *conn, int status, int id)
+{
+    PGresult *res;
+    char *query = malloc(sizeof(char) * 1000);
+    sprintf(query, "UPDATE Task SET status = '%d' WHERE id = '%d'", status, id);
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
         bddExist(conn, res);
