@@ -5,16 +5,39 @@
 
 void changeTaskStatus(GtkWidget *taskStatus, gpointer data)
 {
+    struct data *dataP = data;
+
+    GtkWidget *parent = gtk_widget_get_parent(taskStatus);
+    GList *children = gtk_container_get_children(GTK_CONTAINER(parent));
+    GtkWidget *idButton = g_list_nth_data(children, 5);
+    int id = atoi(gtk_button_get_label(GTK_BUTTON(idButton)));
+
     if (strcmp(gtk_button_get_label(GTK_BUTTON(taskStatus)), "Non completé") == 0) {
+        int queryResult = updateStatus(dataP->conn, 1, id);
+        if (queryResult == -1) {
+            g_print("Error: update status failed");
+        }
         gtk_button_set_label(GTK_BUTTON(taskStatus), "En cours");
     }
     else if (strcmp(gtk_button_get_label(GTK_BUTTON(taskStatus)), "En cours") == 0) {
+        int queryResult = updateStatus(dataP->conn, 2, id);
+        if (queryResult == -1) {
+            g_print("Error: update status failed");
+        }
         gtk_button_set_label(GTK_BUTTON(taskStatus), "Completé");
     }
     else if (strcmp(gtk_button_get_label(GTK_BUTTON(taskStatus)), "Completé") == 0) {
+        int queryResult = updateStatus(dataP->conn, 3, id);
+        if (queryResult == -1) {
+            g_print("Error: update status failed");
+        }
         gtk_button_set_label(GTK_BUTTON(taskStatus), "Abandonné");
     }
     else if (strcmp(gtk_button_get_label(GTK_BUTTON(taskStatus)), "Abandonné") == 0) {
+        int queryResult = updateStatus(dataP->conn, 0, id);
+        if (queryResult == -1) {
+            g_print("Error: update status failed");
+        }
         gtk_button_set_label(GTK_BUTTON(taskStatus), "Non completé");
     }
 }
@@ -275,7 +298,30 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask, char *presentProj
     gtk_box_pack_start(GTK_BOX(pageBox), dataP->tools.boxTask[dataP->state.i], FALSE, FALSE, 0);
     gtk_box_reorder_child(GTK_BOX(pageBox), dataP->tools.boxTask[dataP->state.i], numberOfTask + 2);
 
-    dataP->tools.taskStatus[dataP->state.i] = gtk_button_new_with_label("Non completé");
+    if (dataP->state.repopulatedTask == 1) {
+        dataP->tools.taskStatus[dataP->state.i] = gtk_button_new_with_label("Non completé");
+    }
+    else if (dataP->state.repopulatedTask == 0) {
+        int queryResult = selectStatus(dataP->conn, presentTask);
+        gchar *status;
+        if (queryResult == 0) {
+            status = "Non completé";
+        }
+        else if (queryResult == 1) {
+            status = "En cours";
+        }
+        else if (queryResult == 2) {
+            status = "Complété";
+        }
+        else if (queryResult == 3) {
+            status = "Abandonné";
+        }
+        else {
+            status = "Erreur";
+        }
+        dataP->tools.taskStatus[presentTask] = gtk_button_new_with_label(status);
+    }
+
     gtk_widget_set_margin_top(dataP->tools.taskStatus[dataP->state.i], 10);
     gtk_widget_set_margin_bottom(dataP->tools.taskStatus[dataP->state.i], 10);
     gtk_widget_set_size_request(dataP->tools.taskStatus[dataP->state.i], 150, -1);

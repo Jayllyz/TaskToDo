@@ -76,8 +76,10 @@ int selectTaskId(PGconn *conn, int row);
 char *selectProject(PGconn *conn, int row);
 char *selectDescription(PGconn *conn, int id);
 int selectPriority(PGconn *conn, int id);
+int selectStatus(PGconn *conn, int id);
 char *selectProjectName(PGconn *conn, int id);
 int updateDescription(PGconn *conn, const gchar *description, int id);
 int updatePriority(PGconn *conn, int priority, int id);
+int updateStatus(PGconn *conn, int status, int id);
 
 #endif

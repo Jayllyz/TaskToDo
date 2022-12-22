@@ -287,6 +287,24 @@ int selectPriority(PGconn *conn, int id)
     return priority;
 }
 
+int selectStatus(PGconn *conn, int id)
+{
+    PGresult *res;
+    char *query = malloc(sizeof(char) * 1000);
+    sprintf(query, "SELECT status FROM Task WHERE id = '%d'", id);
+    res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        return -1;
+    }
+
+    int status = atoi(PQgetvalue(res, 0, 0));
+
+    free(query);
+    PQclear(res);
+
+    return status;
+}
+
 char *selectProjectName(PGconn *conn, int id)
 {
     PGresult *res;
@@ -325,6 +343,21 @@ int updatePriority(PGconn *conn, int priority, int id)
     PGresult *res;
     char *query = malloc(sizeof(char) * 1000);
     sprintf(query, "UPDATE Task SET priority = '%d' WHERE id = '%d'", priority, id);
+    res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        bddExist(conn, res);
+        return -1;
+    }
+    free(query);
+    PQclear(res);
+    return 0;
+}
+
+int updateStatus(PGconn *conn, int status, int id)
+{
+    PGresult *res;
+    char *query = malloc(sizeof(char) * 1000);
+    sprintf(query, "UPDATE Task SET status = '%d' WHERE id = '%d'", status, id);
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
         bddExist(conn, res);
