@@ -56,7 +56,6 @@ void deleteTask(GtkWidget *taskDelete, gpointer data);
 void deleteProject(GtkWidget *projectDelete, gpointer data);
 gchar *get_text_of_entry(GtkWidget *testEntry);
 int readOneConfigValue(char *propName);
-int taskExist(PGconn *conn, char *input, const gchar *name);
 int projectExist(PGconn *conn, const gchar *name);
 void addProjectWindow(GtkWidget *project, gpointer data);
 void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProject);
