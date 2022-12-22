@@ -195,11 +195,7 @@ void deleteProject(GtkWidget *projectDelete, gpointer data)
 void addTasks(GtkWidget *task, gpointer data, int presentTask)
 {
     struct data *dataP = data;
-    gchar *getText;
-    getText = malloc(sizeof(gchar) * strlen(get_text_of_entry(dataP->tools.inputEntry)) + 1);
-    strcpy(getText, get_text_of_entry(dataP->tools.inputEntry));
 
-    //Je vais move ca dans la fonction get_text_of_entry
     gint currentPage = gtk_notebook_get_current_page(GTK_NOTEBOOK(dataP->tools.notebook));
     GtkWidget *pageBox = gtk_notebook_get_nth_page(GTK_NOTEBOOK(dataP->tools.notebook), currentPage);
     GList *children = gtk_container_get_children(GTK_CONTAINER(pageBox));
@@ -208,8 +204,7 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask)
     children = gtk_container_get_children(GTK_CONTAINER(addProjectBox));
     GtkWidget *entry = g_list_last(children)->data;
     g_list_free(children);
-    gchar *text = gtk_entry_get_text(GTK_ENTRY(entry));
-    //
+    const gchar *text = gtk_entry_get_text(GTK_ENTRY(entry));
 
     g_print("%s", text);
 
