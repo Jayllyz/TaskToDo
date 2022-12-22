@@ -68,6 +68,7 @@ int insertTask(PGconn *conn, int id, char *name, char *description, int priority
 int insertProject(PGconn *conn, char *name, char *description, int priority, char *deadline, char *color);
 int deleteTaskDB(PGconn *conn, int id);
 int deleteProjectDB(PGconn *conn, const gchar *name);
+int deleteAllTaskFromProject(PGconn *conn, const gchar *name);
 int allTask(PGconn *conn);
 int allProject(PGconn *conn);
 char *selectTask(PGconn *conn, int row);

@@ -182,7 +182,13 @@ void deleteProject(GtkWidget *projectDelete, gpointer data)
 
     g_list_free(boxChildren);
 
-    int queryResult = deleteProjectDB(dataP->conn, nameOfProject);
+    int queryResult = deleteAllTaskFromProject(dataP->conn, nameOfProject);
+    if (queryResult == -1) {
+        g_print("Error: delete all task from project failed");
+        return;
+    }
+
+    queryResult = deleteProjectDB(dataP->conn, nameOfProject);
     if (queryResult == -1) {
         g_print("Error: deleteProject failed");
         return;

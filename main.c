@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
         addTasks(GTK_WIDGET(data.tools.addTask), &data, taskToAdd, project);
     }
     data.state.repopulatedTask = 1;
-    gtk_notebook_set_current_page(dataP->tools.notebook, 0);
+    gtk_notebook_set_current_page(data.tools.notebook, 0);
 
     g_signal_connect(data.tools.addTask, "clicked", G_CALLBACK(addTasks), &data);
     g_signal_connect(data.tools.addProject, "clicked", G_CALLBACK(addProjectWindow), &data);
