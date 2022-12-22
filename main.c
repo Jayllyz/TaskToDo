@@ -74,7 +74,8 @@ int main(int argc, char *argv[])
     for (int i = 0; i < queryResult; i++) {
         int taskToAdd = selectTaskId(data.conn, i);
         data.state.taskNumber[taskToAdd] = -1;
-        gchar *project = selectProjectName(data.conn, taskToAdd);
+        char *project = selectProjectName(data.conn, taskToAdd);
+        g_print("project: %s", project);
         addTasks(GTK_WIDGET(data.tools.addTask), &data, taskToAdd, project);
     }
     data.state.repopulatedTask = 1;

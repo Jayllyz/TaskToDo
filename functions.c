@@ -193,15 +193,15 @@ void deleteProject(GtkWidget *projectDelete, gpointer data)
     dataP->state.projectCount--;
 }
 
-void addTasks(GtkWidget *task, gpointer data, int presentTask, gchar *presentProjectName)
+void addTasks(GtkWidget *task, gpointer data, int presentTask, char *presentProjectName)
 {
     struct data *dataP = data;
     gchar *getText;
-
+    char *projectName = malloc(strlen(presentProjectName) + 1 * sizeof(char));
+    strcpy(projectName, presentProjectName);
     if (dataP->state.repopulatedTask == 0) {
 
         gtk_notebook_set_current_page(dataP->tools.notebook, 0);
-
         for (int i = 0; i < allProject(dataP->conn); i++) {
 
             GtkWidget *projectPageBox = gtk_notebook_get_nth_page(GTK_NOTEBOOK(dataP->tools.notebook), i + 6);
@@ -211,9 +211,9 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask, gchar *presentPro
             const gchar *projectLabelName = gtk_label_get_label(GTK_LABEL(projectLabel));
 
             g_print("%s\n", projectLabelName);
-            g_print("%s\n", presentProjectName);
+            g_print("%s\n", projectName);
 
-            if (strcmp(projectLabelName, presentProjectName) == 0) {
+            if (strcmp(projectLabelName, projectName) == 0) {
                 g_print("ok\n");
                 gtk_notebook_set_current_page(dataP->tools.notebook, i + 6);
             }

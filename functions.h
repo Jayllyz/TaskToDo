@@ -51,7 +51,7 @@ void changeTaskStatus(GtkWidget *taskStatus, gpointer data);
 void changeTaskPriority(GtkWidget *taskPriority, gpointer data);
 void editTaskWindow(GtkWidget *taskEdit, gpointer data);
 void editTaskDB(GtkDialog *window, gint clicked, gpointer entry);
-void addTasks(GtkWidget *task, gpointer data, int presentTask, gchar *projectName);
+void addTasks(GtkWidget *task, gpointer data, int presentTask, char *projectName);
 void deleteTask(GtkWidget *taskDelete, gpointer data);
 void deleteProject(GtkWidget *projectDelete, gpointer data);
 gchar *get_text_of_entry(GtkWidget *testEntry);
