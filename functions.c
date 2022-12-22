@@ -202,6 +202,7 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask, char *presentProj
     if (dataP->state.repopulatedTask == 0) {
 
         gtk_notebook_set_current_page(dataP->tools.notebook, 0);
+
         for (int i = 0; i < allProject(dataP->conn); i++) {
 
             GtkWidget *projectPageBox = gtk_notebook_get_nth_page(GTK_NOTEBOOK(dataP->tools.notebook), i + 6);
