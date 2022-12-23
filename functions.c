@@ -117,7 +117,6 @@ void editTaskDB(GtkDialog *window, gint clicked, gpointer data)
     if (clicked == GTK_RESPONSE_OK) {
         GtkWidget *input = GTK_WIDGET(dataP->tools.descriptionEntry);
         const gchar *text = gtk_entry_get_text(GTK_ENTRY(input));
-        const gchar *taskName = gtk_window_get_title(GTK_WINDOW(window));
         int queryResult;
 
         GtkWidget *parent = gtk_widget_get_parent(GTK_WIDGET(dataP->tools.descriptionEntry));
@@ -389,7 +388,7 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask, char *presentProj
     }
 }
 
-gchar *get_text_of_entry(GtkWidget *inputEntry) //recup le contenu d'un "textview"
+gchar *get_text_of_entry(GtkWidget *inputEntry)
 {
     GtkEntryBuffer *buffer = gtk_entry_get_buffer((GtkEntry *)inputEntry);
     gchar *text;
@@ -555,9 +554,8 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProje
         gtk_widget_show(box);
         dataP->state.projectCount++;
     }
-    if (dataP->state.repopulatedProject == 1) {
+    if (dataP->state.repopulatedProject == 1)
         gtk_widget_destroy(projet);
-    }
 }
 
 void changeDeadlineWindow(GtkWidget *deadline, gpointer data)
@@ -584,7 +582,7 @@ void changeDeadline(GtkWidget *deadline, gint clicked, gpointer data)
         guint year, month, day;
 
         gtk_calendar_get_date(GTK_CALENDAR(calendar), &year, &month, &day);
-        gchar *changedDeadline;
+        gchar *changedDeadline = malloc(11 * sizeof(gchar));
         sprintf(changedDeadline, "%d-%d-%d", year, month + 1, day);
         updateDeadline(dataP->conn, dataP->state.i, changedDeadline);
         gtk_button_set_label(GTK_BUTTON(dataP->tools.taskDeadline[dataP->state.i]), changedDeadline);
