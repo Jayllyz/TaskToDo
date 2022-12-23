@@ -378,6 +378,7 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask, char *presentProj
     g_signal_connect(dataP->tools.taskDeadline[dataP->state.i], "clicked", G_CALLBACK(changeDeadlineWindow), dataP);
 
     gtk_widget_show_all(dataP->tools.boxTask[dataP->state.i]);
+    gtk_widget_hide(taskNumberMarker);
 
     gtk_entry_set_text(GTK_ENTRY(entry), "");
 
