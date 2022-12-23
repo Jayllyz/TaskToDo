@@ -2,6 +2,7 @@
 #include <gtk/gtk.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 void changeTaskStatus(GtkWidget *taskStatus, gpointer data)
 {
@@ -225,6 +226,12 @@ void deleteProject(GtkWidget *projectDelete, gpointer data)
 void addTasks(GtkWidget *task, gpointer data, int presentTask, char *presentProjectName)
 {
     struct data *dataP = data;
+
+    time_t now = time(NULL);
+    struct tm *local_time = localtime(&now);
+    char todayDate[20];
+    sprintf(todayDate, "%d-%d-%d", local_time->tm_year + 1900, local_time->tm_mon + 1, local_time->tm_mday);
+
     gchar *getText;
     char *projectName = malloc(strlen(presentProjectName) + 1 * sizeof(char));
     strcpy(projectName, presentProjectName);
@@ -302,7 +309,7 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask, char *presentProj
         dataP->tools.taskStatus[dataP->state.i] = gtk_button_new_with_label("Non completé");
     }
     else if (dataP->state.repopulatedTask == 0) {
-        int queryResult = selectStatus(dataP->conn, presentTask);
+        int queryResult = selectStatus(dataP->conn, dataP->state.i);
         gchar *status;
         if (queryResult == 0) {
             status = "Non completé";
@@ -319,7 +326,7 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask, char *presentProj
         else {
             status = "Erreur";
         }
-        dataP->tools.taskStatus[presentTask] = gtk_button_new_with_label(status);
+        dataP->tools.taskStatus[dataP->state.i] = gtk_button_new_with_label(status);
     }
 
     gtk_widget_set_margin_top(dataP->tools.taskStatus[dataP->state.i], 10);
@@ -328,13 +335,13 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask, char *presentProj
     gtk_box_pack_start(GTK_BOX(dataP->tools.boxTask[dataP->state.i]), dataP->tools.taskStatus[dataP->state.i], FALSE, FALSE, 0);
     g_signal_connect(dataP->tools.taskStatus[dataP->state.i], "clicked", G_CALLBACK(changeTaskStatus), dataP);
 
-    dataP->tools.taskSeparator[dataP->state.i] = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
-    gtk_widget_set_size_request(dataP->tools.taskSeparator[dataP->state.i], 5, -1);
-    gtk_box_pack_start(GTK_BOX(dataP->tools.boxTask[dataP->state.i]), dataP->tools.taskSeparator[dataP->state.i], FALSE, FALSE, 0);
+    dataP->tools.taskSeparator1[dataP->state.i] = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
+    gtk_widget_set_size_request(dataP->tools.taskSeparator1[dataP->state.i], 5, -1);
+    gtk_box_pack_start(GTK_BOX(dataP->tools.boxTask[dataP->state.i]), dataP->tools.taskSeparator1[dataP->state.i], FALSE, FALSE, 0);
 
     if (dataP->state.repopulatedTask == 0) {
-        gtk_label_set_text(GTK_LABEL(dataP->tools.task[dataP->state.i]), selectTask(dataP->conn, presentTask));
-        gtk_widget_set_tooltip_text(dataP->tools.task[dataP->state.i], selectDescription(dataP->conn, presentTask));
+        gtk_label_set_text(GTK_LABEL(dataP->tools.task[dataP->state.i]), selectTask(dataP->conn, dataP->state.i));
+        gtk_widget_set_tooltip_text(dataP->tools.task[dataP->state.i], selectDescription(dataP->conn, dataP->state.i));
     }
     else {
         gtk_label_set_text(GTK_LABEL(dataP->tools.task[dataP->state.i]), getText);
@@ -351,17 +358,30 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask, char *presentProj
     g_signal_connect(dataP->tools.taskDelete[dataP->state.i], "clicked", G_CALLBACK(deleteTask), dataP);
 
     char numberToTransfer[3];
-    if (dataP->state.repopulatedTask == 0) {
-        sprintf(numberToTransfer, "%d", presentTask);
-    }
-    else if (dataP->state.repopulatedTask == 1) {
-        sprintf(numberToTransfer, "%d", dataP->state.i);
-    }
+    sprintf(numberToTransfer, "%d", dataP->state.i);
     GtkWidget *taskNumberMarker = gtk_button_new_with_label(numberToTransfer);
     gtk_box_pack_start(GTK_BOX(dataP->tools.boxTask[dataP->state.i]), taskNumberMarker, FALSE, FALSE, 0);
 
+    dataP->tools.taskSeparator2[dataP->state.i] = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
+    gtk_widget_set_size_request(dataP->tools.taskSeparator2[dataP->state.i], 5, -1);
+    gtk_box_pack_start(GTK_BOX(dataP->tools.boxTask[dataP->state.i]), dataP->tools.taskSeparator2[dataP->state.i], FALSE, FALSE, 0);
+
+    if (dataP->state.repopulatedTask == 0) {
+        char *queryResult = selectDeadline(dataP->conn, dataP->state.i);
+        dataP->tools.taskDeadline[dataP->state.i] = gtk_button_new_with_label(queryResult);
+    }
+    else if (dataP->state.repopulatedTask == 1) {
+        dataP->tools.taskDeadline[dataP->state.i] = gtk_button_new_with_label(todayDate);
+    }
+
+    gtk_widget_set_margin_top(dataP->tools.taskDeadline[dataP->state.i], 10);
+    gtk_widget_set_margin_bottom(dataP->tools.taskDeadline[dataP->state.i], 10);
+    gtk_widget_set_size_request(dataP->tools.taskDeadline[dataP->state.i], 150, -1);
+    gtk_box_pack_start(GTK_BOX(dataP->tools.boxTask[dataP->state.i]), dataP->tools.taskDeadline[dataP->state.i], FALSE, FALSE, 0);
+    g_signal_connect(dataP->tools.taskDeadline[dataP->state.i], "clicked", G_CALLBACK(changeDeadlineWindow), dataP);
+
     gtk_widget_show_all(dataP->tools.boxTask[dataP->state.i]);
-    gtk_widget_hide(taskNumberMarker);
+    //gtk_widget_hide(taskNumberMarker);
 
     gtk_entry_set_text(GTK_ENTRY(entry), "");
 
@@ -507,9 +527,9 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProje
         gtk_widget_set_size_request(status, 150, -1);
         gtk_box_pack_start(GTK_BOX(dataP->tools.projectTaskBox[dataP->state.i]), status, FALSE, FALSE, 0);
 
-        GtkWidget *separatorV = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
-        gtk_widget_set_size_request(separatorV, 5, -1);
-        gtk_box_pack_start(GTK_BOX(dataP->tools.projectTaskBox[dataP->state.i]), separatorV, FALSE, FALSE, 0);
+        GtkWidget *separatorV1 = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
+        gtk_widget_set_size_request(separatorV1, 5, -1);
+        gtk_box_pack_start(GTK_BOX(dataP->tools.projectTaskBox[dataP->state.i]), separatorV1, FALSE, FALSE, 0);
 
         GtkWidget *projectTitle;
         if (dataP->state.repopulatedProject == 1) {
@@ -519,6 +539,16 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProje
             projectTitle = gtk_label_new(selectProject(dataP->conn, presentProject));
         }
         gtk_box_pack_start(GTK_BOX(dataP->tools.projectTaskBox[dataP->state.i]), projectTitle, TRUE, FALSE, 0);
+
+        GtkWidget *separatorV2 = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
+        gtk_widget_set_size_request(separatorV2, 5, -1);
+        gtk_box_pack_start(GTK_BOX(dataP->tools.projectTaskBox[dataP->state.i]), separatorV2, FALSE, FALSE, 0);
+
+        GtkWidget *deadline = gtk_label_new("Date limite");
+        gtk_widget_set_margin_top(deadline, 10);
+        gtk_widget_set_margin_bottom(deadline, 10);
+        gtk_widget_set_size_request(deadline, 150, -1);
+        gtk_box_pack_start(GTK_BOX(dataP->tools.projectTaskBox[dataP->state.i]), deadline, FALSE, FALSE, 0);
 
         GtkWidget *boxAddTask = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
         GtkWidget *addButton = gtk_button_new_with_label("Ajouter la tâche");
@@ -551,4 +581,36 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProje
     if (dataP->state.repopulatedProject == 1) {
         gtk_widget_destroy(projet);
     }
+}
+
+void changeDeadlineWindow(GtkWidget *deadline, gpointer data)
+{
+    struct data *dataP = data;
+    GtkWidget *changeDeadlineDialog
+        = gtk_dialog_new_with_buttons("Changer de date limite", NULL, GTK_DIALOG_MODAL, "Confirmer", GTK_RESPONSE_OK, "Annuler", GTK_RESPONSE_CANCEL, NULL);
+    GtkWidget *calendar = gtk_calendar_new();
+
+    gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(changeDeadlineDialog))), calendar);
+    gtk_widget_show_all(changeDeadlineDialog);
+
+    g_signal_connect(changeDeadlineDialog, "response", G_CALLBACK(changeDeadline), dataP);
+}
+
+void changeDeadline(GtkWidget *deadline, gint clicked, gpointer data)
+{
+    struct data *dataP = data;
+    if (clicked == GTK_RESPONSE_OK) {
+        GtkWidget *box = GTK_WIDGET(gtk_dialog_get_content_area(GTK_DIALOG(deadline)));
+        GList *child = gtk_container_get_children(GTK_CONTAINER(box));
+        GtkWidget *calendar = g_list_nth_data(child, 0);
+
+        guint year, month, day;
+
+        gtk_calendar_get_date(GTK_CALENDAR(calendar), &year, &month, &day);
+        gchar *changedDeadline;
+        sprintf(changedDeadline, "%d-%d-%d", year, month + 1, day);
+        updateDeadline(dataP->conn, dataP->state.i, changedDeadline);
+        gtk_button_set_label(GTK_BUTTON(dataP->tools.taskDeadline[dataP->state.i]), changedDeadline);
+    }
+    gtk_widget_destroy(deadline);
 }

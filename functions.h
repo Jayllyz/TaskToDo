@@ -10,13 +10,15 @@ struct GTKTools {
     GtkButton *addTask;
     GtkButton *addProject;
     GtkWidget *taskStatus[50];
-    GtkWidget *taskSeparator[50];
+    GtkWidget *taskSeparator1[50];
+    GtkWidget *taskSeparator2[50];
     GtkBox *boxV;
     GtkWidget *boxTask[50];
     GtkWidget *task[50];
     GtkWidget *taskPriority[50];
     GtkWidget *taskEdit[50];
     GtkWidget *taskDelete[50];
+    GtkWidget *taskDeadline[50];
     GtkWidget *inputEntry;
     GtkLabel *outputLabel;
     GtkNotebook *notebook;
@@ -59,6 +61,8 @@ int readOneConfigValue(char *propName);
 int projectExist(PGconn *conn, const gchar *name);
 void addProjectWindow(GtkWidget *project, gpointer data);
 void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProject);
+void changeDeadlineWindow(GtkWidget *deadline, gpointer data);
+void changeDeadline(GtkWidget *deadline, gint clicked, gpointer data);
 
 //bdd.c
 PGconn *connectBdd();
@@ -78,8 +82,10 @@ char *selectDescription(PGconn *conn, int id);
 int selectPriority(PGconn *conn, int id);
 int selectStatus(PGconn *conn, int id);
 char *selectProjectName(PGconn *conn, int id);
+char *selectDeadline(PGconn *conn, int id);
 int updateDescription(PGconn *conn, const gchar *description, int id);
 int updatePriority(PGconn *conn, int priority, int id);
 int updateStatus(PGconn *conn, int status, int id);
+int updateDeadline(PGconn *conn, int id, gchar *deadline);
 
 #endif

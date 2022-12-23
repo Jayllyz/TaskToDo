@@ -47,6 +47,7 @@ int main(int argc, char *argv[])
     data.state.repopulatedTask = 0;
     data.state.repopulatedProject = 0;
     data.state.projectCount = 0;
+
     for (int i = 0; i < data.state.maxTaskTotal; i++) {
         data.tools.task[i] = gtk_label_new("");
         data.state.taskNumber[i] = i;
