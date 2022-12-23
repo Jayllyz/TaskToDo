@@ -1,2 +1,5 @@
 #bdd
 init value:1
+
+#base limit deadline
+set deadline day:10
