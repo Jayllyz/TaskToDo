@@ -392,7 +392,7 @@ gchar *get_text_of_entry(GtkWidget *inputEntry)
 {
     GtkEntryBuffer *buffer = gtk_entry_get_buffer((GtkEntry *)inputEntry);
     gchar *text;
-    text = gtk_entry_buffer_get_text(buffer);
+    text = (gchar *)gtk_entry_buffer_get_text(buffer);
     return text;
 }
 
