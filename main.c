@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     gtk_init(&argc, &argv);
     struct data data;
     data.conn = connectBdd();
-    if (readOneConfigValue("init") == 0) {
+    if (readOneConfigValue("init value") == 0) {
         data.conn = connectBdd();
         if (data.conn == NULL) {
             return EXIT_FAILURE;

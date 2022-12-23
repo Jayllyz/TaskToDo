@@ -202,6 +202,20 @@ void deleteProject(GtkWidget *projectDelete, gpointer data)
 void addTasks(GtkWidget *task, gpointer data, int presentTask, char *presentProjectName)
 {
     struct data *dataP = data;
+
+    time_t now = time(NULL);
+    struct tm *local_time = localtime(&now);
+    if (readOneConfigValue("set deadline day") != -1) {
+        local_time->tm_mday += readOneConfigValue("set deadline day");
+        mktime(local_time);
+    }
+    else {
+        local_time = localtime(&now);
+    }
+
+    char deadlineDate[20];
+    sprintf(deadlineDate, "%d-%d-%d", local_time->tm_year + 1900, local_time->tm_mon + 1, local_time->tm_mday);
+
     gchar *getText;
     char *projectName = malloc(strlen(presentProjectName) + 1 * sizeof(char));
     strcpy(projectName, presentProjectName);
@@ -309,7 +323,7 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask, char *presentProj
         sprintf(numberToTransfer, "%d", presentTask);
     }
     else if (dataP->state.repopulatedTask == 1) {
-        sprintf(numberToTransfer, "%d", dataP->state.i);
+        dataP->tools.taskDeadline[dataP->state.i] = gtk_button_new_with_label(deadlineDate);
     }
     GtkWidget *taskNumberMarker = gtk_button_new_with_label(numberToTransfer);
     gtk_box_pack_start(GTK_BOX(dataP->tools.boxTask[dataP->state.i]), taskNumberMarker, FALSE, FALSE, 0);
@@ -320,11 +334,11 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask, char *presentProj
     gtk_entry_set_text(GTK_ENTRY(entry), "");
 
     if (dataP->state.repopulatedTask == 1) {
-        int queryResult = insertTask(dataP->conn, dataP->state.i, getText, "", 1, "now()", 0, name); //insert in db
-        if (queryResult == -1) {
+        int queryResult = insertTask(dataP->conn, dataP->state.i, getText, "", 1, deadlineDate, 0, name); //insert in db
+        if (queryResult == -1)
             g_print("Error: insertTask failed");
-        }
     }
+}
 }
 
 gchar *get_text_of_entry(GtkWidget *inputEntry) //recup le contenu d'un "textview"
