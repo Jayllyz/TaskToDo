@@ -26,8 +26,7 @@ int main(int argc, char *argv[])
         if (user.conn == NULL) {
             return EXIT_FAILURE;
         }
-        createTables(user.conn);
-        PQfinish(user.conn);
+        createTables(data.conn);
     }
 
     user.builder = gtk_builder_new();
