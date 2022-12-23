@@ -118,6 +118,24 @@ int insertProject(PGconn *conn, char *name, char *description, int priority, cha
     return 0;
 }
 
+int projectExist(PGconn *conn, const gchar *ProjectName)
+{
+    int size = strlen("SELECT Name FROM project WHERE Name = ''") + strlen(ProjectName) + 1;
+    char *query = malloc(size * sizeof(char));
+    sprintf(query, "SELECT Name FROM project WHERE Name = '%s'", ProjectName);
+    PGresult *res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        g_print("Error:  projectExist failed");
+        return -1;
+    }
+    int nbTuples = PQntuples(res);
+    for (int i = 0; i < nbTuples; i++) {
+        if (strcmp(PQgetvalue(res, i, 0), ProjectName) == 0)
+            return 1;
+    }
+    return 0;
+}
+
 int deleteTaskDB(PGconn *conn, int id)
 {
     PGresult *res;
