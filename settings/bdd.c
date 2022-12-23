@@ -60,9 +60,10 @@ int createTables(PGconn *conn)
     PQclear(res);
 
     res = PQexec(conn,
-        "INSERT INTO Project (Name, Description, Priority, Date, Deadline, Color) VALUES ('Ma journée', 'placeholder', 0, 'now()', 'now()', 'black'), ('Important', "
-        "'placeholder', 0, 'now()', 'now()', 'red'), ('Prévu', 'placeholder', 0, 'now()', 'now()', 'blue'), ('Tâches', 'placeholder', 0, 'now()', 'now()', "
-        "'green'), ('Projets', 'placeholder', 0, 'now()', 'now()', 'grey') , ('Finance', 'placeholder', 0, 'now()', 'now()', 'orange')");
+        "INSERT INTO Project (Name, Description, Priority, Date, Deadline, Color) VALUES ('Tâches', 'placeholder', 0, 'now()', 'now()', 'black'), "
+        "('Importantes/Urgentes', "
+        "'placeholder', 0, 'now()', 'now()', 'red'), ('Mineures', 'placeholder', 0, 'now()', 'now()', 'blue'), ('En retard', 'placeholder', 0, 'now()', 'now()', "
+        "'green'), ('Prévues', 'placeholder', 0, 'now()', 'now()', 'grey') , ('Finance', 'placeholder', 0, 'now()', 'now()', 'orange')");
 
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
         bddExist(conn, res);
@@ -73,14 +74,12 @@ int createTables(PGconn *conn)
     FILE *file = fopen("settings/config.txt", "r+");
     char *line = NULL;
     size_t len = 0;
-    int i = 0;
     while ((getline(&line, &len, file)) != -1) {
-        if (i == 1) {
-            fseek(file, -1, SEEK_CUR);
+        if (strstr(line, "init value") != NULL) {
+            fseek(file, -3, SEEK_CUR); // -1 + '\n'
             fprintf(file, "1");
             break;
         }
-        ++i;
     }
     fclose(file);
     return 0;
@@ -213,6 +212,23 @@ int allProject(PGconn *conn)
     free(query);
     PQclear(res);
     return amountOfProject - 6;
+}
+
+int allImportantTask(PGconn *conn)
+{
+    PGresult *res;
+    char *query = malloc(sizeof(char) * strlen("SELECT * FROM Task WHERE priority > 1"));
+    sprintf(query, "SELECT * FROM Task WHERE priority > 1");
+    res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        g_print("Error: Can't get all task");
+        return -1;
+    }
+
+    int amountOfTask = PQntuples(res);
+    free(query);
+    PQclear(res);
+    return amountOfTask;
 }
 
 char *selectTask(PGconn *conn, int id)
