@@ -69,6 +69,7 @@ void addLateTask(gpointer data, int id);
 void addPlannedTask(gpointer data, int id);
 void scanForIdToDestroy(gpointer data, int id);
 void scanForIdToDestroySpecific(gpointer data, int idToDestroy, guint project);
+void scanForIdForUpdate(gpointer data, int idToSeek);
 void updateTask(gpointer data, GtkWidget *task, int id);
 
 //bdd.c

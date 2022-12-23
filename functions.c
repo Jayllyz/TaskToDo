@@ -41,6 +41,7 @@ void changeTaskStatus(GtkWidget *taskStatus, gpointer data)
 
         gtk_button_set_label(GTK_BUTTON(taskStatus), "Non completé");
     }
+    scanForIdForUpdate(dataP, id);
 }
 
 void changeTaskPriority(GtkWidget *taskPriority, gpointer data)
@@ -604,6 +605,7 @@ void changeDeadline(GtkWidget *deadline, gint clicked, gpointer data)
         updateDeadline(dataP->conn, dataP->state.inEditingId, changedDeadline);
         gtk_button_set_label(GTK_BUTTON(dataP->tools.taskDeadline[dataP->state.inEditingId]), changedDeadline);
         addLateTask(dataP, dataP->state.inEditingId);
+        scanForIdForUpdate(dataP, dataP->state.inEditingId);
     }
     gtk_widget_destroy(deadline);
 }
@@ -613,7 +615,6 @@ void addImportantTask(gpointer data, int id)
     struct data *dataP = data;
 
     gint startingPage = gtk_notebook_get_current_page(GTK_NOTEBOOK(dataP->tools.notebook));
-
     gtk_notebook_set_current_page(dataP->tools.notebook, 1);
 
     gint currentPage = gtk_notebook_get_current_page(GTK_NOTEBOOK(dataP->tools.notebook));
@@ -642,8 +643,8 @@ void addImportantTask(gpointer data, int id)
     if (priority <= 1) {
         if (checkTask == 1) {
             scanForIdToDestroySpecific(dataP, id, 1);
-            gtk_notebook_set_current_page(dataP->tools.notebook, startingPage);
         }
+        gtk_notebook_set_current_page(dataP->tools.notebook, startingPage);
         return;
     }
 
@@ -752,8 +753,8 @@ void addMinorTask(gpointer data, int id)
     if (priority > 0) {
         if (checkTask == 1) {
             scanForIdToDestroySpecific(dataP, id, 2);
-            gtk_notebook_set_current_page(dataP->tools.notebook, startingPage);
         }
+        gtk_notebook_set_current_page(dataP->tools.notebook, startingPage);
         return;
     }
 
@@ -884,8 +885,8 @@ void addLateTask(gpointer data, int id)
     if (late == 0) {
         if (checkTask == 1) {
             scanForIdToDestroySpecific(dataP, id, 3);
-            gtk_notebook_set_current_page(dataP->tools.notebook, startingPage);
         }
+        gtk_notebook_set_current_page(dataP->tools.notebook, startingPage);
         return;
     }
 
@@ -1016,8 +1017,8 @@ void addPlannedTask(gpointer data, int id)
     if (late == 1) {
         if (checkTask == 1) {
             scanForIdToDestroySpecific(dataP, id, 4);
-            gtk_notebook_set_current_page(dataP->tools.notebook, startingPage);
         }
+        gtk_notebook_set_current_page(dataP->tools.notebook, startingPage);
         return;
     }
 
@@ -1132,7 +1133,6 @@ void scanForIdToDestroy(gpointer data, int idToDestroy)
 void scanForIdToDestroySpecific(gpointer data, int idToDestroy, guint project)
 {
     struct data *dataP = data;
-    int numberOfProject = allProject(dataP->conn) + 6;
 
     gtk_notebook_set_current_page(dataP->tools.notebook, project);
 
@@ -1160,6 +1160,43 @@ void scanForIdToDestroySpecific(gpointer data, int idToDestroy, guint project)
     g_list_free(children);
 }
 
+void scanForIdForUpdate(gpointer data, int idToSeek)
+{
+    struct data *dataP = data;
+    gint startingPage = gtk_notebook_get_current_page(GTK_NOTEBOOK(dataP->tools.notebook));
+    int numberOfProject = allProject(dataP->conn) + 6;
+
+    for (int i = 0; i < numberOfProject; i++) {
+        if (i != 5) { //le i == 5 c'est la page finance
+            gtk_notebook_set_current_page(dataP->tools.notebook, i);
+
+            gint currentPage = gtk_notebook_get_current_page(GTK_NOTEBOOK(dataP->tools.notebook));
+            GtkWidget *pageBox = gtk_notebook_get_nth_page(GTK_NOTEBOOK(dataP->tools.notebook), currentPage);
+            GList *children = gtk_container_get_children(GTK_CONTAINER(pageBox));
+
+            int numberOfTask;
+            if (i == 1 || i == 2 || i == 3 || i == 4)
+                numberOfTask = g_list_length(children) - 2;
+            else
+                numberOfTask = g_list_length(children) - 3;
+
+            for (int j = 2; j < numberOfTask + 2; j++) {
+                GtkWidget *boxTask = g_list_nth_data(children, j);
+                GList *taskList = gtk_container_get_children(GTK_CONTAINER(boxTask));
+                GtkWidget *idButton = g_list_nth_data(taskList, 5);
+                g_list_free(taskList);
+
+                int id = atoi(gtk_button_get_label(GTK_BUTTON(idButton)));
+                if (id == idToSeek) {
+                    updateTask(dataP, boxTask, id);
+                }
+            }
+            g_list_free(children);
+        }
+    }
+    gtk_notebook_set_current_page(dataP->tools.notebook, startingPage);
+}
+
 void updateTask(gpointer data, GtkWidget *task, int id)
 {
     struct data *dataP = data;
@@ -1184,13 +1221,9 @@ void updateTask(gpointer data, GtkWidget *task, int id)
     else {
         status = "Erreur";
     }
-    taskStatus = gtk_button_new_with_label(status);
+    gtk_button_set_label(GTK_BUTTON(taskStatus), status);
 
-    GtkWidget *taskName = g_list_nth_data(listOfWidget, 2);
-    gtk_label_set_text(GTK_LABEL(taskName), selectTask(dataP->conn, id));
-    gtk_widget_set_tooltip_text(taskName, selectDescription(dataP->conn, id));
-
-    GtkWidget *taskDeadline = g_list_nth_data(listOfWidget, 6);
+    GtkWidget *taskDeadline = g_list_nth_data(listOfWidget, 7);
     char *deadline = selectDeadline(dataP->conn, id);
-    taskDeadline = gtk_button_new_with_label(deadline);
+    gtk_button_set_label(GTK_BUTTON(taskDeadline), deadline);
 }
