@@ -74,14 +74,11 @@ int createTables(PGconn *conn)
     FILE *file = fopen("settings/config.txt", "r+");
     char *line = NULL;
     size_t len = 0;
-    int i = 0;
     while ((getline(&line, &len, file)) != -1) {
-        if (i == 1) {
-            fseek(file, -1, SEEK_CUR);
+        if (strstr(line, "init value") != NULL) {
+            fseek(file, -3, SEEK_CUR); // -1 + '\n'
             fprintf(file, "1");
-            break;
         }
-        ++i;
     }
     fclose(file);
     return 0;
