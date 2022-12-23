@@ -22,23 +22,23 @@ void changeTaskStatus(GtkWidget *taskStatus, gpointer data)
     }
     else if (strcmp(gtk_button_get_label(GTK_BUTTON(taskStatus)), "En cours") == 0) {
         int queryResult = updateStatus(dataP->conn, 2, id);
-        if (queryResult == -1) {
+        if (queryResult == -1)
             g_print("Error: update status failed");
-        }
+
         gtk_button_set_label(GTK_BUTTON(taskStatus), "Completé");
     }
     else if (strcmp(gtk_button_get_label(GTK_BUTTON(taskStatus)), "Completé") == 0) {
         int queryResult = updateStatus(dataP->conn, 3, id);
-        if (queryResult == -1) {
+        if (queryResult == -1)
             g_print("Error: update status failed");
-        }
+
         gtk_button_set_label(GTK_BUTTON(taskStatus), "Abandonné");
     }
     else if (strcmp(gtk_button_get_label(GTK_BUTTON(taskStatus)), "Abandonné") == 0) {
         int queryResult = updateStatus(dataP->conn, 0, id);
-        if (queryResult == -1) {
+        if (queryResult == -1)
             g_print("Error: update status failed");
-        }
+
         gtk_button_set_label(GTK_BUTTON(taskStatus), "Non completé");
     }
 }
@@ -117,7 +117,6 @@ void editTaskDB(GtkDialog *window, gint clicked, gpointer data)
     if (clicked == GTK_RESPONSE_OK) {
         GtkWidget *input = GTK_WIDGET(dataP->tools.descriptionEntry);
         const gchar *text = gtk_entry_get_text(GTK_ENTRY(input));
-        const gchar *taskName = gtk_window_get_title(GTK_WINDOW(window));
         int queryResult;
 
         GtkWidget *parent = gtk_widget_get_parent(GTK_WIDGET(dataP->tools.descriptionEntry));
@@ -247,9 +246,9 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask, char *presentProj
             GtkWidget *projectLabel = g_list_nth_data(projectBoxChildren, 0);
             const gchar *projectLabelName = gtk_label_get_label(GTK_LABEL(projectLabel));
 
-            if (strcmp(projectLabelName, projectName) == 0) {
+            if (strcmp(projectLabelName, projectName) == 0)
                 gtk_notebook_set_current_page(dataP->tools.notebook, i + 6);
-            }
+
             g_list_free(projectBoxChildren);
         }
     }
@@ -268,13 +267,11 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask, char *presentProj
     getText = malloc(sizeof(gchar) * strlen(get_text_of_entry(entry)) + 1);
     strcpy(getText, get_text_of_entry(entry));
 
-    if (strcmp(getText, "") == 0 && dataP->state.repopulatedTask == 1) {
+    if (strcmp(getText, "") == 0 && dataP->state.repopulatedTask == 1)
         return;
-    }
 
-    if (numberOfTask >= dataP->state.maxTaskPerProject) {
+    if (numberOfTask >= dataP->state.maxTaskPerProject)
         return;
-    }
 
     //Attribution de l'id
     if (dataP->state.repopulatedTask == 1) {
@@ -381,23 +378,21 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask, char *presentProj
     g_signal_connect(dataP->tools.taskDeadline[dataP->state.i], "clicked", G_CALLBACK(changeDeadlineWindow), dataP);
 
     gtk_widget_show_all(dataP->tools.boxTask[dataP->state.i]);
-    //gtk_widget_hide(taskNumberMarker);
 
     gtk_entry_set_text(GTK_ENTRY(entry), "");
 
     if (dataP->state.repopulatedTask == 1) {
         int queryResult = insertTask(dataP->conn, dataP->state.i, getText, "", 1, "now()", 0, name); //insert in db
-        if (queryResult == -1) {
+        if (queryResult == -1)
             g_print("Error: insertTask failed");
-        }
     }
 }
 
-gchar *get_text_of_entry(GtkWidget *inputEntry) //recup le contenu d'un "textview"
+gchar *get_text_of_entry(GtkWidget *inputEntry)
 {
     GtkEntryBuffer *buffer = gtk_entry_get_buffer((GtkEntry *)inputEntry);
     gchar *text;
-    text = gtk_entry_buffer_get_text(buffer);
+    text = (gchar *)gtk_entry_buffer_get_text(buffer);
     return text;
 }
 
@@ -424,25 +419,6 @@ int readOneConfigValue(char *propName)
         }
     }
     return -1;
-}
-
-int projectExist(PGconn *conn, const gchar *ProjectName)
-{
-    int size = strlen("SELECT Name FROM project WHERE Name = ''") + strlen(ProjectName) + 1;
-    char *query = malloc(size * sizeof(char));
-    sprintf(query, "SELECT Name FROM project WHERE Name = '%s'", ProjectName);
-    PGresult *res = PQexec(conn, query);
-    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
-        g_print("Error:  projectExist failed");
-        return -1;
-    }
-    int nbTuples = PQntuples(res);
-    for (int i = 0; i < nbTuples; i++) {
-        if (strcmp(PQgetvalue(res, i, 0), ProjectName) == 0) {
-            return 1;
-        }
-    }
-    return 0;
 }
 
 void addProjectWindow(GtkWidget *project, gpointer data)
@@ -578,9 +554,8 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProje
         gtk_widget_show(box);
         dataP->state.projectCount++;
     }
-    if (dataP->state.repopulatedProject == 1) {
+    if (dataP->state.repopulatedProject == 1)
         gtk_widget_destroy(projet);
-    }
 }
 
 void changeDeadlineWindow(GtkWidget *deadline, gpointer data)
@@ -592,6 +567,12 @@ void changeDeadlineWindow(GtkWidget *deadline, gpointer data)
 
     gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(changeDeadlineDialog))), calendar);
     gtk_widget_show_all(changeDeadlineDialog);
+
+    GtkWidget *parent = gtk_widget_get_parent(deadline);
+    GList *children = gtk_container_get_children(GTK_CONTAINER(parent));
+    GtkWidget *idButton = g_list_nth_data(children, 5);
+    int id = atoi(gtk_button_get_label(GTK_BUTTON(idButton)));
+    dataP->state.inEditingId = id;
 
     g_signal_connect(changeDeadlineDialog, "response", G_CALLBACK(changeDeadline), dataP);
 }
@@ -607,10 +588,10 @@ void changeDeadline(GtkWidget *deadline, gint clicked, gpointer data)
         guint year, month, day;
 
         gtk_calendar_get_date(GTK_CALENDAR(calendar), &year, &month, &day);
-        gchar *changedDeadline;
+        gchar *changedDeadline = malloc(11 * sizeof(gchar));
         sprintf(changedDeadline, "%d-%d-%d", year, month + 1, day);
-        updateDeadline(dataP->conn, dataP->state.i, changedDeadline);
-        gtk_button_set_label(GTK_BUTTON(dataP->tools.taskDeadline[dataP->state.i]), changedDeadline);
+        updateDeadline(dataP->conn, dataP->state.inEditingId, changedDeadline);
+        gtk_button_set_label(GTK_BUTTON(dataP->tools.taskDeadline[dataP->state.inEditingId]), changedDeadline);
     }
     gtk_widget_destroy(deadline);
 }
