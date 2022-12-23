@@ -78,6 +78,7 @@ int createTables(PGconn *conn)
         if (strstr(line, "init value") != NULL) {
             fseek(file, -3, SEEK_CUR); // -1 + '\n'
             fprintf(file, "1");
+            break;
         }
     }
     fclose(file);
