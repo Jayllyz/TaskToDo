@@ -568,6 +568,12 @@ void changeDeadlineWindow(GtkWidget *deadline, gpointer data)
     gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(changeDeadlineDialog))), calendar);
     gtk_widget_show_all(changeDeadlineDialog);
 
+    GtkWidget *parent = gtk_widget_get_parent(deadline);
+    GList *children = gtk_container_get_children(GTK_CONTAINER(parent));
+    GtkWidget *idButton = g_list_nth_data(children, 5);
+    int id = atoi(gtk_button_get_label(GTK_BUTTON(idButton)));
+    dataP->state.inEditingId = id;
+
     g_signal_connect(changeDeadlineDialog, "response", G_CALLBACK(changeDeadline), dataP);
 }
 
@@ -584,8 +590,8 @@ void changeDeadline(GtkWidget *deadline, gint clicked, gpointer data)
         gtk_calendar_get_date(GTK_CALENDAR(calendar), &year, &month, &day);
         gchar *changedDeadline = malloc(11 * sizeof(gchar));
         sprintf(changedDeadline, "%d-%d-%d", year, month + 1, day);
-        updateDeadline(dataP->conn, dataP->state.i, changedDeadline);
-        gtk_button_set_label(GTK_BUTTON(dataP->tools.taskDeadline[dataP->state.i]), changedDeadline);
+        updateDeadline(dataP->conn, dataP->state.inEditingId, changedDeadline);
+        gtk_button_set_label(GTK_BUTTON(dataP->tools.taskDeadline[dataP->state.inEditingId]), changedDeadline);
     }
     gtk_widget_destroy(deadline);
 }
