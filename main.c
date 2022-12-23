@@ -28,7 +28,6 @@ int main(int argc, char *argv[])
             return EXIT_FAILURE;
         }
         createTables(data.conn);
-        PQfinish(data.conn);
     }
 
     data.tools.builder = gtk_builder_new();

@@ -162,12 +162,17 @@ void deleteTask(GtkWidget *taskDelete, gpointer data)
     GtkWidget *taskToDelete = gtk_widget_get_parent(taskDelete);
     GList *boxChildren = gtk_container_get_children(GTK_CONTAINER(taskToDelete));
     GtkWidget *numberToFree = g_list_nth_data(boxChildren, 5);
+    GtkWidget *labelOfTask = g_list_nth_data(boxChildren, 2);
     g_list_free(boxChildren);
 
     int numberToChange = atoi(gtk_button_get_label(GTK_BUTTON(numberToFree)));
     dataP->state.taskNumber[numberToChange] = numberToChange;
 
     int queryResult = deleteTaskDB(dataP->conn, numberToChange);
+
+    const gchar *nameOfTask = gtk_label_get_text(GTK_LABEL(labelOfTask));
+
+    int queryResult = deleteTaskDB(user->conn, nameOfTask);
 
     if (queryResult == -1) {
         g_print("Error: insertTask failed");
