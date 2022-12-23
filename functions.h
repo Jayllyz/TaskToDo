@@ -64,6 +64,9 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProje
 void changeDeadlineWindow(GtkWidget *deadline, gpointer data);
 void changeDeadline(GtkWidget *deadline, gint clicked, gpointer data);
 void addImportantTask(gpointer data, int id);
+void scanForIdToDestroy(gpointer data, int id);
+void scanForIdToDestroySpecific(gpointer data, int idToDestroy, guint project);
+void updateTask(gpointer data, GtkWidget *task, int id);
 
 //bdd.c
 PGconn *connectBdd();

@@ -78,17 +78,9 @@ int main(int argc, char *argv[])
         data.state.taskNumber[taskToAdd] = -1;
         char *project = selectProjectName(data.conn, taskToAdd);
         addTasks(GTK_WIDGET(data.tools.addTask), &data, taskToAdd, project);
+        addImportantTask(&data, i);
     }
     data.state.repopulatedTask = 1;
-
-    queryResult = allImportantTask(data.conn);
-    if (queryResult == -1) {
-        g_print("Error: can't collect all tasks");
-    }
-    for (int i = 0; i < queryResult; i++) {
-        int taskToAdd = selectTaskId(data.conn, i);
-        addImportantTask(&data, taskToAdd);
-    }
 
     gtk_notebook_set_current_page(data.tools.notebook, 0);
 
