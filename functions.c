@@ -603,6 +603,7 @@ void changeDeadline(GtkWidget *deadline, gint clicked, gpointer data)
         sprintf(changedDeadline, "%d-%d-%d", year, month + 1, day);
         updateDeadline(dataP->conn, dataP->state.inEditingId, changedDeadline);
         gtk_button_set_label(GTK_BUTTON(dataP->tools.taskDeadline[dataP->state.inEditingId]), changedDeadline);
+        addLateTask(dataP, dataP->state.inEditingId);
     }
     gtk_widget_destroy(deadline);
 }
@@ -827,6 +828,270 @@ void addMinorTask(gpointer data, int id)
     gtk_notebook_set_current_page(dataP->tools.notebook, startingPage);
 }
 
+void addLateTask(gpointer data, int id)
+{
+    struct data *dataP = data;
+
+    gint startingPage = gtk_notebook_get_current_page(GTK_NOTEBOOK(dataP->tools.notebook));
+
+    time_t now = time(NULL);
+    struct tm *local_time = localtime(&now);
+    local_time = localtime(&now);
+
+    gtk_notebook_set_current_page(dataP->tools.notebook, 3);
+
+    gint currentPage = gtk_notebook_get_current_page(GTK_NOTEBOOK(dataP->tools.notebook));
+    GtkWidget *pageBox = gtk_notebook_get_nth_page(GTK_NOTEBOOK(dataP->tools.notebook), currentPage); //boxV
+    GList *children = gtk_container_get_children(GTK_CONTAINER(pageBox));
+
+    int checkTask = 0;
+    int numberOfTask = g_list_length(children) - 2;
+
+    for (int j = 2; j < numberOfTask + 2; j++) {
+        GtkWidget *boxTask = g_list_nth_data(children, j);
+        GList *taskList = gtk_container_get_children(GTK_CONTAINER(boxTask));
+        GtkWidget *idButton = g_list_nth_data(taskList, 5);
+        g_list_free(taskList);
+
+        int idCheck = atoi(gtk_button_get_label(GTK_BUTTON(idButton)));
+        if (idCheck == id) {
+            updateTask(dataP, boxTask, id);
+            checkTask = 1;
+        }
+    }
+
+    g_list_free(children);
+
+    char *deadline = selectDeadline(dataP->conn, id);
+
+    int deadlineYear, deadlineMonth, deadlineDay, late = 1;
+    sscanf(deadline, "%d-%d-%d", &deadlineYear, &deadlineMonth, &deadlineDay);
+
+    if (deadlineYear > local_time->tm_year + 1900) {
+        late = 0;
+    }
+    else if (deadlineYear == local_time->tm_year + 1900) {
+        if (deadlineMonth > local_time->tm_mon + 1) {
+            late = 0;
+        }
+        else if (deadlineMonth == local_time->tm_mon + 1) {
+            if (deadlineDay >= local_time->tm_mday) {
+                late = 0;
+            }
+        }
+    }
+
+    if (late == 0) {
+        if (checkTask == 1) {
+            scanForIdToDestroySpecific(dataP, id, 3);
+            gtk_notebook_set_current_page(dataP->tools.notebook, startingPage);
+        }
+        return;
+    }
+
+    if (checkTask == 1) { //Pour que le GList se free
+        return;
+    }
+
+    GtkWidget *boxTask = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    gtk_box_pack_start(GTK_BOX(pageBox), boxTask, FALSE, FALSE, 0);
+
+    int queryResult = selectStatus(dataP->conn, id);
+    gchar *status;
+    if (queryResult == 0) {
+        status = "Non completé";
+    }
+    else if (queryResult == 1) {
+        status = "En cours";
+    }
+    else if (queryResult == 2) {
+        status = "Complété";
+    }
+    else if (queryResult == 3) {
+        status = "Abandonné";
+    }
+    else {
+        status = "Erreur";
+    }
+    GtkWidget *statusButton = gtk_button_new_with_label(status);
+
+    gtk_widget_set_margin_top(statusButton, 10);
+    gtk_widget_set_margin_bottom(statusButton, 10);
+    gtk_widget_set_size_request(statusButton, 150, -1);
+    gtk_box_pack_start(GTK_BOX(boxTask), statusButton, FALSE, FALSE, 0);
+    g_signal_connect(statusButton, "clicked", G_CALLBACK(changeTaskStatus), dataP);
+
+    GtkWidget *taskSeparator1 = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
+    gtk_widget_set_size_request(taskSeparator1, 5, -1);
+    gtk_box_pack_start(GTK_BOX(boxTask), taskSeparator1, FALSE, FALSE, 0);
+
+    GtkWidget *taskName = gtk_label_new(selectTask(dataP->conn, id));
+    gtk_widget_set_tooltip_text(taskName, selectDescription(dataP->conn, id));
+    gtk_box_pack_start(GTK_BOX(boxTask), taskName, TRUE, FALSE, 0);
+
+    GtkWidget *taskEdit = gtk_button_new_with_label("Editer");
+    gtk_box_pack_start(GTK_BOX(boxTask), taskEdit, FALSE, FALSE, 0);
+    g_signal_connect(taskEdit, "clicked", G_CALLBACK(editTaskWindow), dataP);
+
+    GtkWidget *taskDelete = gtk_button_new_with_label("X");
+    gtk_box_pack_start(GTK_BOX(boxTask), taskDelete, FALSE, FALSE, 0);
+    g_signal_connect(taskDelete, "clicked", G_CALLBACK(deleteTask), dataP);
+
+    char numberToTransfer[3];
+    sprintf(numberToTransfer, "%d", id);
+    GtkWidget *taskNumberMarker = gtk_button_new_with_label(numberToTransfer);
+    gtk_box_pack_start(GTK_BOX(boxTask), taskNumberMarker, FALSE, FALSE, 0);
+
+    GtkWidget *taskSeparator2 = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
+    gtk_widget_set_size_request(taskSeparator2, 5, -1);
+    gtk_box_pack_start(GTK_BOX(boxTask), taskSeparator2, FALSE, FALSE, 0);
+
+    char *queryDeadline = selectDeadline(dataP->conn, id);
+    GtkWidget *taskDeadline = gtk_button_new_with_label(queryDeadline);
+    gtk_widget_set_margin_top(taskDeadline, 10);
+    gtk_widget_set_margin_bottom(taskDeadline, 10);
+    gtk_widget_set_size_request(taskDeadline, 150, -1);
+    gtk_box_pack_start(GTK_BOX(boxTask), taskDeadline, FALSE, FALSE, 0);
+    g_signal_connect(taskDeadline, "clicked", G_CALLBACK(changeDeadlineWindow), dataP);
+
+    gtk_widget_show_all(boxTask);
+    gtk_widget_hide(taskNumberMarker);
+
+    gtk_notebook_set_current_page(dataP->tools.notebook, startingPage);
+}
+
+void addPlannedTask(gpointer data, int id)
+{
+    struct data *dataP = data;
+
+    gint startingPage = gtk_notebook_get_current_page(GTK_NOTEBOOK(dataP->tools.notebook));
+
+    time_t now = time(NULL);
+    struct tm *local_time = localtime(&now);
+    local_time = localtime(&now);
+
+    gtk_notebook_set_current_page(dataP->tools.notebook, 4);
+
+    gint currentPage = gtk_notebook_get_current_page(GTK_NOTEBOOK(dataP->tools.notebook));
+    GtkWidget *pageBox = gtk_notebook_get_nth_page(GTK_NOTEBOOK(dataP->tools.notebook), currentPage); //boxV
+    GList *children = gtk_container_get_children(GTK_CONTAINER(pageBox));
+
+    int checkTask = 0;
+    int numberOfTask = g_list_length(children) - 2;
+
+    for (int j = 2; j < numberOfTask + 2; j++) {
+        GtkWidget *boxTask = g_list_nth_data(children, j);
+        GList *taskList = gtk_container_get_children(GTK_CONTAINER(boxTask));
+        GtkWidget *idButton = g_list_nth_data(taskList, 5);
+        g_list_free(taskList);
+
+        int idCheck = atoi(gtk_button_get_label(GTK_BUTTON(idButton)));
+        if (idCheck == id) {
+            updateTask(dataP, boxTask, id);
+            checkTask = 1;
+        }
+    }
+
+    g_list_free(children);
+
+    char *deadline = selectDeadline(dataP->conn, id);
+
+    int deadlineYear, deadlineMonth, deadlineDay, late = 1;
+    sscanf(deadline, "%d-%d-%d", &deadlineYear, &deadlineMonth, &deadlineDay);
+
+    if (deadlineYear > local_time->tm_year + 1900) {
+        late = 0;
+    }
+    else if (deadlineYear == local_time->tm_year + 1900) {
+        if (deadlineMonth > local_time->tm_mon + 1) {
+            late = 0;
+        }
+        else if (deadlineMonth == local_time->tm_mon + 1) {
+            if (deadlineDay >= local_time->tm_mday) {
+                late = 0;
+            }
+        }
+    }
+
+    if (late == 1) {
+        if (checkTask == 1) {
+            scanForIdToDestroySpecific(dataP, id, 4);
+            gtk_notebook_set_current_page(dataP->tools.notebook, startingPage);
+        }
+        return;
+    }
+
+    if (checkTask == 1) { //Pour que le GList se free
+        return;
+    }
+
+    GtkWidget *boxTask = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    gtk_box_pack_start(GTK_BOX(pageBox), boxTask, FALSE, FALSE, 0);
+
+    int queryResult = selectStatus(dataP->conn, id);
+    gchar *status;
+    if (queryResult == 0) {
+        status = "Non completé";
+    }
+    else if (queryResult == 1) {
+        status = "En cours";
+    }
+    else if (queryResult == 2) {
+        status = "Complété";
+    }
+    else if (queryResult == 3) {
+        status = "Abandonné";
+    }
+    else {
+        status = "Erreur";
+    }
+    GtkWidget *statusButton = gtk_button_new_with_label(status);
+
+    gtk_widget_set_margin_top(statusButton, 10);
+    gtk_widget_set_margin_bottom(statusButton, 10);
+    gtk_widget_set_size_request(statusButton, 150, -1);
+    gtk_box_pack_start(GTK_BOX(boxTask), statusButton, FALSE, FALSE, 0);
+    g_signal_connect(statusButton, "clicked", G_CALLBACK(changeTaskStatus), dataP);
+
+    GtkWidget *taskSeparator1 = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
+    gtk_widget_set_size_request(taskSeparator1, 5, -1);
+    gtk_box_pack_start(GTK_BOX(boxTask), taskSeparator1, FALSE, FALSE, 0);
+
+    GtkWidget *taskName = gtk_label_new(selectTask(dataP->conn, id));
+    gtk_widget_set_tooltip_text(taskName, selectDescription(dataP->conn, id));
+    gtk_box_pack_start(GTK_BOX(boxTask), taskName, TRUE, FALSE, 0);
+
+    GtkWidget *taskEdit = gtk_button_new_with_label("Editer");
+    gtk_box_pack_start(GTK_BOX(boxTask), taskEdit, FALSE, FALSE, 0);
+    g_signal_connect(taskEdit, "clicked", G_CALLBACK(editTaskWindow), dataP);
+
+    GtkWidget *taskDelete = gtk_button_new_with_label("X");
+    gtk_box_pack_start(GTK_BOX(boxTask), taskDelete, FALSE, FALSE, 0);
+    g_signal_connect(taskDelete, "clicked", G_CALLBACK(deleteTask), dataP);
+
+    char numberToTransfer[3];
+    sprintf(numberToTransfer, "%d", id);
+    GtkWidget *taskNumberMarker = gtk_button_new_with_label(numberToTransfer);
+    gtk_box_pack_start(GTK_BOX(boxTask), taskNumberMarker, FALSE, FALSE, 0);
+
+    GtkWidget *taskSeparator2 = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
+    gtk_widget_set_size_request(taskSeparator2, 5, -1);
+    gtk_box_pack_start(GTK_BOX(boxTask), taskSeparator2, FALSE, FALSE, 0);
+
+    char *queryDeadline = selectDeadline(dataP->conn, id);
+    GtkWidget *taskDeadline = gtk_button_new_with_label(queryDeadline);
+    gtk_widget_set_margin_top(taskDeadline, 10);
+    gtk_widget_set_margin_bottom(taskDeadline, 10);
+    gtk_widget_set_size_request(taskDeadline, 150, -1);
+    gtk_box_pack_start(GTK_BOX(boxTask), taskDeadline, FALSE, FALSE, 0);
+    g_signal_connect(taskDeadline, "clicked", G_CALLBACK(changeDeadlineWindow), dataP);
+
+    gtk_widget_show_all(boxTask);
+    gtk_widget_hide(taskNumberMarker);
+
+    gtk_notebook_set_current_page(dataP->tools.notebook, startingPage);
+}
+
 void scanForIdToDestroy(gpointer data, int idToDestroy)
 {
     struct data *dataP = data;
@@ -834,7 +1099,7 @@ void scanForIdToDestroy(gpointer data, int idToDestroy)
     int numberOfProject = allProject(dataP->conn) + 6;
 
     for (int i = 0; i < numberOfProject; i++) {
-        if (i != 2 || i != 3 || i != 4 || i != 5) { //temporaire pour eviter les seg fault juste le 5 restera plus tard
+        if (i != 5) { //le i == 5 c'est la page finance
             gtk_notebook_set_current_page(dataP->tools.notebook, i);
 
             gint currentPage = gtk_notebook_get_current_page(GTK_NOTEBOOK(dataP->tools.notebook));

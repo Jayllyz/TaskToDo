@@ -80,6 +80,8 @@ int main(int argc, char *argv[])
         addTasks(GTK_WIDGET(data.tools.addTask), &data, taskToAdd, project);
         addImportantTask(&data, i);
         addMinorTask(&data, i);
+        addLateTask(&data, i);
+        addPlannedTask(&data, i);
     }
     data.state.repopulatedTask = 1;
 
