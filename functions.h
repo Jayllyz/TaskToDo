@@ -63,6 +63,7 @@ void addProjectWindow(GtkWidget *project, gpointer data);
 void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProject);
 void changeDeadlineWindow(GtkWidget *deadline, gpointer data);
 void changeDeadline(GtkWidget *deadline, gint clicked, gpointer data);
+void addImportantTask(gpointer data, int id);
 
 //bdd.c
 PGconn *connectBdd();
@@ -75,6 +76,7 @@ int deleteProjectDB(PGconn *conn, const gchar *name);
 int deleteAllTaskFromProject(PGconn *conn, const gchar *name);
 int allTask(PGconn *conn);
 int allProject(PGconn *conn);
+int allImportantTask(PGconn *conn);
 char *selectTask(PGconn *conn, int row);
 int selectTaskId(PGconn *conn, int row);
 char *selectProject(PGconn *conn, int row);

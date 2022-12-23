@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     gtk_init(&argc, &argv);
     struct data data;
     data.conn = connectBdd();
-    if (readOneConfigValue("init value") == 0) {
+    if (readOneConfigValue("init") == 0) {
         data.conn = connectBdd();
         if (data.conn == NULL) {
             g_print("Error: can't connect to database");
@@ -80,6 +80,16 @@ int main(int argc, char *argv[])
         addTasks(GTK_WIDGET(data.tools.addTask), &data, taskToAdd, project);
     }
     data.state.repopulatedTask = 1;
+
+    queryResult = allImportantTask(data.conn);
+    if (queryResult == -1) {
+        g_print("Error: can't collect all tasks");
+    }
+    for (int i = 0; i < queryResult; i++) {
+        int taskToAdd = selectTaskId(data.conn, i);
+        addImportantTask(&data, taskToAdd);
+    }
+
     gtk_notebook_set_current_page(data.tools.notebook, 0);
 
     g_signal_connect(data.tools.addTask, "clicked", G_CALLBACK(addTasks), &data);
