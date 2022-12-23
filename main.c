@@ -79,6 +79,7 @@ int main(int argc, char *argv[])
         char *project = selectProjectName(data.conn, taskToAdd);
         addTasks(GTK_WIDGET(data.tools.addTask), &data, taskToAdd, project);
         addImportantTask(&data, i);
+        addMinorTask(&data, i);
     }
     data.state.repopulatedTask = 1;
 
