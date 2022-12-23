@@ -24,6 +24,7 @@ int main(int argc, char *argv[])
     if (readOneConfigValue("init value") == 0) {
         data.conn = connectBdd();
         if (data.conn == NULL) {
+            g_print("Error: can't connect to database");
             return EXIT_FAILURE;
         }
         createTables(data.conn);
@@ -47,6 +48,7 @@ int main(int argc, char *argv[])
     data.state.repopulatedTask = 0;
     data.state.repopulatedProject = 0;
     data.state.projectCount = 0;
+
     for (int i = 0; i < data.state.maxTaskTotal; i++) {
         data.tools.task[i] = gtk_label_new("");
         data.state.taskNumber[i] = i;
@@ -59,9 +61,9 @@ int main(int argc, char *argv[])
     gtk_entry_set_max_length(GTK_ENTRY(data.tools.inputEntry), 35); //limit char input
 
     int queryResult = allProject(data.conn);
-    if (queryResult == -1) {
+    if (queryResult == -1)
         g_print("Error: can't collect all projects");
-    }
+
     for (int i = 0; i < queryResult; i++) {
         addProject(GTK_WIDGET(data.tools.addProject), GTK_RESPONSE_OK, &data, i);
     }

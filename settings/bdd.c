@@ -118,6 +118,24 @@ int insertProject(PGconn *conn, char *name, char *description, int priority, cha
     return 0;
 }
 
+int projectExist(PGconn *conn, const gchar *ProjectName)
+{
+    int size = strlen("SELECT Name FROM project WHERE Name = ''") + strlen(ProjectName) + 1;
+    char *query = malloc(size * sizeof(char));
+    sprintf(query, "SELECT Name FROM project WHERE Name = '%s'", ProjectName);
+    PGresult *res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        g_print("Error:  projectExist failed");
+        return -1;
+    }
+    int nbTuples = PQntuples(res);
+    for (int i = 0; i < nbTuples; i++) {
+        if (strcmp(PQgetvalue(res, i, 0), ProjectName) == 0)
+            return 1;
+    }
+    return 0;
+}
+
 int deleteTaskDB(PGconn *conn, int id)
 {
     PGresult *res;
@@ -203,9 +221,8 @@ char *selectTask(PGconn *conn, int id)
     char *query = malloc(sizeof(char) * 1000);
     sprintf(query, "SELECT name FROM Task WHERE id = %d", id);
     res = PQexec(conn, query);
-    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+    if (PQresultStatus(res) != PGRES_TUPLES_OK)
         return "Error: Can't get the task";
-    }
 
     char *name = PQgetvalue(res, 0, 0);
 
@@ -221,9 +238,8 @@ int selectTaskId(PGconn *conn, int row)
     char *query = malloc(sizeof(char) * 1000);
     sprintf(query, "SELECT Id FROM Task ORDER BY date LIMIT 1 OFFSET %d", row);
     res = PQexec(conn, query);
-    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+    if (PQresultStatus(res) != PGRES_TUPLES_OK)
         return -1;
-    }
 
     int id = atoi(PQgetvalue(res, 0, 0));
 
@@ -239,9 +255,8 @@ char *selectProject(PGconn *conn, int row)
     char *query = malloc(sizeof(char) * 1000);
     sprintf(query, "SELECT name FROM Project ORDER BY date LIMIT 1 OFFSET %d", 6 + row);
     res = PQexec(conn, query);
-    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+    if (PQresultStatus(res) != PGRES_TUPLES_OK)
         return "Error: Can't get the Project";
-    }
 
     char *name = PQgetvalue(res, 0, 0);
 
@@ -257,9 +272,8 @@ char *selectDescription(PGconn *conn, int id)
     char *query = malloc(sizeof(char) * 1000);
     sprintf(query, "SELECT description FROM Task WHERE id = '%d'", id);
     res = PQexec(conn, query);
-    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+    if (PQresultStatus(res) != PGRES_TUPLES_OK)
         return "Error: Can't get the task";
-    }
 
     char *description = PQgetvalue(res, 0, 0);
 
@@ -275,9 +289,8 @@ int selectPriority(PGconn *conn, int id)
     char *query = malloc(sizeof(char) * 1000);
     sprintf(query, "SELECT priority FROM Task WHERE id = '%d'", id);
     res = PQexec(conn, query);
-    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+    if (PQresultStatus(res) != PGRES_TUPLES_OK)
         return -1;
-    }
 
     int priority = atoi(PQgetvalue(res, 0, 0));
 
@@ -287,15 +300,31 @@ int selectPriority(PGconn *conn, int id)
     return priority;
 }
 
+int selectStatus(PGconn *conn, int id)
+{
+    PGresult *res;
+    char *query = malloc(sizeof(char) * 1000);
+    sprintf(query, "SELECT status FROM Task WHERE id = '%d'", id);
+    res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_TUPLES_OK)
+        return -1;
+
+    int status = atoi(PQgetvalue(res, 0, 0));
+
+    free(query);
+    PQclear(res);
+
+    return status;
+}
+
 char *selectProjectName(PGconn *conn, int id)
 {
     PGresult *res;
     char *query = malloc(sizeof(char) * 1000);
     sprintf(query, "SELECT projectName FROM Task WHERE id = '%d'", id);
     res = PQexec(conn, query);
-    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+    if (PQresultStatus(res) != PGRES_TUPLES_OK)
         return "Error: Can't get the task";
-    }
 
     char *projectName = PQgetvalue(res, 0, 0);
 
@@ -303,6 +332,23 @@ char *selectProjectName(PGconn *conn, int id)
     PQclear(res);
 
     return projectName;
+}
+
+char *selectDeadline(PGconn *conn, int id)
+{
+    PGresult *res;
+    char *query = malloc(sizeof(char) * 1000);
+    sprintf(query, "SELECT DATE(deadline) FROM Task WHERE id = '%d'", id);
+    res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_TUPLES_OK)
+        return "Error: Can't get the task";
+
+    char *deadline = PQgetvalue(res, 0, 0);
+
+    free(query);
+    PQclear(res);
+
+    return deadline;
 }
 
 int updateDescription(PGconn *conn, const gchar *description, int id)
@@ -325,6 +371,36 @@ int updatePriority(PGconn *conn, int priority, int id)
     PGresult *res;
     char *query = malloc(sizeof(char) * 1000);
     sprintf(query, "UPDATE Task SET priority = '%d' WHERE id = '%d'", priority, id);
+    res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        bddExist(conn, res);
+        return -1;
+    }
+    free(query);
+    PQclear(res);
+    return 0;
+}
+
+int updateStatus(PGconn *conn, int status, int id)
+{
+    PGresult *res;
+    char *query = malloc(sizeof(char) * 1000);
+    sprintf(query, "UPDATE Task SET status = '%d' WHERE id = '%d'", status, id);
+    res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        bddExist(conn, res);
+        return -1;
+    }
+    free(query);
+    PQclear(res);
+    return 0;
+}
+
+int updateDeadline(PGconn *conn, int id, gchar *deadline)
+{
+    PGresult *res;
+    char *query = malloc(sizeof(char) * 1000);
+    sprintf(query, "UPDATE Task SET deadline = '%s' WHERE id = '%d'", deadline, id);
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
         bddExist(conn, res);
