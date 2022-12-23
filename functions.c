@@ -1223,6 +1223,9 @@ void updateTask(gpointer data, GtkWidget *task, int id)
     }
     gtk_button_set_label(GTK_BUTTON(taskStatus), status);
 
+    GtkWidget *taskName = g_list_nth_data(listOfWidget, 2);
+    gtk_widget_set_tooltip_text(taskName, selectDescription(dataP->conn, id));
+
     GtkWidget *taskDeadline = g_list_nth_data(listOfWidget, 7);
     char *deadline = selectDeadline(dataP->conn, id);
     gtk_button_set_label(GTK_BUTTON(taskDeadline), deadline);
