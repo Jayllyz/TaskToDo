@@ -1248,7 +1248,7 @@ void curlCalendar()
     strcat(url, "/");
     strcat(url, year);
     strcat(url, "-calendar.png");
-    char *outfile = "calendar.png";
+    char *outfile = "data/calendar.png";
 
     curl = curl_easy_init();
     if (curl) {
@@ -1277,7 +1277,7 @@ void calendarDialog(GtkButton *calendar, gpointer data)
     curlCalendar();
     GtkWidget *dialog = gtk_dialog_new_with_buttons("Calendrier", GTK_WINDOW(dataP->tools.window), GTK_DIALOG_MODAL, NULL, GTK_RESPONSE_CLOSE, NULL);
     GtkWidget *contentArea = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
-    GtkWidget *image = gtk_image_new_from_file("calendar.png");
+    GtkWidget *image = gtk_image_new_from_file("data/calendar.png");
     gtk_container_add(GTK_CONTAINER(contentArea), image);
     gtk_widget_show_all(dialog);
     gtk_dialog_run(GTK_DIALOG(dialog));
