@@ -23,7 +23,6 @@ int main(int argc, char *argv[])
     struct data data;
     data.conn = connectBdd();
     if (readOneConfigValue("init") == 0) {
-        data.conn = connectBdd();
         if (data.conn == NULL) {
             g_print("Error: can't connect to database");
             return EXIT_FAILURE;
