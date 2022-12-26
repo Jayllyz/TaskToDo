@@ -22,13 +22,12 @@ int main(int argc, char *argv[])
     gtk_init(&argc, &argv);
     struct data data;
     data.conn = connectBdd();
-    if (readOneConfigValue("init") == 0) {
-        if (data.conn == NULL) {
-            g_print("Error: can't connect to database");
-            return EXIT_FAILURE;
-        }
-        createTables(data.conn);
+    if (data.conn == NULL) {
+        g_print("Error: can't connect to database");
+        return EXIT_FAILURE;
     }
+    if (readOneConfigValue("init") == 0)
+        createTables(data.conn);
 
     data.tools.builder = gtk_builder_new();
     gtk_builder_add_from_file(data.tools.builder, "data/window_main.glade", NULL);
