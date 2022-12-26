@@ -1,5 +1,6 @@
-
 .vscode/c_cpp_properties.json
 .vscode/settings.json
 EXEC
 main
+calendar.png
+data/window_main.glade~

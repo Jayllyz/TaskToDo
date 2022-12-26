@@ -1,3 +1,4 @@
+#include <curl/curl.h>
 #include <gtk/gtk.h>
 #include <libpq-fe.h>
 #include <stdio.h>
@@ -27,6 +28,7 @@ struct GTKTools {
     GtkWidget *projectNameEntry;
     GtkWidget *pageTitleBox[10];
     GtkWidget *projectTaskBox[10];
+    GtkButton *calendar;
 };
 
 struct TaskProjectState {
@@ -71,6 +73,8 @@ void scanForIdToDestroy(gpointer data, int id);
 void scanForIdToDestroySpecific(gpointer data, int idToDestroy, guint project);
 void scanForIdForUpdate(gpointer data, int idToSeek);
 void updateTask(gpointer data, GtkWidget *task, int id);
+void curlCalendar();
+void calendarDialog(GtkButton *calendar, gpointer data);
 
 //bdd.c
 PGconn *connectBdd();

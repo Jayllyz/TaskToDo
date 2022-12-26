@@ -7,6 +7,7 @@ Description: Main file of our Todo list software
 #include "functions.c"
 #include "functions.h"
 #include "settings/bdd.c"
+#include <curl/curl.h>
 #include <gtk/gtk.h>
 #include <libpq-fe.h>
 #include <stdio.h>
@@ -44,6 +45,7 @@ int main(int argc, char *argv[])
     data.state.i = 0;
     data.tools.inputEntry = GTK_WIDGET(gtk_builder_get_object(data.tools.builder, "inputEntry"));
     data.tools.notebook = GTK_NOTEBOOK(gtk_builder_get_object(data.tools.builder, "project_notebook"));
+    data.tools.calendar = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "calendar"));
     data.state.repopulatedTask = 0;
     data.state.repopulatedProject = 0;
     data.state.projectCount = 0;
@@ -88,6 +90,7 @@ int main(int argc, char *argv[])
 
     g_signal_connect(data.tools.addTask, "clicked", G_CALLBACK(addTasks), &data);
     g_signal_connect(data.tools.addProject, "clicked", G_CALLBACK(addProjectWindow), &data);
+    g_signal_connect(data.tools.calendar, "clicked", G_CALLBACK(calendarDialog), &data);
 
     gtk_builder_connect_signals(data.tools.builder, NULL);
 

@@ -1,4 +1,5 @@
 #include "functions.h"
+#include <curl/curl.h>
 #include <gtk/gtk.h>
 #include <stdio.h>
 #include <string.h>
@@ -1229,4 +1230,56 @@ void updateTask(gpointer data, GtkWidget *task, int id)
     GtkWidget *taskDeadline = g_list_nth_data(listOfWidget, 7);
     char *deadline = selectDeadline(dataP->conn, id);
     gtk_button_set_label(GTK_BUTTON(taskDeadline), deadline);
+}
+
+void curlCalendar()
+{
+    time_t t = time(NULL);
+    struct tm *tm = localtime(&t);
+    int yearInt = tm->tm_year + 1900;
+    char year[5];
+    sprintf(year, "%d", yearInt);
+    CURL *curl;
+    CURLcode res;
+    FILE *fp;
+    char *url = malloc(60 * sizeof(char));
+    strcpy(url, "https://cdn.vertex42.com/calendars/");
+    strcat(url, year);
+    strcat(url, "/");
+    strcat(url, year);
+    strcat(url, "-calendar.png");
+    char *outfile = "data/calendar.png";
+
+    curl = curl_easy_init();
+    if (curl) {
+        fp = fopen(outfile, "wb");
+        if (fp == NULL) {
+            g_print("Impossible d'ouvrir le fichier '%s'\n", outfile);
+            return;
+        }
+        curl_easy_setopt(curl, CURLOPT_URL, url);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+
+        res = curl_easy_perform(curl);
+        if (res != CURLE_OK) {
+            g_print("Erreur lors de l'exécution de la requête cURL : %s\n", curl_easy_strerror(res));
+        }
+
+        curl_easy_cleanup(curl);
+        fclose(fp);
+    }
+}
+
+void calendarDialog(GtkButton *calendar, gpointer data)
+{
+    struct data *dataP = data;
+    curlCalendar();
+    GtkWidget *dialog = gtk_dialog_new_with_buttons("Calendrier", GTK_WINDOW(dataP->tools.window), GTK_DIALOG_MODAL, NULL, GTK_RESPONSE_CLOSE, NULL);
+    GtkWidget *contentArea = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+    GtkWidget *image = gtk_image_new_from_file("data/calendar.png");
+    gtk_container_add(GTK_CONTAINER(contentArea), image);
+    gtk_widget_show_all(dialog);
+    gtk_dialog_run(GTK_DIALOG(dialog));
+    gtk_widget_destroy(dialog);
 }
