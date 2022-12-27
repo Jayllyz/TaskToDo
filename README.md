@@ -24,7 +24,7 @@ Projet de "todolist" réalisé en C avec la librairie GTK+3.2, la partie graphiq
 ## Features
 
 - Ajouter/supprimer des tâches
-- Editer les taches (nom, description, date de fin, priorité)
+- Éditer les tâches (nom, description, date de fin, priorité)
 - Ajouter des projets
 - Récupération du calendrier à l'aide de cURL
 - Suivi de ses finances
@@ -32,7 +32,7 @@ Projet de "todolist" réalisé en C avec la librairie GTK+3.2, la partie graphiq
 
 ## Installation
 
-Ce projet a été réalisé sur Windows avec un environement **WSL**, il est donc conseillé de l'installer sur une distribution Linux ou de l'installer sur Windows avec un environement WSL.
+Ce projet a été réalisé sur Windows avec un environnement **WSL**, il est donc conseiller de l'installer sur une distribution Linux ou de l'installer sur Windows avec un environnement WSL.
 
 ```bash
 #Upgrade the package list

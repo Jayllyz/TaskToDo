@@ -44,9 +44,9 @@ int main(int argc, char *argv[])
     gtk_builder_add_from_file(data.tools.builder, "data/window_main.glade", NULL);
 
     //Datas
-    data.state.maxTaskTotal = 50;
-    data.state.maxTaskPerProject = 6;
-    data.state.maxProject = 3;
+    data.state.maxTaskTotal = readOneConfigValue("maxTaskTotal");
+    data.state.maxTaskPerProject = readOneConfigValue("maxTaskPerProject");
+    data.state.maxProject = readOneConfigValue("maxProject");
     data.tools.window = GTK_WIDGET(gtk_builder_get_object(data.tools.builder, "window_main"));
     data.tools.addTask = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "addTask"));
     data.tools.addProject = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "addProject"));
@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
     }
 
     //signals
-    gtk_entry_set_max_length(GTK_ENTRY(data.tools.inputEntry), 35); //limit char input
+    gtk_entry_set_max_length(GTK_ENTRY(data.tools.inputEntry), readOneConfigValue("limitCharInput")); //limit char input
 
     int queryResult = allProject(data.conn);
     if (queryResult == -1)

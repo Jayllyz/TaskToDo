@@ -6,5 +6,9 @@ last connect year:2022
 #bdd
 init value:1
 
-#base limit deadline
+#set default values
 set deadline day:10
+set maxProject:10
+set maxTaskTotal:200
+set maxTaskPerProject:15
+set limitCharInput:35
