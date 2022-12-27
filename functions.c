@@ -5,6 +5,8 @@
 #include <string.h>
 #include <time.h>
 
+#define UTF8(string) g_locale_to_utf8(string, -1, NULL, NULL, NULL)
+
 void changeTaskStatus(GtkWidget *taskStatus, gpointer data)
 {
     struct data *dataP = data;
@@ -246,6 +248,7 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask, char *presentProj
     gchar *getText;
     char *projectName = malloc(strlen(presentProjectName) + 1 * sizeof(char));
     strcpy(projectName, presentProjectName);
+    projectName = UTF8(projectName);
     if (dataP->state.repopulatedTask == 0) {
 
         gtk_notebook_set_current_page(dataP->tools.notebook, 0);
@@ -470,6 +473,7 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProje
                 return;
             }
 
+            projectName = UTF8(projectName);
             char *query = malloc((strlen("INSERT INTO project VALUES ('','Placeholder', 0, 'now()', 'now()', 0)") + strlen(projectName) + 1) * sizeof(char));
             sprintf(query, "INSERT INTO project VALUES ('%s','Placeholder', 0, 'now()', 'now()', 0)", projectName);
             PGresult *res = PQexec(dataP->conn, query);
