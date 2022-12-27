@@ -32,11 +32,15 @@ int main(int argc, char *argv[])
     time_t now = time(NULL);
     struct tm *local_time = localtime(&now);
     int newConnect = 0;
+    int newMonth = 0;
 
     if (readOneConfigValue("last connect day") != local_time->tm_mday)
         newConnect = 1;
-    if (readOneConfigValue("last connect month") != local_time->tm_mon + 1)
+    if (readOneConfigValue("last connect month") != local_time->tm_mon + 1) {
         newConnect = 1;
+        newMonth = 1;
+    }
+
     if (readOneConfigValue("last connect year") != local_time->tm_year + 1900)
         newConnect = 1;
 
@@ -55,6 +59,19 @@ int main(int argc, char *argv[])
     data.tools.inputEntry = GTK_WIDGET(gtk_builder_get_object(data.tools.builder, "inputEntry"));
     data.tools.notebook = GTK_NOTEBOOK(gtk_builder_get_object(data.tools.builder, "project_notebook"));
     data.tools.calendar = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "calendar"));
+    data.tools.dailyCap = GTK_LABEL(gtk_builder_get_object(data.tools.builder, "dailyCap"));
+    data.tools.monthlyCap = GTK_LABEL(gtk_builder_get_object(data.tools.builder, "monthlyCap"));
+    data.tools.dailyExpense = GTK_LABEL(gtk_builder_get_object(data.tools.builder, "dailyExpense"));
+    data.tools.monthlyExpense = GTK_LABEL(gtk_builder_get_object(data.tools.builder, "monthlyExpense"));
+    data.tools.setDaily = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "setDaily"));
+    data.tools.setMonthly = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "setMonthly"));
+    data.tools.setExpense = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "setExpense"));
+    data.tools.desetExpense = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "desetExpense"));
+    data.tools.dailyCapEntry = GTK_ENTRY(gtk_builder_get_object(data.tools.builder, "dailyCapEntry"));
+    data.tools.monthlyCapEntry = GTK_ENTRY(gtk_builder_get_object(data.tools.builder, "monthlyCapEntry"));
+    data.tools.expenseEntry = GTK_ENTRY(gtk_builder_get_object(data.tools.builder, "expenseEntry"));
+    data.tools.savedEntry = GTK_ENTRY(gtk_builder_get_object(data.tools.builder, "savedEntry"));
+
     data.state.repopulatedTask = 0;
     data.state.repopulatedProject = 0;
     data.state.projectCount = 0;
@@ -95,11 +112,23 @@ int main(int argc, char *argv[])
     }
     data.state.repopulatedTask = 1;
 
+    if (newConnect == 1) {
+        updateExpense(data.conn, 2, 0);
+        if (newMonth == 1)
+            updateExpense(data.conn, 3, 0);
+    }
+    updateFinance(&data);
+
     gtk_notebook_set_current_page(data.tools.notebook, 0);
 
     g_signal_connect(data.tools.addTask, "clicked", G_CALLBACK(addTasks), &data);
     g_signal_connect(data.tools.addProject, "clicked", G_CALLBACK(addProjectWindow), &data);
     g_signal_connect(data.tools.calendar, "clicked", G_CALLBACK(calendarDialog), &data);
+
+    g_signal_connect(data.tools.setDaily, "clicked", G_CALLBACK(financeButton), &data);
+    g_signal_connect(data.tools.setMonthly, "clicked", G_CALLBACK(financeButton), &data);
+    g_signal_connect(data.tools.setExpense, "clicked", G_CALLBACK(financeButton), &data);
+    g_signal_connect(data.tools.desetExpense, "clicked", G_CALLBACK(financeButton), &data);
 
     gtk_builder_connect_signals(data.tools.builder, NULL);
 
@@ -109,6 +138,7 @@ int main(int argc, char *argv[])
 
     if (newConnect == 1) {
         newConnectUpdate(local_time->tm_mday, local_time->tm_mon + 1, local_time->tm_year + 1900);
+
         gchar *message = malloc(sizeof(char) * strlen("Vous avez ??? tâches urgentes à réaliser et ??? tâches en retard"));
         message = warningMessage(&data);
         if (strcmp(message, "empty") != 0) {
