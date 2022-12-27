@@ -1416,7 +1416,6 @@ void updateExpense(int typeOfExpense, int amount, gpointer data)
         if (strstr(line, expense) != NULL) {
             fseek(file, -strlen(line), SEEK_CUR);
             fprintf(file, "daily expense:%d", amount);
-            fprintf(file, "\r\n");
             break;
         }
     }
