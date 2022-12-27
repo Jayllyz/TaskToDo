@@ -1409,15 +1409,14 @@ void updateExpense(int typeOfExpense, int amount, gpointer data)
     int value = readOneConfigValue(expense);
     char string[10];
     sprintf(string, "%d", value);
-    int length = strlen(string) + 2;
 
     amount = amount + value;
 
     while ((getline(&line, &len, file)) != -1) {
         if (strstr(line, expense) != NULL) {
-            fseek(file, -length, SEEK_CUR);
-            fprintf(file, "%d", amount);
-            fprintf(file, "\0"); //Ca le met pas le fprintf j'en ai aucune idée de pk
+            fseek(file, -strlen(line), SEEK_CUR);
+            fprintf(file, "daily expense:%d", amount);
+            fprintf(file, "\r\n");
             break;
         }
     }
