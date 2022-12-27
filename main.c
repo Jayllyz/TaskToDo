@@ -55,6 +55,19 @@ int main(int argc, char *argv[])
     data.tools.inputEntry = GTK_WIDGET(gtk_builder_get_object(data.tools.builder, "inputEntry"));
     data.tools.notebook = GTK_NOTEBOOK(gtk_builder_get_object(data.tools.builder, "project_notebook"));
     data.tools.calendar = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "calendar"));
+    data.tools.dailyCap = GTK_LABEL(gtk_builder_get_object(data.tools.builder, "dailyCap"));
+    data.tools.monthlyCap = GTK_LABEL(gtk_builder_get_object(data.tools.builder, "monthlyCap"));
+    data.tools.dailyExpense = GTK_LABEL(gtk_builder_get_object(data.tools.builder, "dailyExpense"));
+    data.tools.monthlyExpense = GTK_LABEL(gtk_builder_get_object(data.tools.builder, "monthlyExpense"));
+    data.tools.setDaily = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "setDaily"));
+    data.tools.setMonthly = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "setMonthly"));
+    data.tools.setExpense = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "setExpense"));
+    data.tools.desetExpense = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "desetDaily"));
+    data.tools.dailyCapEntry = GTK_ENTRY(gtk_builder_get_object(data.tools.builder, "dailyCapEntry"));
+    data.tools.monthlyCapEntry = GTK_ENTRY(gtk_builder_get_object(data.tools.builder, "monthlyCapEntry"));
+    data.tools.expenseEntry = GTK_ENTRY(gtk_builder_get_object(data.tools.builder, "expenseEntry"));
+    data.tools.savedEntry = GTK_ENTRY(gtk_builder_get_object(data.tools.builder, "savedEntry"));
+
     data.state.repopulatedTask = 0;
     data.state.repopulatedProject = 0;
     data.state.projectCount = 0;

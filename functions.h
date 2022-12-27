@@ -29,6 +29,18 @@ struct GTKTools {
     GtkWidget *pageTitleBox[10];
     GtkWidget *projectTaskBox[10];
     GtkButton *calendar;
+    GtkLabel *dailyCap;
+    GtkLabel *monthlyCap;
+    GtkLabel *dailyExpense;
+    GtkLabel *monthlyExpense;
+    GtkEntry *dailyCapEntry;
+    GtkButton *setDaily;
+    GtkEntry *monthlyCapEntry;
+    GtkButton *setMonthly;
+    GtkEntry *expenseEntry;
+    GtkButton *setExpense;
+    GtkEntry *savedEntry;
+    GtkButton *desetExpense;
 };
 
 struct TaskProjectState {
