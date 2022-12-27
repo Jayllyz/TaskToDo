@@ -90,7 +90,7 @@ void calendarDialog(GtkButton *calendar, gpointer data);
 gchar *warningMessage(gpointer data);
 int newConnectUpdate(int day, int month, int year);
 void financeButton(GtkButton *buttonPressed, gpointer data);
-void updateExpense(int typeOfExpense, int amount, gpointer data);
+void updateFinance(gpointer data);
 
 //bdd.c
 PGconn *connectBdd();
@@ -118,5 +118,9 @@ int updateDescription(PGconn *conn, const gchar *description, int id);
 int updatePriority(PGconn *conn, int priority, int id);
 int updateStatus(PGconn *conn, int status, int id);
 int updateDeadline(PGconn *conn, int id, gchar *deadline);
+int updateExpense(PGconn *conn, int typeOfExpense, int amount);
+int updateCap(PGconn *conn, int typeOfCap, int amount);
+int selectExpense(PGconn *conn, int typeOfExpense);
+int selectCap(PGconn *conn, int typeOfCap);
 
 #endif

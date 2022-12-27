@@ -71,6 +71,19 @@ int createTables(PGconn *conn)
 
     PQclear(res);
 
+    res = PQexec(conn, "CREATE TABLE IF NOT EXISTS Finance(Name VARCHAR(25) PRIMARY KEY, Value INT)");
+
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        bddExist(conn, res);
+    }
+
+    res = PQexec(
+        conn, "INSERT INTO Finance (Name, Value) VALUES ('Dépenses journalières', 0), ('Dépenses mensuelles', 0), ('Plafond journalier', 0), ('Plafond mensuel', 0)");
+
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        bddExist(conn, res);
+    }
+
     FILE *file = fopen("settings/config.txt", "r+");
     char *line = NULL;
     size_t len = 0;
@@ -460,4 +473,84 @@ int updateDeadline(PGconn *conn, int id, gchar *deadline)
     free(query);
     PQclear(res);
     return 0;
+}
+
+int updateExpense(PGconn *conn, int typeOfExpense, int amount)
+{
+    PGresult *res;
+    char *query = malloc(sizeof(char) * 1000);
+    if (typeOfExpense == 2)
+        sprintf(query, "UPDATE Finance SET Value = %d WHERE name = 'Dépenses journalières'", amount);
+    else if (typeOfExpense == 3)
+        sprintf(query, "UPDATE Finance SET Value = %d WHERE name = 'Dépenses mensuelles'", amount);
+
+    res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        bddExist(conn, res);
+        return -1;
+    }
+    free(query);
+    PQclear(res);
+    return 0;
+}
+
+int updateCap(PGconn *conn, int typeOfCap, int amount)
+{
+    PGresult *res;
+    char *query = malloc(sizeof(char) * 1000);
+    if (typeOfCap == 0)
+        sprintf(query, "UPDATE Finance SET Value = %d WHERE name = 'Plafond journalier'", amount);
+    else if (typeOfCap == 1)
+        sprintf(query, "UPDATE Finance SET Value = %d WHERE name = 'Plafond mensuel'", amount);
+
+    res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        bddExist(conn, res);
+        return -1;
+    }
+    free(query);
+    PQclear(res);
+    return 0;
+}
+
+int selectExpense(PGconn *conn, int typeOfExpense)
+{
+    PGresult *res;
+    char *query = malloc(sizeof(char) * 1000);
+    if (typeOfExpense == 0)
+        sprintf(query, "SELECT value FROM Finance WHERE name = 'Dépenses journalières'");
+    else if (typeOfExpense == 1)
+        sprintf(query, "SELECT value FROM Finance WHERE name = 'Dépenses mensuelles'");
+
+    res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_TUPLES_OK)
+        return -1;
+
+    int value = atoi(PQgetvalue(res, 0, 0));
+
+    free(query);
+    PQclear(res);
+
+    return value;
+}
+
+int selectCap(PGconn *conn, int typeOfCap)
+{
+    PGresult *res;
+    char *query = malloc(sizeof(char) * 1000);
+    if (typeOfCap == 2)
+        sprintf(query, "SELECT value FROM Finance WHERE name = 'Plafond journalier'");
+    else if (typeOfCap == 3)
+        sprintf(query, "SELECT value FROM Finance WHERE name = 'Plafond mensuel'");
+
+    res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_TUPLES_OK)
+        return -1;
+
+    int value = atoi(PQgetvalue(res, 0, 0));
+
+    free(query);
+    PQclear(res);
+
+    return value;
 }

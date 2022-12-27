@@ -1368,8 +1368,32 @@ int newConnectUpdate(int day, int month, int year)
 void financeButton(GtkButton *buttonPressed, gpointer data)
 {
     struct data *dataP = data;
+    int type;
 
-    const gchar *entry = gtk_entry_get_text(dataP->tools.dailyCapEntry);
+    GtkWidget *box = gtk_widget_get_parent(GTK_WIDGET(buttonPressed));
+    GtkWidget *alignment = gtk_widget_get_parent(box);
+    GtkWidget *frame = gtk_widget_get_parent(alignment);
+    const gchar *frameLabel = gtk_frame_get_label(GTK_FRAME(frame));
+
+    if (strcmp(frameLabel, "Mettre un plafond journalier") == 0)
+        type = 0;
+    else if (strcmp(frameLabel, "Mettre un plafond mensuel") == 0)
+        type = 1;
+    else if (strcmp(frameLabel, "Vos dépenses") == 0)
+        type = 2;
+    else if (strcmp(frameLabel, "Retirer des dépenses") == 0)
+        type = 3;
+
+    const gchar *entry;
+    if (type == 0)
+        entry = gtk_entry_get_text(GTK_ENTRY(dataP->tools.dailyCapEntry));
+    else if (type == 1)
+        entry = gtk_entry_get_text(GTK_ENTRY(dataP->tools.monthlyCapEntry));
+    else if (type == 2)
+        entry = gtk_entry_get_text(GTK_ENTRY(dataP->tools.expenseEntry));
+    else if (type == 3)
+        entry = gtk_entry_get_text(GTK_ENTRY(dataP->tools.savedEntry));
+
     int amount = atoi(entry);
     int onlyDigits = 1;
 
@@ -1390,52 +1414,106 @@ void financeButton(GtkButton *buttonPressed, gpointer data)
         return;
     }
 
-    updateExpense(0, amount, dataP);
+    int exceededDaily = 0;
+    int exceededMonthly = 0;
+
+    if (type == 0 || type == 1) {
+        updateCap(dataP->conn, type, amount);
+        if (type == 0)
+            gtk_entry_set_text(GTK_ENTRY(dataP->tools.dailyCapEntry), "");
+        if (type == 1)
+            gtk_entry_set_text(GTK_ENTRY(dataP->tools.monthlyCapEntry), "");
+    }
+    else if (type == 2) {
+        int dailyMoney = selectExpense(dataP->conn, 0);
+        int monthlyMoney = selectExpense(dataP->conn, 1);
+        int dailyAmount = amount + dailyMoney;
+        int monthlyAmount = amount + monthlyMoney;
+        updateExpense(dataP->conn, 2, dailyAmount);
+        updateExpense(dataP->conn, 3, monthlyAmount);
+
+        int cap = selectCap(dataP->conn, 2);
+        int currentMoney = selectExpense(dataP->conn, 0);
+        if (currentMoney > cap && cap != 0)
+            exceededDaily = 1;
+
+        cap = selectCap(dataP->conn, 3);
+        currentMoney = selectExpense(dataP->conn, 1);
+        if (currentMoney > cap && cap != 0)
+            exceededMonthly = 1;
+
+        gtk_entry_set_text(GTK_ENTRY(dataP->tools.expenseEntry), "");
+    }
+    else if (type == 3) {
+        int dailyMoney = selectExpense(dataP->conn, 0);
+        int monthlyMoney = selectExpense(dataP->conn, 1);
+
+        if (amount > dailyMoney)
+            amount = dailyMoney;
+
+        int dailyAmount = dailyMoney - amount;
+        int monthlyAmount = monthlyMoney - amount;
+
+        updateExpense(dataP->conn, 2, dailyAmount);
+        updateExpense(dataP->conn, 3, monthlyAmount);
+
+        gtk_entry_set_text(GTK_ENTRY(dataP->tools.savedEntry), "");
+    }
+
+    if (exceededDaily == 1 && exceededMonthly == 1) {
+        GtkDialog *dialog = GTK_DIALOG(gtk_message_dialog_new(
+            GTK_WINDOW(dataP->tools.window), GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "Attention, vous avez dépassé le plafond journalier et mensuel"));
+        gtk_dialog_run(dialog);
+        gtk_widget_destroy(GTK_WIDGET(dialog));
+    }
+    else if (exceededDaily == 1) {
+        GtkDialog *dialog = GTK_DIALOG(gtk_message_dialog_new(
+            GTK_WINDOW(dataP->tools.window), GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "Attention, vous avez dépassé le plafond journalier"));
+        gtk_dialog_run(dialog);
+        gtk_widget_destroy(GTK_WIDGET(dialog));
+    }
+    else if (exceededMonthly == 1) {
+        GtkDialog *dialog = GTK_DIALOG(gtk_message_dialog_new(
+            GTK_WINDOW(dataP->tools.window), GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "Attention, vous avez dépassé le plafond mensuel"));
+        gtk_dialog_run(dialog);
+        gtk_widget_destroy(GTK_WIDGET(dialog));
+    }
+
+    updateFinance(dataP);
 }
 
-void updateExpense(int typeOfExpense, int amount, gpointer data)
+void updateFinance(gpointer data)
 {
     struct data *dataP = data;
+    char showMoney[25];
 
-    FILE *file = fopen("settings/config.txt", "r+");
-    char *line = NULL;
-    size_t len = 0;
-    char expense[16];
-    if (typeOfExpense == 0)
-        strcpy(expense, "daily expense");
-    if (typeOfExpense == 1)
-        strcpy(expense, "monthly expense");
-
-    int value = readOneConfigValue(expense);
-    char string[10];
-    sprintf(string, "%d", value);
-
-    amount = amount + value;
-    int temp = amount;
-    int i = 0;
-
-    while ((getline(&line, &len, file)) != -1) {
-        if (strstr(line, expense) != NULL) {
-            fseek(file, -strlen(line), SEEK_CUR);
-            fprintf(file, "daily expense:");
-            while (temp > 0) {
-                temp = temp / 10;
-                i++;
-                fputc(' ', file);
-            }
-            fseek(file, -i, SEEK_CUR);
-            fprintf(file, "%d", amount);
-            fprintf(file, "\n");
-            break;
-        }
-    }
-    fclose(file);
-
-    char showMoney[12];
-    sprintf(showMoney, "%d", amount);
+    int money = selectExpense(dataP->conn, 0);
+    sprintf(showMoney, "%d", money);
     strcat(showMoney, " €");
-    if (typeOfExpense == 0)
-        gtk_label_set_text(dataP->tools.dailyExpense, showMoney);
-    if (typeOfExpense == 1)
-        gtk_label_set_text(dataP->tools.monthlyExpense, showMoney);
+    gtk_label_set_text(dataP->tools.dailyExpense, showMoney);
+
+    money = selectExpense(dataP->conn, 1);
+    sprintf(showMoney, "%d", money);
+    strcat(showMoney, " €");
+    gtk_label_set_text(dataP->tools.monthlyExpense, showMoney);
+
+    int cap = selectCap(dataP->conn, 2);
+    if (cap != 0) {
+        sprintf(showMoney, "Plafond: %d", cap);
+        strcat(showMoney, " €");
+        gtk_label_set_text(dataP->tools.dailyCap, showMoney);
+    }
+    else {
+        gtk_label_set_text(dataP->tools.dailyCap, "Plafond: Aucun");
+    }
+
+    cap = selectCap(dataP->conn, 3);
+    if (cap != 0) {
+        sprintf(showMoney, "Plafond: %d", cap);
+        strcat(showMoney, " €");
+        gtk_label_set_text(dataP->tools.monthlyCap, showMoney);
+    }
+    else {
+        gtk_label_set_text(dataP->tools.monthlyCap, "Plafond: Aucun");
+    }
 }
