@@ -1,3 +1,8 @@
+#last connexion
+last connect day:27
+last connect month:12
+last connect year:2022
+
 #bdd
 init value:1
 

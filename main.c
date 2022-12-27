@@ -29,6 +29,17 @@ int main(int argc, char *argv[])
     if (readOneConfigValue("init") == 0)
         createTables(data.conn);
 
+    time_t now = time(NULL);
+    struct tm *local_time = localtime(&now);
+    int newConnect = 0;
+
+    if (readOneConfigValue("last connect day") != local_time->tm_mday)
+        newConnect = 1;
+    if (readOneConfigValue("last connect month") != local_time->tm_mon + 1)
+        newConnect = 1;
+    if (readOneConfigValue("last connect year") != local_time->tm_year + 1900)
+        newConnect = 1;
+
     data.tools.builder = gtk_builder_new();
     gtk_builder_add_from_file(data.tools.builder, "data/window_main.glade", NULL);
 
@@ -77,10 +88,10 @@ int main(int argc, char *argv[])
         data.state.taskNumber[taskToAdd] = -1;
         char *project = selectProjectName(data.conn, taskToAdd);
         addTasks(GTK_WIDGET(data.tools.addTask), &data, taskToAdd, project);
-        addImportantTask(&data, i);
-        addMinorTask(&data, i);
-        addLateTask(&data, i);
-        addPlannedTask(&data, i);
+        addImportantTask(&data, taskToAdd);
+        addMinorTask(&data, taskToAdd);
+        addLateTask(&data, taskToAdd);
+        addPlannedTask(&data, taskToAdd);
     }
     data.state.repopulatedTask = 1;
 
@@ -95,6 +106,19 @@ int main(int argc, char *argv[])
     g_object_unref(data.tools.builder);
 
     gtk_widget_show(data.tools.window);
+
+    if (newConnect == 1) {
+        newConnectUpdate(local_time->tm_mday, local_time->tm_mon + 1, local_time->tm_year + 1900);
+        gchar *message = malloc(sizeof(char) * strlen("Vous avez ??? tâches urgentes à réaliser et ??? tâches en retard"));
+        message = warningMessage(&data);
+        if (strcmp(message, "empty") != 0) {
+            GtkDialog *dialog = GTK_DIALOG(gtk_message_dialog_new(GTK_WINDOW(data.tools.window), GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "%s", message));
+            gtk_dialog_run(dialog);
+            gtk_widget_destroy(GTK_WIDGET(dialog));
+        }
+        free(message);
+    }
+
     gtk_main();
 
     return 0;

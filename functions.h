@@ -75,6 +75,7 @@ void scanForIdForUpdate(gpointer data, int idToSeek);
 void updateTask(gpointer data, GtkWidget *task, int id);
 void curlCalendar();
 void calendarDialog(GtkButton *calendar, gpointer data);
+gchar *warningMessage(gpointer data);
 
 //bdd.c
 PGconn *connectBdd();
@@ -88,6 +89,8 @@ int deleteAllTaskFromProject(PGconn *conn, const gchar *name);
 int allTask(PGconn *conn);
 int allProject(PGconn *conn);
 int allImportantTask(PGconn *conn);
+int allUrgentTask(PGconn *conn);
+int allLateTask(PGconn *conn);
 char *selectTask(PGconn *conn, int row);
 int selectTaskId(PGconn *conn, int row);
 char *selectProject(PGconn *conn, int row);
@@ -100,5 +103,6 @@ int updateDescription(PGconn *conn, const gchar *description, int id);
 int updatePriority(PGconn *conn, int priority, int id);
 int updateStatus(PGconn *conn, int status, int id);
 int updateDeadline(PGconn *conn, int id, gchar *deadline);
+int newConnectUpdate(int day, int month, int year);
 
 #endif
