@@ -10,12 +10,10 @@ void btnClicked(GtkButton *button, gpointer data)
     struct data *dataP = data;
     const char *text = gtk_button_get_label(button);
     if (strcmp(text, "C") == 0) {
-        g_print("test");
         clearCalc(dataP);
         gtk_label_set_text(dataP->calc.txtResult, "");
     }
     else if (strcmp(text, "=") == 0) {
-        g_print("ici");
         calculate(dataP);
         gtk_label_set_text(dataP->calc.txtResult, "");
         showResult(dataP->calc.txtResult, dataP);
@@ -83,9 +81,6 @@ void calculate(gpointer data)
         dataP->calc.result = dataP->calc.firstNumber / dataP->calc.secondNumber;
         break;
     }
-    g_print("F:%d\n", dataP->calc.firstNumber);
-    g_print("O:%c\n", dataP->calc.operator);
-    g_print("S:%d\n", dataP->calc.secondNumber);
 }
 
 void clearCalc(gpointer data)
