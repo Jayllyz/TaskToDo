@@ -1283,3 +1283,50 @@ void calendarDialog(GtkButton *calendar, gpointer data)
     gtk_dialog_run(GTK_DIALOG(dialog));
     gtk_widget_destroy(dialog);
 }
+
+gchar *warningMessage(gpointer data)
+{
+    struct data *dataP = data;
+    int urgent = allUrgentTask(dataP->conn);
+    int late = allLateTask(dataP->conn);
+    gchar *message;
+    char number[3];
+
+    message = malloc(sizeof(char) * strlen("Vous avez ??? tâches urgentes à réaliser et ??? tâches en retard")); //Le message le plus long possible
+
+    if (urgent != 0) {
+        if (urgent == 1)
+            strcpy(message, "Vous avez 1 tâche urgente à réaliser");
+        else {
+            strcpy(message, "Vous avez ");
+            sprintf(number, "%d", urgent);
+            strcat(message, number);
+            strcat(message, " tâches urgentes à réaliser");
+        }
+
+        if (late != 0) {
+            if (late == 1)
+                strcat(message, " et 1 tâche en retard");
+            else {
+                strcat(message, " et ");
+                sprintf(number, "%d", late);
+                strcat(message, number);
+                strcat(message, " tâches en retard");
+            }
+        }
+    }
+    else if (late != 0) {
+        if (late == 1)
+            strcpy(message, "Vous avez 1 tâche en retard");
+        else {
+            strcpy(message, "Vous avez ");
+            sprintf(number, "%d", late);
+            strcat(message, number);
+            strcat(message, " tâches en retard");
+        }
+    }
+    else
+        strcpy(message, "empty");
+
+    return message;
+}

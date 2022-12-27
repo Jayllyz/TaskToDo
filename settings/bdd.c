@@ -231,6 +231,40 @@ int allImportantTask(PGconn *conn)
     return amountOfTask;
 }
 
+int allUrgentTask(PGconn *conn)
+{
+    PGresult *res;
+    char *query = malloc(sizeof(char) * strlen("SELECT * FROM Task WHERE priority > 2"));
+    sprintf(query, "SELECT * FROM Task WHERE priority > 2");
+    res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        g_print("Error: Can't get all task");
+        return -1;
+    }
+
+    int amountOfTask = PQntuples(res);
+    free(query);
+    PQclear(res);
+    return amountOfTask;
+}
+
+int allLateTask(PGconn *conn)
+{
+    PGresult *res;
+    char *query = malloc(sizeof(char) * strlen("SELECT * FROM Task WHERE deadline < now()"));
+    sprintf(query, "SELECT * FROM Task WHERE deadline < now()");
+    res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        g_print("Error: Can't get all task");
+        return -1;
+    }
+
+    int amountOfTask = PQntuples(res);
+    free(query);
+    PQclear(res);
+    return amountOfTask;
+}
+
 char *selectTask(PGconn *conn, int id)
 {
     PGresult *res;
@@ -305,8 +339,9 @@ int selectPriority(PGconn *conn, int id)
     char *query = malloc(sizeof(char) * 1000);
     sprintf(query, "SELECT priority FROM Task WHERE id = '%d'", id);
     res = PQexec(conn, query);
-    if (PQresultStatus(res) != PGRES_TUPLES_OK)
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
         return -1;
+    }
 
     int priority = atoi(PQgetvalue(res, 0, 0));
 
@@ -424,5 +459,39 @@ int updateDeadline(PGconn *conn, int id, gchar *deadline)
     }
     free(query);
     PQclear(res);
+    return 0;
+}
+
+int newConnectUpdate(int day, int month, int year)
+{
+    FILE *file = fopen("settings/config.txt", "r+");
+    char *line = NULL;
+    size_t len = 0;
+    char insert[4];
+    while ((getline(&line, &len, file)) != -1) {
+        if (strstr(line, "last connect day") != NULL) {
+            if (day < 10)
+                fseek(file, -3, SEEK_CUR);
+            else
+                fseek(file, -4, SEEK_CUR);
+            sprintf(insert, "%d", day);
+            fprintf(file, "%s", insert);
+        }
+        if (strstr(line, "last connect month") != NULL) {
+            if (month < 10)
+                fseek(file, -3, SEEK_CUR);
+            else
+                fseek(file, -4, SEEK_CUR);
+            sprintf(insert, "%d", month);
+            fprintf(file, "%s", insert);
+        }
+        if (strstr(line, "last connect year") != NULL) {
+            fseek(file, -6, SEEK_CUR);
+            sprintf(insert, "%d", year);
+            fprintf(file, "%s", insert);
+            break;
+        }
+    }
+    fclose(file);
     return 0;
 }
