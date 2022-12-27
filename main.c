@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
     }
 
     //signals
-    gtk_entry_set_max_length(GTK_ENTRY(data.tools.inputEntry), 35); //limit char input
+    gtk_entry_set_max_length(GTK_ENTRY(data.tools.inputEntry), readOneConfigValue("limitCharInput")); //limit char input
 
     int queryResult = allProject(data.conn);
     if (queryResult == -1)
