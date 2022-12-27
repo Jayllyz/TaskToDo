@@ -1330,3 +1330,104 @@ gchar *warningMessage(gpointer data)
 
     return message;
 }
+
+int newConnectUpdate(int day, int month, int year)
+{
+    FILE *file = fopen("settings/config.txt", "r+");
+    char *line = NULL;
+    size_t len = 0;
+    char insert[4];
+    while ((getline(&line, &len, file)) != -1) {
+        if (strstr(line, "last connect day") != NULL) {
+            if (day < 10)
+                fseek(file, -3, SEEK_CUR);
+            else
+                fseek(file, -4, SEEK_CUR);
+            sprintf(insert, "%d", day);
+            fprintf(file, "%s", insert);
+        }
+        if (strstr(line, "last connect month") != NULL) {
+            if (month < 10)
+                fseek(file, -3, SEEK_CUR);
+            else
+                fseek(file, -4, SEEK_CUR);
+            sprintf(insert, "%d", month);
+            fprintf(file, "%s", insert);
+        }
+        if (strstr(line, "last connect year") != NULL) {
+            fseek(file, -6, SEEK_CUR);
+            sprintf(insert, "%d", year);
+            fprintf(file, "%s", insert);
+            break;
+        }
+    }
+    fclose(file);
+    return 0;
+}
+
+void financeButton(GtkButton *buttonPressed, gpointer data)
+{
+    struct data *dataP = data;
+
+    const gchar *entry = gtk_entry_get_text(dataP->tools.dailyCapEntry);
+    int amount = atoi(entry);
+    int onlyDigits = 1;
+
+    for (const gchar *p = entry; *p != '\0'; p++) {
+        if (!g_ascii_isdigit(*p)) {
+            onlyDigits = 0;
+            break;
+        }
+    }
+
+    gtk_entry_set_text(dataP->tools.dailyCapEntry, "");
+
+    if (onlyDigits == 0) {
+        GtkDialog *dialog
+            = GTK_DIALOG(gtk_message_dialog_new(GTK_WINDOW(dataP->tools.window), GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "Veuillez saisir des chiffres"));
+        gtk_dialog_run(dialog);
+        gtk_widget_destroy(GTK_WIDGET(dialog));
+        return;
+    }
+
+    updateExpense(0, amount, dataP);
+}
+
+void updateExpense(int typeOfExpense, int amount, gpointer data)
+{
+    struct data *dataP = data;
+
+    FILE *file = fopen("settings/config.txt", "r+");
+    char *line = NULL;
+    size_t len = 0;
+    char expense[16];
+    if (typeOfExpense == 0)
+        strcpy(expense, "daily expense");
+    if (typeOfExpense == 1)
+        strcpy(expense, "monthly expense");
+
+    int value = readOneConfigValue(expense);
+    char string[10];
+    sprintf(string, "%d", value);
+    int length = strlen(string) + 2;
+
+    amount = amount + value;
+
+    while ((getline(&line, &len, file)) != -1) {
+        if (strstr(line, expense) != NULL) {
+            fseek(file, -length, SEEK_CUR);
+            fprintf(file, "%d", amount);
+            fprintf(file, "\0"); //Ca le met pas le fprintf j'en ai aucune idée de pk
+            break;
+        }
+    }
+    fclose(file);
+
+    char showMoney[12];
+    sprintf(showMoney, "%d", amount);
+    strcat(showMoney, " €");
+    if (typeOfExpense == 0)
+        gtk_label_set_text(dataP->tools.dailyExpense, showMoney);
+    if (typeOfExpense == 1)
+        gtk_label_set_text(dataP->tools.monthlyExpense, showMoney);
+}

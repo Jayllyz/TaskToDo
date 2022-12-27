@@ -114,6 +114,8 @@ int main(int argc, char *argv[])
     g_signal_connect(data.tools.addProject, "clicked", G_CALLBACK(addProjectWindow), &data);
     g_signal_connect(data.tools.calendar, "clicked", G_CALLBACK(calendarDialog), &data);
 
+    g_signal_connect(data.tools.setDaily, "clicked", G_CALLBACK(financeButton), &data);
+
     gtk_builder_connect_signals(data.tools.builder, NULL);
 
     g_object_unref(data.tools.builder);

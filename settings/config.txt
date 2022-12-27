@@ -3,6 +3,12 @@ last connect day:27
 last connect month:12
 last connect year:2022
 
+#Finance
+daily expense:102
+monthly expense:0
+daily cap:0
+monthly cap:0
+
 #bdd
 init value:1
 
