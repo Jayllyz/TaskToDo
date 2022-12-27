@@ -1411,11 +1411,21 @@ void updateExpense(int typeOfExpense, int amount, gpointer data)
     sprintf(string, "%d", value);
 
     amount = amount + value;
+    int temp = amount;
+    int i = 0;
 
     while ((getline(&line, &len, file)) != -1) {
         if (strstr(line, expense) != NULL) {
             fseek(file, -strlen(line), SEEK_CUR);
-            fprintf(file, "daily expense:%d", amount);
+            fprintf(file, "daily expense:");
+            while (temp > 0) {
+                temp = temp / 10;
+                i++;
+                fputc(' ', file);
+            }
+            fseek(file, -i, SEEK_CUR);
+            fprintf(file, "%d", amount);
+            fprintf(file, "\n");
             break;
         }
     }
