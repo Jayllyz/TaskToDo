@@ -4,6 +4,7 @@ Date: 24-11-2022
 Description: Main file of our Todo list software
 */
 
+#include "calculator.c"
 #include "functions.c"
 #include "functions.h"
 #include "settings/bdd.c"
@@ -55,6 +56,29 @@ int main(int argc, char *argv[])
     data.tools.inputEntry = GTK_WIDGET(gtk_builder_get_object(data.tools.builder, "inputEntry"));
     data.tools.notebook = GTK_NOTEBOOK(gtk_builder_get_object(data.tools.builder, "project_notebook"));
     data.tools.calendar = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "calendar"));
+
+    data.calc.clear = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "clear"));
+    data.calc.plus = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "plus"));
+    data.calc.minus = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "minus"));
+    data.calc.multiply = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "multiply"));
+    data.calc.divide = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "divide"));
+    data.calc.equal = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "equal"));
+    data.calc.zero = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "zero"));
+    data.calc.one = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "one"));
+    data.calc.two = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "two"));
+    data.calc.three = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "three"));
+    data.calc.four = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "four"));
+    data.calc.five = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "five"));
+    data.calc.six = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "six"));
+    data.calc.seven = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "seven"));
+    data.calc.eight = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "eight"));
+    data.calc.nine = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "nine"));
+    data.calc.txtResult = GTK_LABEL(gtk_builder_get_object(data.tools.builder, "txtResult"));
+    data.calc.firstNumber = 0;
+    data.calc.secondNumber = 0;
+    data.calc.result = 0;
+    data.calc.operator= '0';
+
     data.state.repopulatedTask = 0;
     data.state.repopulatedProject = 0;
     data.state.projectCount = 0;
@@ -100,6 +124,22 @@ int main(int argc, char *argv[])
     g_signal_connect(data.tools.addTask, "clicked", G_CALLBACK(addTasks), &data);
     g_signal_connect(data.tools.addProject, "clicked", G_CALLBACK(addProjectWindow), &data);
     g_signal_connect(data.tools.calendar, "clicked", G_CALLBACK(calendarDialog), &data);
+    g_signal_connect(data.calc.clear, "clicked", G_CALLBACK(btnClicked), &data);
+    g_signal_connect(data.calc.plus, "clicked", G_CALLBACK(btnClicked), &data);
+    g_signal_connect(data.calc.minus, "clicked", G_CALLBACK(btnClicked), &data);
+    g_signal_connect(data.calc.multiply, "clicked", G_CALLBACK(btnClicked), &data);
+    g_signal_connect(data.calc.divide, "clicked", G_CALLBACK(btnClicked), &data);
+    g_signal_connect(data.calc.equal, "clicked", G_CALLBACK(btnClicked), &data);
+    g_signal_connect(data.calc.zero, "clicked", G_CALLBACK(btnClicked), &data);
+    g_signal_connect(data.calc.one, "clicked", G_CALLBACK(btnClicked), &data);
+    g_signal_connect(data.calc.two, "clicked", G_CALLBACK(btnClicked), &data);
+    g_signal_connect(data.calc.three, "clicked", G_CALLBACK(btnClicked), &data);
+    g_signal_connect(data.calc.four, "clicked", G_CALLBACK(btnClicked), &data);
+    g_signal_connect(data.calc.five, "clicked", G_CALLBACK(btnClicked), &data);
+    g_signal_connect(data.calc.six, "clicked", G_CALLBACK(btnClicked), &data);
+    g_signal_connect(data.calc.seven, "clicked", G_CALLBACK(btnClicked), &data);
+    g_signal_connect(data.calc.eight, "clicked", G_CALLBACK(btnClicked), &data);
+    g_signal_connect(data.calc.nine, "clicked", G_CALLBACK(btnClicked), &data);
 
     gtk_builder_connect_signals(data.tools.builder, NULL);
 

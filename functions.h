@@ -44,9 +44,35 @@ struct TaskProjectState {
     int inEditingId;
 };
 
+struct Calculator {
+    int firstNumber;
+    int secondNumber;
+    double result;
+    char operator;
+
+    GtkButton *clear;
+    GtkButton *plus;
+    GtkButton *minus;
+    GtkButton *multiply;
+    GtkButton *divide;
+    GtkButton *equal;
+    GtkButton *zero;
+    GtkButton *one;
+    GtkButton *two;
+    GtkButton *three;
+    GtkButton *four;
+    GtkButton *five;
+    GtkButton *six;
+    GtkButton *seven;
+    GtkButton *eight;
+    GtkButton *nine;
+    GtkLabel *txtResult;
+};
+
 struct data {
     struct GTKTools tools;
     struct TaskProjectState state;
+    struct Calculator calc;
     PGconn *conn;
 };
 
@@ -104,5 +130,13 @@ int updatePriority(PGconn *conn, int priority, int id);
 int updateStatus(PGconn *conn, int status, int id);
 int updateDeadline(PGconn *conn, int id, gchar *deadline);
 int newConnectUpdate(int day, int month, int year);
+
+//calculator.c
+void btnClicked(GtkButton *button, gpointer data);
+void addDigit(const char *digit, gpointer data);
+void addOperator(const char *operator, gpointer data);
+void calculate(gpointer data);
+void clearCalc(gpointer data);
+void showResult(GtkLabel *outputLabel, gpointer data);
 
 #endif
