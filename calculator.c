@@ -9,8 +9,8 @@ void btnClicked(GtkButton *button, gpointer data)
 {
     struct data *dataP = data;
     const char *text = gtk_button_get_label(button);
-    if (dataP->calc.result != 0) {
-        dataP->calc.firstNumber = (int)dataP->calc.result;
+    if (dataP->calc.result != 0 && dataP->calc.resultB == 1) {
+        dataP->calc.firstNumber = (int)dataP->calc.result > 0 ? (int)dataP->calc.result : (int)(dataP->calc.result - 1) + 1;
         dataP->calc.result = 0;
         dataP->calc.operator= '0';
         dataP->calc.secondNumber = 0;
@@ -28,7 +28,7 @@ void btnClicked(GtkButton *button, gpointer data)
         addOperator(text, dataP);
     }
     else {
-        if (dataP->calc.result != 0)
+        if (dataP->calc.result != 0 || dataP->calc.resultB == 1)
             clearCalc(dataP);
 
         addDigit(text, dataP);
@@ -93,19 +93,25 @@ void addOperator(const char *operator, gpointer data)
 void calculate(gpointer data)
 {
     struct data *dataP = data;
-
+    g_print("first: %d\n", dataP->calc.firstNumber);
+    g_print("operator: %c\n", dataP->calc.operator);
+    g_print("second: %d\n", dataP->calc.secondNumber);
     switch (dataP->calc.operator) {
     case '+':
         dataP->calc.result = dataP->calc.firstNumber + dataP->calc.secondNumber;
+        dataP->calc.resultB = 1;
         break;
     case '-':
         dataP->calc.result = dataP->calc.firstNumber - dataP->calc.secondNumber;
+        dataP->calc.resultB = 1;
         break;
     case '*':
         dataP->calc.result = dataP->calc.firstNumber * dataP->calc.secondNumber;
+        dataP->calc.resultB = 1;
         break;
     case '/':
-        dataP->calc.result = dataP->calc.firstNumber / dataP->calc.secondNumber;
+        dataP->calc.result = (double)dataP->calc.firstNumber / (double)dataP->calc.secondNumber;
+        dataP->calc.resultB = 1;
         break;
     default:
         dataP->calc.result = 0;
@@ -121,6 +127,7 @@ void clearCalc(gpointer data)
     dataP->calc.secondNumber = 0;
     dataP->calc.result = 0;
     dataP->calc.operator= '0';
+    dataP->calc.resultB = 1;
 }
 
 void showResult(GtkLabel *outputLabel, gpointer data)
@@ -144,12 +151,12 @@ void showResult(GtkLabel *outputLabel, gpointer data)
         tempSecond /= 10;
         ++iS;
     }
-
-    if (dataP->calc.firstNumber == 0 && dataP->calc.secondNumber == 0 && dataP->calc.result == 0)
+    if (dataP->calc.firstNumber == 0 && dataP->calc.secondNumber == 0 && dataP->calc.result == 0 && dataP->calc.resultB == 0)
         return;
-    if (dataP->calc.firstNumber != 0 && dataP->calc.secondNumber != 0 && dataP->calc.result != 0) {
+    if (dataP->calc.result != 0 || dataP->calc.resultB == 1) {
         char *result = malloc(iR + 1 * sizeof(char));
         sprintf(result, "%.2lf", dataP->calc.result);
+        g_print("result: %s\n", result);
         gtk_label_set_text(outputLabel, result);
     }
     else {

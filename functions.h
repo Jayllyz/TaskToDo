@@ -48,6 +48,7 @@ struct Calculator {
     int firstNumber;
     int secondNumber;
     double result;
+    int resultB;
     char operator;
 
     GtkButton *clear;

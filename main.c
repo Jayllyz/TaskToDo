@@ -78,6 +78,7 @@ int main(int argc, char *argv[])
     data.calc.firstNumber = 0;
     data.calc.secondNumber = 0;
     data.calc.result = 0;
+    data.calc.resultB = 0;
     data.calc.operator= '0';
 
     data.state.repopulatedTask = 0;
