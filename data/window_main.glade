@@ -910,8 +910,8 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="btn_point">
-                <property name="label" translatable="yes">.</property>
+              <object class="GtkButton" id="clear">
+                <property name="label" translatable="yes">C</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
@@ -959,18 +959,6 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="clear">
-                <property name="label" translatable="yes">C</property>
-                <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="receives-default">True</property>
-              </object>
-              <packing>
-                <property name="left-attach">2</property>
-                <property name="top-attach">1</property>
-              </packing>
-            </child>
-            <child>
               <object class="GtkLabel" id="txtResult">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
@@ -981,6 +969,9 @@
                 <property name="top-attach">0</property>
                 <property name="width">4</property>
               </packing>
+            </child>
+            <child>
+              <placeholder/>
             </child>
             <child>
               <placeholder/>

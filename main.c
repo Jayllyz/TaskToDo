@@ -45,9 +45,10 @@ int main(int argc, char *argv[])
     gtk_builder_add_from_file(data.tools.builder, "data/window_main.glade", NULL);
 
     //Datas
-    data.state.maxTaskTotal = readOneConfigValue("maxTaskTotal");
-    data.state.maxTaskPerProject = readOneConfigValue("maxTaskPerProject");
-    data.state.maxProject = readOneConfigValue("maxProject");
+    data.state.maxTaskTotal = readOneConfigValue("maxTaskTotal") > 0 ? readOneConfigValue("maxTaskTotal") : 200;
+    data.state.maxTaskPerProject = readOneConfigValue("maxTaskPerProject") > 0 ? readOneConfigValue("maxTaskPerProject") : 15;
+    data.state.maxProject = readOneConfigValue("maxProject") > 0 ? readOneConfigValue("maxProject") : 10;
+
     data.tools.window = GTK_WIDGET(gtk_builder_get_object(data.tools.builder, "window_main"));
     data.tools.addTask = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "addTask"));
     data.tools.addProject = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "addProject"));
@@ -56,7 +57,7 @@ int main(int argc, char *argv[])
     data.tools.inputEntry = GTK_WIDGET(gtk_builder_get_object(data.tools.builder, "inputEntry"));
     data.tools.notebook = GTK_NOTEBOOK(gtk_builder_get_object(data.tools.builder, "project_notebook"));
     data.tools.calendar = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "calendar"));
-
+    //calculator
     data.calc.clear = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "clear"));
     data.calc.plus = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "plus"));
     data.calc.minus = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "minus"));
@@ -124,6 +125,7 @@ int main(int argc, char *argv[])
     g_signal_connect(data.tools.addTask, "clicked", G_CALLBACK(addTasks), &data);
     g_signal_connect(data.tools.addProject, "clicked", G_CALLBACK(addProjectWindow), &data);
     g_signal_connect(data.tools.calendar, "clicked", G_CALLBACK(calendarDialog), &data);
+    //calculator
     g_signal_connect(data.calc.clear, "clicked", G_CALLBACK(btnClicked), &data);
     g_signal_connect(data.calc.plus, "clicked", G_CALLBACK(btnClicked), &data);
     g_signal_connect(data.calc.minus, "clicked", G_CALLBACK(btnClicked), &data);
