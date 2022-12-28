@@ -9,6 +9,12 @@ void btnClicked(GtkButton *button, gpointer data)
 {
     struct data *dataP = data;
     const char *text = gtk_button_get_label(button);
+    if (dataP->calc.result != 0) {
+        dataP->calc.firstNumber = (int)dataP->calc.result;
+        dataP->calc.result = 0;
+        dataP->calc.operator= '0';
+        dataP->calc.secondNumber = 0;
+    }
     if (strcmp(text, "C") == 0) {
         clearCalc(dataP);
         gtk_label_set_text(dataP->calc.txtResult, "");
