@@ -46,6 +46,7 @@ struct TaskProjectState {
 
 struct Calculator {
     int firstNumber;
+    int firstB;
     int secondNumber;
     double result;
     int resultB;

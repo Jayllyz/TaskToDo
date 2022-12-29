@@ -9,9 +9,10 @@ void btnClicked(GtkButton *button, gpointer data)
 {
     struct data *dataP = data;
     const char *text = gtk_button_get_label(button);
-    if (dataP->calc.result != 0 && dataP->calc.resultB == 1) {
+    if (dataP->calc.resultB == 1) {
         dataP->calc.firstNumber = (int)dataP->calc.result > 0 ? (int)dataP->calc.result : (int)(dataP->calc.result - 1) + 1;
-        dataP->calc.result = 0;
+        dataP->calc.resultB = 0;
+        dataP->calc.firstB = 1;
         dataP->calc.operator= '0';
         dataP->calc.secondNumber = 0;
     }
@@ -25,10 +26,11 @@ void btnClicked(GtkButton *button, gpointer data)
         showResult(dataP->calc.txtResult, dataP);
     }
     else if (strcmp(text, "+") == 0 || strcmp(text, "-") == 0 || strcmp(text, "*") == 0 || strcmp(text, "/") == 0) {
-        addOperator(text, dataP);
+        if (dataP->calc.firstB == 1)
+            addOperator(text, dataP);
     }
     else {
-        if (dataP->calc.result != 0 || dataP->calc.resultB == 1)
+        if (dataP->calc.resultB == 1)
             clearCalc(dataP);
 
         addDigit(text, dataP);
@@ -42,7 +44,7 @@ void addDigit(const char *digit, gpointer data)
     struct data *dataP = data;
     if (dataP->calc.operator== '0') {
 
-        if (dataP->calc.firstNumber != 0)
+        if (dataP->calc.firstB == 1)
             dataP->calc.firstNumber = dataP->calc.firstNumber * 10 + atoi(digit);
         else
             dataP->calc.firstNumber = atoi(digit);
@@ -52,6 +54,7 @@ void addDigit(const char *digit, gpointer data)
             ++i;
         }
         char *first = malloc(i + 1 * sizeof(char));
+        dataP->calc.firstB = 1;
         sprintf(first, "%d", dataP->calc.firstNumber);
         gtk_label_set_text(dataP->calc.txtResult, first);
     }
@@ -124,10 +127,11 @@ void clearCalc(gpointer data)
     struct data *dataP = data;
 
     dataP->calc.firstNumber = 0;
+    dataP->calc.firstB = 0;
     dataP->calc.secondNumber = 0;
     dataP->calc.result = 0;
     dataP->calc.operator= '0';
-    dataP->calc.resultB = 1;
+    dataP->calc.resultB = 0;
 }
 
 void showResult(GtkLabel *outputLabel, gpointer data)
