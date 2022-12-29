@@ -4,6 +4,7 @@ Date: 24-11-2022
 Description: Main file of our Todo list software
 */
 
+#include "calculator.c"
 #include "functions.c"
 #include "functions.h"
 #include "settings/bdd.c"
@@ -48,9 +49,10 @@ int main(int argc, char *argv[])
     gtk_builder_add_from_file(data.tools.builder, "data/window_main.glade", NULL);
 
     //Datas
-    data.state.maxTaskTotal = readOneConfigValue("maxTaskTotal");
-    data.state.maxTaskPerProject = readOneConfigValue("maxTaskPerProject");
-    data.state.maxProject = readOneConfigValue("maxProject");
+    data.state.maxTaskTotal = readOneConfigValue("maxTaskTotal") > 0 ? readOneConfigValue("maxTaskTotal") : 200;
+    data.state.maxTaskPerProject = readOneConfigValue("maxTaskPerProject") > 0 ? readOneConfigValue("maxTaskPerProject") : 15;
+    data.state.maxProject = readOneConfigValue("maxProject") > 0 ? readOneConfigValue("maxProject") : 10;
+
     data.tools.window = GTK_WIDGET(gtk_builder_get_object(data.tools.builder, "window_main"));
     data.tools.addTask = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "addTask"));
     data.tools.addProject = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "addProject"));
@@ -59,6 +61,31 @@ int main(int argc, char *argv[])
     data.tools.inputEntry = GTK_WIDGET(gtk_builder_get_object(data.tools.builder, "inputEntry"));
     data.tools.notebook = GTK_NOTEBOOK(gtk_builder_get_object(data.tools.builder, "project_notebook"));
     data.tools.calendar = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "calendar"));
+    //calculator
+    data.calc.clear = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "clear"));
+    data.calc.plus = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "plus"));
+    data.calc.minus = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "minus"));
+    data.calc.multiply = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "multiply"));
+    data.calc.divide = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "divide"));
+    data.calc.equal = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "equal"));
+    data.calc.zero = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "zero"));
+    data.calc.one = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "one"));
+    data.calc.two = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "two"));
+    data.calc.three = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "three"));
+    data.calc.four = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "four"));
+    data.calc.five = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "five"));
+    data.calc.six = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "six"));
+    data.calc.seven = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "seven"));
+    data.calc.eight = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "eight"));
+    data.calc.nine = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "nine"));
+    data.calc.txtResult = GTK_LABEL(gtk_builder_get_object(data.tools.builder, "txtResult"));
+    data.calc.firstNumber = 0;
+    data.calc.firstB = 0;
+    data.calc.secondNumber = 0;
+    data.calc.result = 0;
+    data.calc.resultB = 0;
+    data.calc.operator= '0';
+    //finances
     data.tools.dailyCap = GTK_LABEL(gtk_builder_get_object(data.tools.builder, "dailyCap"));
     data.tools.monthlyCap = GTK_LABEL(gtk_builder_get_object(data.tools.builder, "monthlyCap"));
     data.tools.dailyExpense = GTK_LABEL(gtk_builder_get_object(data.tools.builder, "dailyExpense"));
@@ -124,6 +151,23 @@ int main(int argc, char *argv[])
     g_signal_connect(data.tools.addTask, "clicked", G_CALLBACK(addTasks), &data);
     g_signal_connect(data.tools.addProject, "clicked", G_CALLBACK(addProjectWindow), &data);
     g_signal_connect(data.tools.calendar, "clicked", G_CALLBACK(calendarDialog), &data);
+    //calculator
+    g_signal_connect(data.calc.clear, "clicked", G_CALLBACK(btnClicked), &data);
+    g_signal_connect(data.calc.plus, "clicked", G_CALLBACK(btnClicked), &data);
+    g_signal_connect(data.calc.minus, "clicked", G_CALLBACK(btnClicked), &data);
+    g_signal_connect(data.calc.multiply, "clicked", G_CALLBACK(btnClicked), &data);
+    g_signal_connect(data.calc.divide, "clicked", G_CALLBACK(btnClicked), &data);
+    g_signal_connect(data.calc.equal, "clicked", G_CALLBACK(btnClicked), &data);
+    g_signal_connect(data.calc.zero, "clicked", G_CALLBACK(btnClicked), &data);
+    g_signal_connect(data.calc.one, "clicked", G_CALLBACK(btnClicked), &data);
+    g_signal_connect(data.calc.two, "clicked", G_CALLBACK(btnClicked), &data);
+    g_signal_connect(data.calc.three, "clicked", G_CALLBACK(btnClicked), &data);
+    g_signal_connect(data.calc.four, "clicked", G_CALLBACK(btnClicked), &data);
+    g_signal_connect(data.calc.five, "clicked", G_CALLBACK(btnClicked), &data);
+    g_signal_connect(data.calc.six, "clicked", G_CALLBACK(btnClicked), &data);
+    g_signal_connect(data.calc.seven, "clicked", G_CALLBACK(btnClicked), &data);
+    g_signal_connect(data.calc.eight, "clicked", G_CALLBACK(btnClicked), &data);
+    g_signal_connect(data.calc.nine, "clicked", G_CALLBACK(btnClicked), &data);
 
     g_signal_connect(data.tools.setDaily, "clicked", G_CALLBACK(financeButton), &data);
     g_signal_connect(data.tools.setMonthly, "clicked", G_CALLBACK(financeButton), &data);

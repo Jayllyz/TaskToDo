@@ -56,9 +56,37 @@ struct TaskProjectState {
     int inEditingId;
 };
 
+struct Calculator {
+    int firstNumber;
+    int firstB;
+    int secondNumber;
+    double result;
+    int resultB;
+    char operator;
+
+    GtkButton *clear;
+    GtkButton *plus;
+    GtkButton *minus;
+    GtkButton *multiply;
+    GtkButton *divide;
+    GtkButton *equal;
+    GtkButton *zero;
+    GtkButton *one;
+    GtkButton *two;
+    GtkButton *three;
+    GtkButton *four;
+    GtkButton *five;
+    GtkButton *six;
+    GtkButton *seven;
+    GtkButton *eight;
+    GtkButton *nine;
+    GtkLabel *txtResult;
+};
+
 struct data {
     struct GTKTools tools;
     struct TaskProjectState state;
+    struct Calculator calc;
     PGconn *conn;
 };
 
@@ -122,5 +150,13 @@ int updateExpense(PGconn *conn, int typeOfExpense, int amount);
 int updateCap(PGconn *conn, int typeOfCap, int amount);
 int selectExpense(PGconn *conn, int typeOfExpense);
 int selectCap(PGconn *conn, int typeOfCap);
+
+//calculator.c
+void btnClicked(GtkButton *button, gpointer data);
+void addDigit(const char *digit, gpointer data);
+void addOperator(const char *operator, gpointer data);
+void calculate(gpointer data);
+void clearCalc(gpointer data);
+void showResult(GtkLabel *outputLabel, gpointer data);
 
 #endif
