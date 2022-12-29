@@ -457,9 +457,6 @@ int updateStatus(PGconn *conn, int status, int id, gpointer data)
     }
     free(query);
 
-    if (selectAllTaskInGroup(conn, id, data) <= 1) //check if the task is alone in the group
-        return 0;
-
     char *queryDepend = malloc(sizeof(char) * 1000);
     sprintf(queryDepend, "SELECT DependGroup FROM Task WHERE id ='%d' AND ProjectName = '%s'", id, selectProjectName(conn, id));
     res = PQexec(conn, query);
@@ -469,6 +466,7 @@ int updateStatus(PGconn *conn, int status, int id, gpointer data)
     free(queryDepend);
 
     int dependGroup = atoi(PQgetvalue(res, 0, 0));
+
     if (dependGroup != 0) {
         char *queryUpdateDepend = malloc(sizeof(char) * 1000);
         sprintf(queryUpdateDepend, "UPDATE Task SET status = '%d' WHERE DependGroup = '%d' AND ProjectName = '%s'", status, dependGroup, selectProjectName(conn, id));
@@ -494,9 +492,6 @@ int updateDeadline(PGconn *conn, int id, gchar *deadline, gpointer data)
         return -1;
     }
     free(query);
-
-    if (selectAllTaskInGroup(conn, id, data) <= 1) //check if the task is alone in the group
-        return 0;
 
     char *queryDepend = malloc(sizeof(char) * 1000);
     sprintf(queryDepend, "SELECT DependGroup FROM Task WHERE id ='%d' AND ProjectName = '%s'", id, selectProjectName(conn, id));
