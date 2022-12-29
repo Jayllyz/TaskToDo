@@ -445,7 +445,7 @@ int updatePriority(PGconn *conn, int priority, int id)
     return 0;
 }
 
-int updateStatus(PGconn *conn, int status, int id)
+int updateStatus(PGconn *conn, int status, int id, gpointer data)
 {
     PGresult *res;
     char *query = malloc(sizeof(char) * 1000);
@@ -475,11 +475,12 @@ int updateStatus(PGconn *conn, int status, int id)
         }
         free(queryUpdateDepend);
     }
+    selectAllTaskInGroup(conn, dependGroup, data);
     PQclear(res);
     return 0;
 }
 
-int updateDeadline(PGconn *conn, int id, gchar *deadline)
+int updateDeadline(PGconn *conn, int id, gchar *deadline, gpointer data)
 {
     PGresult *res;
     char *query = malloc(sizeof(char) * 1000);
@@ -509,6 +510,8 @@ int updateDeadline(PGconn *conn, int id, gchar *deadline)
         }
         free(queryUpdateDepend);
     }
+
+    selectAllTaskInGroup(conn, dependGroup, data);
     PQclear(res);
     return 0;
 }

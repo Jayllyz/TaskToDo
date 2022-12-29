@@ -17,28 +17,28 @@ void changeTaskStatus(GtkWidget *taskStatus, gpointer data)
     int id = atoi(gtk_button_get_label(GTK_BUTTON(idButton)));
 
     if (strcmp(gtk_button_get_label(GTK_BUTTON(taskStatus)), "Non completé") == 0) {
-        int queryResult = updateStatus(dataP->conn, 1, id);
+        int queryResult = updateStatus(dataP->conn, 1, id, data);
         if (queryResult == -1) {
             g_print("Error: update status failed");
         }
         gtk_button_set_label(GTK_BUTTON(taskStatus), "En cours");
     }
     else if (strcmp(gtk_button_get_label(GTK_BUTTON(taskStatus)), "En cours") == 0) {
-        int queryResult = updateStatus(dataP->conn, 2, id);
+        int queryResult = updateStatus(dataP->conn, 2, id, data);
         if (queryResult == -1)
             g_print("Error: update status failed");
 
         gtk_button_set_label(GTK_BUTTON(taskStatus), "Completé");
     }
     else if (strcmp(gtk_button_get_label(GTK_BUTTON(taskStatus)), "Completé") == 0) {
-        int queryResult = updateStatus(dataP->conn, 3, id);
+        int queryResult = updateStatus(dataP->conn, 3, id, data);
         if (queryResult == -1)
             g_print("Error: update status failed");
 
         gtk_button_set_label(GTK_BUTTON(taskStatus), "Abandonné");
     }
     else if (strcmp(gtk_button_get_label(GTK_BUTTON(taskStatus)), "Abandonné") == 0) {
-        int queryResult = updateStatus(dataP->conn, 0, id);
+        int queryResult = updateStatus(dataP->conn, 0, id, data);
         if (queryResult == -1)
             g_print("Error: update status failed");
 
@@ -642,7 +642,7 @@ void changeDeadline(GtkWidget *deadline, gint clicked, gpointer data)
         gtk_calendar_get_date(GTK_CALENDAR(calendar), &year, &month, &day);
         gchar *changedDeadline = malloc(11 * sizeof(gchar));
         sprintf(changedDeadline, "%d-%d-%d", year, month + 1, day);
-        updateDeadline(dataP->conn, dataP->state.inEditingId, changedDeadline);
+        updateDeadline(dataP->conn, dataP->state.inEditingId, changedDeadline, data);
         gtk_button_set_label(GTK_BUTTON(dataP->tools.taskDeadline[dataP->state.inEditingId]), changedDeadline);
         addLateTask(dataP, dataP->state.inEditingId);
         scanForIdForUpdate(dataP, dataP->state.inEditingId);
