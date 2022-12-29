@@ -1599,5 +1599,7 @@ void refreshTaskVisually(gpointer data, int id)
             char *deadline = selectDeadline(dataP->conn, id);
             gtk_button_set_label(GTK_BUTTON(taskDeadline), deadline);
         }
+        g_list_free(taskList);
     }
+    g_list_free(boxTask);
 }
