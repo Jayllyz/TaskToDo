@@ -96,9 +96,6 @@ void addOperator(const char *operator, gpointer data)
 void calculate(gpointer data)
 {
     struct data *dataP = data;
-    g_print("first: %d\n", dataP->calc.firstNumber);
-    g_print("operator: %c\n", dataP->calc.operator);
-    g_print("second: %d\n", dataP->calc.secondNumber);
     switch (dataP->calc.operator) {
     case '+':
         dataP->calc.result = dataP->calc.firstNumber + dataP->calc.secondNumber;
@@ -160,7 +157,6 @@ void showResult(GtkLabel *outputLabel, gpointer data)
     if (dataP->calc.result != 0 || dataP->calc.resultB == 1) {
         char *result = malloc(iR + 1 * sizeof(char));
         sprintf(result, "%.2lf", dataP->calc.result);
-        g_print("result: %s\n", result);
         gtk_label_set_text(outputLabel, result);
     }
     else {
