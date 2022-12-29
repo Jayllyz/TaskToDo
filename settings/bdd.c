@@ -645,7 +645,6 @@ int selectAllTaskInGroup(PGconn *conn, int dependGroup, gpointer data)
     }
     free(query);
 
-    //update de toutes les taches graphiquement
     if (PQntuples(res) > 1) {
         for (int i = 0; i < PQntuples(res); i++) {
             int id = atoi(PQgetvalue(res, i, 0));

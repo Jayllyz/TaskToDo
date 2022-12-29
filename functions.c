@@ -182,7 +182,7 @@ void editTaskDB(GtkDialog *window, gint clicked, gpointer data)
                     g_print("Erreur de la modification du groupe de dépendance");
                     return;
                 }
-                selectAllTaskInGroup(dataP->conn, atoi(dependText), data); //provisoire pour update les autres task la facon dont c fait est pas terrible
+                selectAllTaskInGroup(dataP->conn, atoi(dependText), data);
             }
         }
 
