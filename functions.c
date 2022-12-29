@@ -1555,3 +1555,49 @@ void updateFinance(gpointer data)
         gtk_label_set_text(dataP->tools.monthlyCap, "Plafond: Aucun");
     }
 }
+
+void refreshTaskVisually(gpointer data, int id)
+{
+    struct data *dataP = data;
+
+    gint currentPage = gtk_notebook_get_current_page(GTK_NOTEBOOK(dataP->tools.notebook));
+    GtkWidget *pageBox = gtk_notebook_get_nth_page(GTK_NOTEBOOK(dataP->tools.notebook), currentPage);
+    GList *boxTask = gtk_container_get_children(GTK_CONTAINER(pageBox));
+    int numberOfTask = g_list_length(boxTask) - 1;
+
+    for (int i = 2; i < numberOfTask; i++) {
+        GtkWidget *task = g_list_nth_data(boxTask, i);
+        GList *taskList = gtk_container_get_children(GTK_CONTAINER(task));
+        GtkWidget *idButton = g_list_nth_data(taskList, 5);
+        int attributedId = atoi(gtk_button_get_label(GTK_BUTTON(idButton)));
+
+        if (id == attributedId) {
+            GtkWidget *taskStatus = g_list_nth_data(taskList, 0);
+            int queryResult = selectStatus(dataP->conn, id);
+            gchar *status;
+            if (queryResult == 0) {
+                status = "Non completé";
+            }
+            else if (queryResult == 1) {
+                status = "En cours";
+            }
+            else if (queryResult == 2) {
+                status = "Complété";
+            }
+            else if (queryResult == 3) {
+                status = "Abandonné";
+            }
+            else {
+                status = "Erreur";
+            }
+            gtk_button_set_label(GTK_BUTTON(taskStatus), status);
+
+            GtkWidget *taskName = g_list_nth_data(taskList, 2);
+            gtk_widget_set_tooltip_text(taskName, selectDescription(dataP->conn, id));
+
+            GtkWidget *taskDeadline = g_list_nth_data(taskList, 7);
+            char *deadline = selectDeadline(dataP->conn, id);
+            gtk_button_set_label(GTK_BUTTON(taskDeadline), deadline);
+        }
+    }
+}

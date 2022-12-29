@@ -120,6 +120,7 @@ gchar *warningMessage(gpointer data);
 int newConnectUpdate(int day, int month, int year);
 void financeButton(GtkButton *buttonPressed, gpointer data);
 void updateFinance(gpointer data);
+void refreshTaskVisually(gpointer data, int id);
 
 //bdd.c
 PGconn *connectBdd();
