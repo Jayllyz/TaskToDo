@@ -24,6 +24,7 @@ struct GTKTools {
     GtkLabel *outputLabel;
     GtkNotebook *notebook;
     GtkWidget *descriptionEntry;
+    GtkWidget *dependEntry;
     GtkWidget *inEditing;
     GtkWidget *projectNameEntry;
     GtkWidget *pageTitleBox[10];
@@ -150,6 +151,10 @@ int updateExpense(PGconn *conn, int typeOfExpense, int amount);
 int updateCap(PGconn *conn, int typeOfCap, int amount);
 int selectExpense(PGconn *conn, int typeOfExpense);
 int selectCap(PGconn *conn, int typeOfCap);
+int updateDependGroup(PGconn *conn, int id, int dependGroup);
+char *selectDependGroup(PGconn *conn, int id);
+int selectAllTaskInGroup(PGconn *conn, int dependGroup, gpointer data);
+int refreshTaskInGroup(PGconn *conn, int id, int dependGroup);
 
 //calculator.c
 void btnClicked(GtkButton *button, gpointer data);

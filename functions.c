@@ -82,6 +82,11 @@ void editTaskWindow(GtkWidget *taskEdit, gpointer data)
     dataP->tools.descriptionEntry = gtk_entry_new();
     gtk_widget_set_size_request(dataP->tools.descriptionEntry, 200, 50);
 
+    GtkWidget *dependLabel = gtk_label_new("Groupe de tâches");
+    dataP->tools.dependEntry = gtk_entry_new();
+    gtk_widget_set_size_request(dataP->tools.dependEntry, 200, 50);
+    gtk_entry_set_input_purpose(GTK_ENTRY(dataP->tools.dependEntry), GTK_INPUT_PURPOSE_NUMBER);
+
     GtkWidget *priorityButton = gtk_button_new();
     int priority = selectPriority(dataP->conn, id);
 
@@ -103,10 +108,13 @@ void editTaskWindow(GtkWidget *taskEdit, gpointer data)
     g_signal_connect(priorityButton, "clicked", G_CALLBACK(changeTaskPriority), dataP->tools.descriptionEntry);
 
     gtk_entry_set_text(GTK_ENTRY(dataP->tools.descriptionEntry), selectDescription(dataP->conn, id));
+    gtk_entry_set_text(GTK_ENTRY(dataP->tools.dependEntry), selectDependGroup(dataP->conn, id));
 
     gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(editWindow))), descriptionLabel);
     gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(editWindow))), dataP->tools.descriptionEntry);
     gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(editWindow))), priorityButton);
+    gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(editWindow))), dependLabel);
+    gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(editWindow))), dataP->tools.dependEntry);
     gtk_widget_show_all(editWindow);
 
     g_signal_connect(editWindow, "response", G_CALLBACK(editTaskDB), dataP);
@@ -121,6 +129,8 @@ void editTaskDB(GtkDialog *window, gint clicked, gpointer data)
     if (clicked == GTK_RESPONSE_OK) {
         GtkWidget *input = GTK_WIDGET(dataP->tools.descriptionEntry);
         const gchar *text = gtk_entry_get_text(GTK_ENTRY(input));
+        GtkWidget *dependInput = GTK_WIDGET(dataP->tools.dependEntry);
+        const gchar *dependText = gtk_entry_get_text(GTK_ENTRY(dependInput));
         int queryResult;
 
         GtkWidget *parent = gtk_widget_get_parent(GTK_WIDGET(dataP->tools.descriptionEntry));
@@ -150,6 +160,30 @@ void editTaskDB(GtkDialog *window, gint clicked, gpointer data)
         if (queryResult != 0) {
             g_print("Erreur de la modification de la base");
             return;
+        }
+
+        int onlyDigits = 1;
+        for (const gchar *p = dependText; *p != '\0'; p++) {
+            if (!g_ascii_isdigit(*p)) {
+                onlyDigits = 0;
+                break;
+            }
+        }
+
+        if (strcmp(dependText, "") != 0 && strcmp(dependText, "0") != 0 && onlyDigits == 1) {
+            queryResult = updateDependGroup(dataP->conn, dataP->state.inEditingId, atoi(dependText));
+            if (queryResult != 0) {
+                g_print("Erreur de la modification du groupe de dépendance");
+                return;
+            }
+
+            if (selectAllTaskInGroup(dataP->conn, atoi(dependText), data) > 1) {
+                queryResult = refreshTaskInGroup(dataP->conn, dataP->state.inEditingId, atoi(dependText));
+                if (queryResult != 0) {
+                    g_print("Erreur de la modification du groupe de dépendance");
+                    return;
+                }
+            }
         }
 
         addImportantTask(dataP, dataP->state.inEditingId);
