@@ -28,6 +28,7 @@ Projet de "todolist" réalisé en C avec la librairie GTK+3.2, la partie graphiq
 - Ajouter des projets
 - Récupération du calendrier à l'aide de cURL
 - Suivi de ses finances
+- Calculatrice de base intégrée
 - Filtre pour retrouver ses tâches (par date, par priorité, par projet)
 
 ## Installation
