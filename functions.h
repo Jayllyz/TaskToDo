@@ -29,6 +29,18 @@ struct GTKTools {
     GtkWidget *pageTitleBox[10];
     GtkWidget *projectTaskBox[10];
     GtkButton *calendar;
+    GtkLabel *dailyCap;
+    GtkLabel *monthlyCap;
+    GtkLabel *dailyExpense;
+    GtkLabel *monthlyExpense;
+    GtkEntry *dailyCapEntry;
+    GtkButton *setDaily;
+    GtkEntry *monthlyCapEntry;
+    GtkButton *setMonthly;
+    GtkEntry *expenseEntry;
+    GtkButton *setExpense;
+    GtkEntry *savedEntry;
+    GtkButton *desetExpense;
 };
 
 struct TaskProjectState {
@@ -104,6 +116,9 @@ void updateTask(gpointer data, GtkWidget *task, int id);
 void curlCalendar();
 void calendarDialog(GtkButton *calendar, gpointer data);
 gchar *warningMessage(gpointer data);
+int newConnectUpdate(int day, int month, int year);
+void financeButton(GtkButton *buttonPressed, gpointer data);
+void updateFinance(gpointer data);
 
 //bdd.c
 PGconn *connectBdd();
@@ -131,7 +146,10 @@ int updateDescription(PGconn *conn, const gchar *description, int id);
 int updatePriority(PGconn *conn, int priority, int id);
 int updateStatus(PGconn *conn, int status, int id);
 int updateDeadline(PGconn *conn, int id, gchar *deadline);
-int newConnectUpdate(int day, int month, int year);
+int updateExpense(PGconn *conn, int typeOfExpense, int amount);
+int updateCap(PGconn *conn, int typeOfCap, int amount);
+int selectExpense(PGconn *conn, int typeOfExpense);
+int selectCap(PGconn *conn, int typeOfCap);
 
 //calculator.c
 void btnClicked(GtkButton *button, gpointer data);
