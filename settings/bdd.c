@@ -456,7 +456,6 @@ int updateStatus(PGconn *conn, int status, int id)
         return -1;
     }
     free(query);
-    PQclear(res);
 
     char *queryDepend = malloc(sizeof(char) * 1000);
     sprintf(queryDepend, "SELECT DependGroup FROM Task WHERE id ='%d' AND ProjectName = '%s'", id, selectProjectName(conn, id));
@@ -491,7 +490,6 @@ int updateDeadline(PGconn *conn, int id, gchar *deadline)
         return -1;
     }
     free(query);
-    PQclear(res);
 
     char *queryDepend = malloc(sizeof(char) * 1000);
     sprintf(queryDepend, "SELECT DependGroup FROM Task WHERE id ='%d' AND ProjectName = '%s'", id, selectProjectName(conn, id));
@@ -628,7 +626,6 @@ int updateDependGroup(PGconn *conn, int id, int dependGroup)
 
 int selectAllTaskInGroup(PGconn *conn, int dependGroup, gpointer data)
 {
-
     PGresult *res;
     char *query = malloc(sizeof(char) * 1000);
     sprintf(query, "SELECT id FROM Task WHERE DependGroup = '%d' AND ProjectName = '%s'", dependGroup, selectProjectName(conn, dependGroup));
@@ -637,6 +634,12 @@ int selectAllTaskInGroup(PGconn *conn, int dependGroup, gpointer data)
         g_print("Erreur lors de la récupération du groupe de dépendance de la tâche");
     }
     free(query);
+
+    //update de toutes les taches graphiquement
+    for (int i = 0; i < PQntuples(res); i++) {
+        int id = atoi(PQgetvalue(res, i, 0));
+        scanForIdForUpdate(data, id);
+    }
 
     int nbTas = PQntuples(res);
     PQclear(res);
@@ -665,7 +668,6 @@ int refreshTaskInGroup(PGconn *conn, int id, int dependGroup)
         return -1;
     }
     free(queryUpdate);
-    free(deadline);
     PQclear(res);
     return 0;
 }
