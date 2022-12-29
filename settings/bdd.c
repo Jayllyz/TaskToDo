@@ -457,6 +457,9 @@ int updateStatus(PGconn *conn, int status, int id, gpointer data)
     }
     free(query);
 
+    if (selectAllTaskInGroup(conn, id, data) <= 1) //check if the task is alone in the group
+        return 0;
+
     char *queryDepend = malloc(sizeof(char) * 1000);
     sprintf(queryDepend, "SELECT DependGroup FROM Task WHERE id ='%d' AND ProjectName = '%s'", id, selectProjectName(conn, id));
     res = PQexec(conn, query);
@@ -466,7 +469,7 @@ int updateStatus(PGconn *conn, int status, int id, gpointer data)
     free(queryDepend);
 
     int dependGroup = atoi(PQgetvalue(res, 0, 0));
-    if (dependGroup != 0) { // Si la tâche a un groupe de dépendance on met à jour le status de toutes les tâches du groupe
+    if (dependGroup != 0) {
         char *queryUpdateDepend = malloc(sizeof(char) * 1000);
         sprintf(queryUpdateDepend, "UPDATE Task SET status = '%d' WHERE DependGroup = '%d' AND ProjectName = '%s'", status, dependGroup, selectProjectName(conn, id));
         res = PQexec(conn, query);
@@ -492,6 +495,9 @@ int updateDeadline(PGconn *conn, int id, gchar *deadline, gpointer data)
     }
     free(query);
 
+    if (selectAllTaskInGroup(conn, id, data) <= 1) //check if the task is alone in the group
+        return 0;
+
     char *queryDepend = malloc(sizeof(char) * 1000);
     sprintf(queryDepend, "SELECT DependGroup FROM Task WHERE id ='%d' AND ProjectName = '%s'", id, selectProjectName(conn, id));
     res = PQexec(conn, query);
@@ -501,7 +507,8 @@ int updateDeadline(PGconn *conn, int id, gchar *deadline, gpointer data)
     free(queryDepend);
 
     int dependGroup = atoi(PQgetvalue(res, 0, 0));
-    if (dependGroup != 0) { // Si la tâche a un groupe de dépendance on met à jour le status de toutes les tâches du groupe
+
+    if (dependGroup != 0) {
         char *queryUpdateDepend = malloc(sizeof(char) * 1000);
         sprintf(queryUpdateDepend, "UPDATE Task SET deadline = '%s' WHERE DependGroup = '%d' AND ProjectName = '%s'", deadline, dependGroup, selectProjectName(conn, id));
         res = PQexec(conn, query);
@@ -639,9 +646,11 @@ int selectAllTaskInGroup(PGconn *conn, int dependGroup, gpointer data)
     free(query);
 
     //update de toutes les taches graphiquement
-    for (int i = 0; i < PQntuples(res); i++) {
-        int id = atoi(PQgetvalue(res, i, 0));
-        scanForIdForUpdate(data, id);
+    if (PQntuples(res) > 1) {
+        for (int i = 0; i < PQntuples(res); i++) {
+            int id = atoi(PQgetvalue(res, i, 0));
+            scanForIdForUpdate(data, id);
+        }
     }
 
     int nbTas = PQntuples(res);
