@@ -608,8 +608,10 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProje
         gtk_box_pack_start(GTK_BOX(dataP->tools.projectTaskBox[dataP->state.i]), deadline, FALSE, FALSE, 0);
 
         GtkWidget *boxAddTask = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+        GtkWidget *calendar = gtk_button_new_with_label("Calendrier");
         GtkWidget *addButton = gtk_button_new_with_label("Ajouter la tâche");
         GtkWidget *inputEntry = gtk_entry_new();
+        gtk_box_pack_start(GTK_BOX(boxAddTask), calendar, FALSE, FALSE, 0);
         gtk_box_pack_start(GTK_BOX(boxAddTask), addButton, FALSE, FALSE, 0);
         gtk_box_pack_start(GTK_BOX(boxAddTask), inputEntry, TRUE, TRUE, 0);
 
@@ -627,6 +629,7 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProje
 
         gint numberOfPage = gtk_notebook_get_n_pages(GTK_NOTEBOOK(dataP->tools.notebook));
 
+        g_signal_connect(calendar, "clicked", G_CALLBACK(calendarDialog), dataP);
         g_signal_connect(addButton, "clicked", G_CALLBACK(addTasks), dataP);
         g_signal_connect(titleButton, "clicked", G_CALLBACK(deleteProject), dataP);
 
