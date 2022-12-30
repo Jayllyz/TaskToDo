@@ -25,6 +25,7 @@ Projet de "todolist" réalisé en C avec la librairie GTK+3.2, la partie graphiq
 
 - Ajouter/supprimer des tâches
 - Éditer les tâches (nom, description, date de fin, priorité)
+- Groupe de tâches pour synchroniser le statut et la date de fin
 - Ajouter des projets
 - Récupération du calendrier à l'aide de cURL
 - Suivi de ses finances
