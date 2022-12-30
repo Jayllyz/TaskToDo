@@ -120,6 +120,7 @@ gchar *warningMessage(gpointer data);
 int newConnectUpdate(int day, int month, int year);
 void financeButton(GtkButton *buttonPressed, gpointer data);
 void updateFinance(gpointer data);
+void refreshTaskVisually(gpointer data, int id);
 
 //bdd.c
 PGconn *connectBdd();
@@ -145,8 +146,8 @@ char *selectProjectName(PGconn *conn, int id);
 char *selectDeadline(PGconn *conn, int id);
 int updateDescription(PGconn *conn, const gchar *description, int id);
 int updatePriority(PGconn *conn, int priority, int id);
-int updateStatus(PGconn *conn, int status, int id);
-int updateDeadline(PGconn *conn, int id, gchar *deadline);
+int updateStatus(PGconn *conn, int status, int id, gpointer data);
+int updateDeadline(PGconn *conn, int id, gchar *deadline, gpointer data);
 int updateExpense(PGconn *conn, int typeOfExpense, int amount);
 int updateCap(PGconn *conn, int typeOfCap, int amount);
 int selectExpense(PGconn *conn, int typeOfExpense);

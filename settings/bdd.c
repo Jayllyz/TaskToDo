@@ -445,7 +445,7 @@ int updatePriority(PGconn *conn, int priority, int id)
     return 0;
 }
 
-int updateStatus(PGconn *conn, int status, int id)
+int updateStatus(PGconn *conn, int status, int id, gpointer data)
 {
     PGresult *res;
     char *query = malloc(sizeof(char) * 1000);
@@ -456,7 +456,6 @@ int updateStatus(PGconn *conn, int status, int id)
         return -1;
     }
     free(query);
-    PQclear(res);
 
     char *queryDepend = malloc(sizeof(char) * 1000);
     sprintf(queryDepend, "SELECT DependGroup FROM Task WHERE id ='%d' AND ProjectName = '%s'", id, selectProjectName(conn, id));
@@ -467,7 +466,8 @@ int updateStatus(PGconn *conn, int status, int id)
     free(queryDepend);
 
     int dependGroup = atoi(PQgetvalue(res, 0, 0));
-    if (dependGroup != 0) { // Si la tâche a un groupe de dépendance on met à jour le status de toutes les tâches du groupe
+
+    if (dependGroup != 0) {
         char *queryUpdateDepend = malloc(sizeof(char) * 1000);
         sprintf(queryUpdateDepend, "UPDATE Task SET status = '%d' WHERE DependGroup = '%d' AND ProjectName = '%s'", status, dependGroup, selectProjectName(conn, id));
         res = PQexec(conn, query);
@@ -476,11 +476,12 @@ int updateStatus(PGconn *conn, int status, int id)
         }
         free(queryUpdateDepend);
     }
+    selectAllTaskInGroup(conn, dependGroup, data);
     PQclear(res);
     return 0;
 }
 
-int updateDeadline(PGconn *conn, int id, gchar *deadline)
+int updateDeadline(PGconn *conn, int id, gchar *deadline, gpointer data)
 {
     PGresult *res;
     char *query = malloc(sizeof(char) * 1000);
@@ -491,7 +492,6 @@ int updateDeadline(PGconn *conn, int id, gchar *deadline)
         return -1;
     }
     free(query);
-    PQclear(res);
 
     char *queryDepend = malloc(sizeof(char) * 1000);
     sprintf(queryDepend, "SELECT DependGroup FROM Task WHERE id ='%d' AND ProjectName = '%s'", id, selectProjectName(conn, id));
@@ -502,7 +502,8 @@ int updateDeadline(PGconn *conn, int id, gchar *deadline)
     free(queryDepend);
 
     int dependGroup = atoi(PQgetvalue(res, 0, 0));
-    if (dependGroup != 0) { // Si la tâche a un groupe de dépendance on met à jour le status de toutes les tâches du groupe
+
+    if (dependGroup != 0) {
         char *queryUpdateDepend = malloc(sizeof(char) * 1000);
         sprintf(queryUpdateDepend, "UPDATE Task SET deadline = '%s' WHERE DependGroup = '%d' AND ProjectName = '%s'", deadline, dependGroup, selectProjectName(conn, id));
         res = PQexec(conn, query);
@@ -511,6 +512,8 @@ int updateDeadline(PGconn *conn, int id, gchar *deadline)
         }
         free(queryUpdateDepend);
     }
+
+    selectAllTaskInGroup(conn, dependGroup, data);
     PQclear(res);
     return 0;
 }
