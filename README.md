@@ -60,6 +60,12 @@ sudo -u postgres createdb projet-todolist --owner projet
 #You can now clone the repository and compile the project
 gcc `pkg-config --cflags gtk+-3.0` main.c -o main `pkg-config --libs gtk+-3.0` -rdynamic -I/usr/include/postgresql -lpq -lcurl -Wall
 
+#OR
+$ mkdir build && cd build
+$ cmake ../
+$ make
+$ ./todolist
+
 #Run the project
 ./main
 ```
