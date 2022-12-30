@@ -99,7 +99,7 @@ int createTables(PGconn *conn)
 int insertTask(PGconn *conn, int id, char *name, char *description, int priority, char *deadline, int status, int dependGroup, const gchar *projectName)
 {
     PGresult *res;
-    char *query = malloc(sizeof(char) * 1000);
+    char *query = malloc(sizeof(char) * 200);
     sprintf(query, "INSERT INTO Task ( Id, Name, Description, Priority, Deadline, Status, DependGroup, ProjectName) VALUES ( %d,'%s', '%s', %d, '%s', %d, %d, '%s')", id,
         name, description, priority, deadline, status, dependGroup, projectName);
     res = PQexec(conn, query);
@@ -115,7 +115,7 @@ int insertTask(PGconn *conn, int id, char *name, char *description, int priority
 int insertProject(PGconn *conn, char *name, char *description, int priority, char *deadline, char *color)
 {
     PGresult *res;
-    char *query = malloc(sizeof(char) * 1000);
+    char *query = malloc(sizeof(char) * 200);
     sprintf(
         query, "INSERT INTO Project ( Name, Description, Priority, Deadline, Color) VALUES ('%s', '%s', %d, '%s', '%s')", name, description, priority, deadline, color);
     res = PQexec(conn, query);
@@ -149,7 +149,7 @@ int projectExist(PGconn *conn, const gchar *ProjectName)
 int deleteTaskDB(PGconn *conn, int id)
 {
     PGresult *res;
-    char *query = malloc(sizeof(char) * 1000);
+    char *query = malloc(sizeof(char) * 100);
     sprintf(query, "DELETE FROM Task WHERE id='%d'", id);
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
@@ -164,7 +164,7 @@ int deleteTaskDB(PGconn *conn, int id)
 int deleteProjectDB(PGconn *conn, const gchar *name)
 {
     PGresult *res;
-    char *query = malloc(sizeof(char) * 1000);
+    char *query = malloc(sizeof(char) * 100);
     sprintf(query, "DELETE FROM Project WHERE name='%s'", name);
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
@@ -279,7 +279,7 @@ int allLateTask(PGconn *conn)
 char *selectTask(PGconn *conn, int id)
 {
     PGresult *res;
-    char *query = malloc(sizeof(char) * 1000);
+    char *query = malloc(sizeof(char) * 100);
     sprintf(query, "SELECT name FROM Task WHERE id = %d", id);
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
@@ -298,7 +298,7 @@ char *selectTask(PGconn *conn, int id)
 int selectTaskId(PGconn *conn, int row)
 {
     PGresult *res;
-    char *query = malloc(sizeof(char) * 1000);
+    char *query = malloc(sizeof(char) * 100);
     sprintf(query, "SELECT Id FROM Task ORDER BY date LIMIT 1 OFFSET %d", row);
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
@@ -317,8 +317,8 @@ int selectTaskId(PGconn *conn, int row)
 char *selectProject(PGconn *conn, int row)
 {
     PGresult *res;
-    char *query = malloc(sizeof(char) * 1000);
-    sprintf(query, "SELECT name FROM Project ORDER BY date LIMIT 1 OFFSET %d", 6 + row);
+    char *query = malloc(sizeof(char) * 100);
+    sprintf(query, "SELECT name FROM Project ORDER BY date LIMIT 1 OFFSET %d", 7 + row);
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
         g_print("Error: Can't get project name");
@@ -336,7 +336,7 @@ char *selectProject(PGconn *conn, int row)
 char *selectDescription(PGconn *conn, int id)
 {
     PGresult *res;
-    char *query = malloc(sizeof(char) * 1000);
+    char *query = malloc(sizeof(char) * 100);
     sprintf(query, "SELECT description FROM Task WHERE id = '%d'", id);
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
@@ -355,7 +355,7 @@ char *selectDescription(PGconn *conn, int id)
 int selectPriority(PGconn *conn, int id)
 {
     PGresult *res;
-    char *query = malloc(sizeof(char) * 1000);
+    char *query = malloc(sizeof(char) * 100);
     sprintf(query, "SELECT priority FROM Task WHERE id = '%d'", id);
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
@@ -374,7 +374,7 @@ int selectPriority(PGconn *conn, int id)
 int selectStatus(PGconn *conn, int id)
 {
     PGresult *res;
-    char *query = malloc(sizeof(char) * 1000);
+    char *query = malloc(sizeof(char) * 100);
     sprintf(query, "SELECT status FROM Task WHERE id = '%d'", id);
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
@@ -393,7 +393,7 @@ int selectStatus(PGconn *conn, int id)
 char *selectProjectName(PGconn *conn, int id)
 {
     PGresult *res;
-    char *query = malloc(sizeof(char) * 1000);
+    char *query = malloc(sizeof(char) * 100);
     sprintf(query, "SELECT projectName FROM Task WHERE id = '%d'", id);
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
@@ -412,7 +412,7 @@ char *selectProjectName(PGconn *conn, int id)
 char *selectDeadline(PGconn *conn, int id)
 {
     PGresult *res;
-    char *query = malloc(sizeof(char) * 1000);
+    char *query = malloc(sizeof(char) * 100);
     sprintf(query, "SELECT DATE(deadline) FROM Task WHERE id = '%d'", id);
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
@@ -431,7 +431,7 @@ char *selectDeadline(PGconn *conn, int id)
 int updateDescription(PGconn *conn, const gchar *description, int id)
 {
     PGresult *res;
-    char *query = malloc(sizeof(char) * 1000);
+    char *query = malloc(sizeof(char) * 150);
     sprintf(query, "UPDATE Task SET description = '%s' WHERE id = '%d'", description, id);
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
@@ -446,7 +446,7 @@ int updateDescription(PGconn *conn, const gchar *description, int id)
 int updatePriority(PGconn *conn, int priority, int id)
 {
     PGresult *res;
-    char *query = malloc(sizeof(char) * 1000);
+    char *query = malloc(sizeof(char) * 150);
     sprintf(query, "UPDATE Task SET priority = '%d' WHERE id = '%d'", priority, id);
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
@@ -461,7 +461,7 @@ int updatePriority(PGconn *conn, int priority, int id)
 int updateStatus(PGconn *conn, int status, int id, gpointer data)
 {
     PGresult *res;
-    char *query = malloc(sizeof(char) * 1000);
+    char *query = malloc(sizeof(char) * 150);
     sprintf(query, "UPDATE Task SET status = '%d' WHERE id = '%d'", status, id);
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
@@ -470,7 +470,7 @@ int updateStatus(PGconn *conn, int status, int id, gpointer data)
     }
     free(query);
 
-    char *queryDepend = malloc(sizeof(char) * 1000);
+    char *queryDepend = malloc(sizeof(char) * 150);
     sprintf(queryDepend, "SELECT DependGroup FROM Task WHERE id ='%d' AND ProjectName = '%s'", id, selectProjectName(conn, id));
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
@@ -482,7 +482,7 @@ int updateStatus(PGconn *conn, int status, int id, gpointer data)
     int dependGroup = atoi(PQgetvalue(res, 0, 0));
 
     if (dependGroup != -1) {
-        char *queryUpdateDepend = malloc(sizeof(char) * 1000);
+        char *queryUpdateDepend = malloc(sizeof(char) * 150);
         sprintf(queryUpdateDepend, "UPDATE Task SET status = '%d' WHERE DependGroup = '%d' AND ProjectName = '%s'", status, dependGroup, selectProjectName(conn, id));
         res = PQexec(conn, query);
         if (PQresultStatus(res) != PGRES_COMMAND_OK) {
@@ -499,7 +499,7 @@ int updateStatus(PGconn *conn, int status, int id, gpointer data)
 int updateDeadline(PGconn *conn, int id, gchar *deadline, gpointer data)
 {
     PGresult *res;
-    char *query = malloc(sizeof(char) * 1000);
+    char *query = malloc(sizeof(char) * 150);
     sprintf(query, "UPDATE Task SET deadline = '%s' WHERE id = '%d'", deadline, id);
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
@@ -508,7 +508,7 @@ int updateDeadline(PGconn *conn, int id, gchar *deadline, gpointer data)
     }
     free(query);
 
-    char *queryDepend = malloc(sizeof(char) * 1000);
+    char *queryDepend = malloc(sizeof(char) * 150);
     sprintf(queryDepend, "SELECT DependGroup FROM Task WHERE id ='%d' AND ProjectName = '%s'", id, selectProjectName(conn, id));
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
@@ -520,7 +520,7 @@ int updateDeadline(PGconn *conn, int id, gchar *deadline, gpointer data)
     int dependGroup = atoi(PQgetvalue(res, 0, 0));
 
     if (dependGroup != -1) {
-        char *queryUpdateDepend = malloc(sizeof(char) * 1000);
+        char *queryUpdateDepend = malloc(sizeof(char) * 150);
         sprintf(queryUpdateDepend, "UPDATE Task SET deadline = '%s' WHERE DependGroup = '%d' AND ProjectName = '%s'", deadline, dependGroup, selectProjectName(conn, id));
         res = PQexec(conn, query);
         if (PQresultStatus(res) != PGRES_COMMAND_OK) {
@@ -537,7 +537,7 @@ int updateDeadline(PGconn *conn, int id, gchar *deadline, gpointer data)
 int updateExpense(PGconn *conn, int typeOfExpense, int amount)
 {
     PGresult *res;
-    char *query = malloc(sizeof(char) * 1000);
+    char *query = malloc(sizeof(char) * strlen("UPDATE Finance SET Value =  WHERE name = 'Dépenses journalières'") + sizeof(amount));
     if (typeOfExpense == 2)
         sprintf(query, "UPDATE Finance SET Value = %d WHERE name = 'Dépenses journalières'", amount);
     else if (typeOfExpense == 3)
@@ -556,7 +556,7 @@ int updateExpense(PGconn *conn, int typeOfExpense, int amount)
 int updateCap(PGconn *conn, int typeOfCap, int amount)
 {
     PGresult *res;
-    char *query = malloc(sizeof(char) * 1000);
+    char *query = malloc(sizeof(char) * strlen("UPDATE Finance SET Value =  WHERE name = 'Plafond journalier'") + sizeof(amount));
     if (typeOfCap == 0)
         sprintf(query, "UPDATE Finance SET Value = %d WHERE name = 'Plafond journalier'", amount);
     else if (typeOfCap == 1)
@@ -575,7 +575,7 @@ int updateCap(PGconn *conn, int typeOfCap, int amount)
 int selectExpense(PGconn *conn, int typeOfExpense)
 {
     PGresult *res;
-    char *query = malloc(sizeof(char) * 1000);
+    char *query = malloc(sizeof(char) * strlen("SELECT value FROM Finance WHERE name = 'Dépenses journalières'") + 1);
     if (typeOfExpense == 0)
         sprintf(query, "SELECT value FROM Finance WHERE name = 'Dépenses journalières'");
     else if (typeOfExpense == 1)
@@ -597,7 +597,7 @@ int selectExpense(PGconn *conn, int typeOfExpense)
 int selectCap(PGconn *conn, int typeOfCap)
 {
     PGresult *res;
-    char *query = malloc(sizeof(char) * 1000);
+    char *query = malloc(sizeof(char) * strlen("SELECT value FROM Finance WHERE name = 'Plafond journalier'") + 1);
     if (typeOfCap == 2)
         sprintf(query, "SELECT value FROM Finance WHERE name = 'Plafond journalier'");
     else if (typeOfCap == 3)
@@ -620,7 +620,7 @@ int selectCap(PGconn *conn, int typeOfCap)
 int selectDependGroup(PGconn *conn, int id)
 {
     PGresult *res;
-    char *query = malloc(sizeof(char) * 1000);
+    char *query = malloc(sizeof(char) * 150);
     sprintf(query, "SELECT DependGroup FROM Task WHERE id ='%d' AND ProjectName = '%s'", id, selectProjectName(conn, id));
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
@@ -637,7 +637,7 @@ int selectDependGroup(PGconn *conn, int id)
 int updateDependGroup(PGconn *conn, int id, int dependGroup)
 {
     PGresult *res;
-    char *query = malloc(sizeof(char) * 1000);
+    char *query = malloc(sizeof(char) * 150);
     sprintf(query, "UPDATE Task SET DependGroup = '%d' WHERE id = '%d' AND ProjectName = '%s'", dependGroup, id, selectProjectName(conn, id));
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
@@ -652,7 +652,7 @@ int updateDependGroup(PGconn *conn, int id, int dependGroup)
 int AllDependGroup(PGconn *conn, int id, int dependGroup)
 {
     PGresult *res;
-    char *query = malloc(sizeof(char) * 1000);
+    char *query = malloc(sizeof(char) * 150);
     sprintf(query, "SELECT * FROM Task WHERE DependGroup = '%d' AND ProjectName = '%s'", dependGroup, selectProjectName(conn, id));
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
@@ -669,7 +669,7 @@ int AllDependGroup(PGconn *conn, int id, int dependGroup)
 int selectIdFromDependGroup(PGconn *conn, int row, int dependGroup, char *projectName)
 {
     PGresult *res;
-    char *query = malloc(sizeof(char) * 1000);
+    char *query = malloc(sizeof(char) * 150);
     sprintf(query, "SELECT id FROM Task WHERE DependGroup = '%d' AND ProjectName = '%s' LIMIT 1 OFFSET %d", dependGroup, projectName, row);
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
@@ -688,7 +688,7 @@ int selectIdFromDependGroup(PGconn *conn, int row, int dependGroup, char *projec
 int refreshTaskInGroup(PGconn *conn, int id, int dependGroup)
 {
     PGresult *res;
-    char *query = malloc(sizeof(char) * 1000);
+    char *query = malloc(sizeof(char) * 100);
     sprintf(query, "SELECT status, deadline FROM Task WHERE DependGroup = '%d' AND ProjectName = '%s' AND id != '%d' ", dependGroup, selectProjectName(conn, id), id);
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
@@ -699,7 +699,7 @@ int refreshTaskInGroup(PGconn *conn, int id, int dependGroup)
     int status = atoi(PQgetvalue(res, 0, 0));
     char *deadline = PQgetvalue(res, 0, 1);
 
-    char *queryUpdate = malloc(sizeof(char) * 1000);
+    char *queryUpdate = malloc(sizeof(char) * 150);
     sprintf(queryUpdate, "UPDATE Task SET status = '%d', deadline = '%s' WHERE id = '%d' AND ProjectName = '%s'", status, deadline, id, selectProjectName(conn, id));
     res = PQexec(conn, queryUpdate);
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
