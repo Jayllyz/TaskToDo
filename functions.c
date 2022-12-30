@@ -46,7 +46,6 @@ void changeTaskStatus(GtkWidget *taskStatus, gpointer data)
     }
 
     //Recherche de tâches du groupe de dépendance
-
     char *projectName = malloc(sizeof(char) * 1000);
     sprintf(projectName, "%s", selectProjectName(dataP->conn, id));
     int dependGroup = selectDependGroup(dataP->conn, id);
@@ -58,7 +57,6 @@ void changeTaskStatus(GtkWidget *taskStatus, gpointer data)
             scanForIdForUpdate(dataP, dependanceId);
         }
     }
-
     scanForIdForUpdate(dataP, id);
 }
 
@@ -1248,10 +1246,10 @@ void scanForIdForUpdate(gpointer data, int idToSeek)
 {
     struct data *dataP = data;
     gint startingPage = gtk_notebook_get_current_page(GTK_NOTEBOOK(dataP->tools.notebook));
-    int numberOfProject = allProject(dataP->conn) + 6;
+    int numberOfProject = allProject(dataP->conn) + 7;
 
     for (int i = 0; i < numberOfProject; i++) {
-        if (i != 5) { //le i == 5 c'est la page finance
+        if (i != 5 && i != 6) { //le i == 5 c'est la page finance et le i == 6 c'est la calculatrice
             gtk_notebook_set_current_page(dataP->tools.notebook, i);
 
             gint currentPage = gtk_notebook_get_current_page(GTK_NOTEBOOK(dataP->tools.notebook));
