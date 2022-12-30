@@ -200,6 +200,14 @@ void editTaskDB(GtkDialog *window, gint clicked, gpointer data)
                 g_print("Erreur de la modification du groupe de dépendance");
                 return;
             }
+            if (AllDependGroup(dataP->conn, dataP->state.inEditingId, atoi(dependText)) > 1) {
+                queryResult = refreshTaskInGroup(dataP->conn, dataP->state.inEditingId, atoi(dependText));
+                if (queryResult != 0) {
+                    g_print("Erreur de la modification du groupe de dépendance");
+                    return;
+                }
+                scanForIdForUpdate(dataP, dataP->state.inEditingId);
+            }
         }
         else if (strcmp(dependText, "") == 0 && atoi(dependText) >= 0) {
             queryResult = updateDependGroup(dataP->conn, dataP->state.inEditingId, -1);

@@ -156,6 +156,7 @@ int updateDependGroup(PGconn *conn, int id, int dependGroup);
 int selectDependGroup(PGconn *conn, int id);
 int AllDependGroup(PGconn *conn, int id, int dependGroup);
 int selectIdFromDependGroup(PGconn *conn, int row, int dependGroup, char *projectName);
+int refreshTaskInGroup(PGconn *conn, int id, int dependGroup);
 
 //calculator.c
 void btnClicked(GtkButton *button, gpointer data);
