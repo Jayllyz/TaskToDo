@@ -32,7 +32,6 @@ if(CLANG_FORMAT)
         COMMAND ${CLANG_FORMAT} -i -style=file ${CMAKE_CURRENT_SOURCE_DIR}/*.h
         COMMAND ${CLANG_FORMAT} -i -style=file ${CMAKE_CURRENT_SOURCE_DIR}/settings/*.c
     )
-
 endif()
 
 add_executable(todolist main.c calculator.c functions.c settings/bdd.c)

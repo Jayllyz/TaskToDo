@@ -1,9 +1,6 @@
 #include "functions.h"
-#include <curl/curl.h>
 #include <gtk/gtk.h>
 #include <stdio.h>
-#include <string.h>
-#include <time.h>
 
 void btnClicked(GtkButton *button, gpointer data)
 {

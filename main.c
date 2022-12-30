@@ -5,7 +5,6 @@ Description: Main file of our Todo list software
 */
 
 #include "functions.h"
-#include <curl/curl.h>
 #include <gtk/gtk.h>
 #include <libpq-fe.h>
 #include <stdio.h>
@@ -14,8 +13,6 @@ Description: Main file of our Todo list software
 
 int main(int argc, char *argv[])
 {
-    system("clear"); //provisoire
-    system("sudo service postgresql start"); //provisoire
     //Init
     gtk_init(&argc, &argv);
     struct data data;
@@ -24,7 +21,7 @@ int main(int argc, char *argv[])
         g_print("Error: can't connect to database");
         return EXIT_FAILURE;
     }
-    if (readOneConfigValue("init") == 0)
+    if (readOneConfigValue("init db") == 0)
         createTables(data.conn);
 
     time_t now = time(NULL);
@@ -109,7 +106,7 @@ int main(int argc, char *argv[])
     }
 
     //signals
-    gtk_entry_set_max_length(GTK_ENTRY(data.tools.inputEntry), readOneConfigValue("limitCharInput")); //limit char input
+    gtk_entry_set_max_length(GTK_ENTRY(data.tools.inputEntry), readOneConfigValue("limitCharInput"));
 
     int queryResult = allProject(data.conn);
     if (queryResult == -1)
@@ -171,6 +168,7 @@ int main(int argc, char *argv[])
     g_signal_connect(data.tools.setExpense, "clicked", G_CALLBACK(financeButton), &data);
     g_signal_connect(data.tools.desetExpense, "clicked", G_CALLBACK(financeButton), &data);
 
+    g_signal_connect(data.tools.window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
     gtk_builder_connect_signals(data.tools.builder, NULL);
 
     g_object_unref(data.tools.builder);
