@@ -256,7 +256,7 @@ void deleteProject(GtkWidget *projectDelete, gpointer data)
 
     gint totalPage = gtk_notebook_get_n_pages(GTK_NOTEBOOK(dataP->tools.notebook));
     const gchar *nameOfProject = gtk_label_get_text(GTK_LABEL(child));
-    int numberToDelete;
+    int numberToDelete = 0;
 
     for (int i = 0; i < totalPage; i++) {
         GtkWidget *curPage = gtk_notebook_get_nth_page(GTK_NOTEBOOK(dataP->tools.notebook), i);
@@ -524,6 +524,10 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProje
 
         if (dataP->state.repopulatedProject == 1) {
             projectName = get_text_of_entry(dataP->tools.projectNameEntry);
+            if (projectName == NULL) {
+                g_print("Error: projectName is null");
+                return;
+            }
             if (projectExist(dataP->conn, projectName) == 1 || projectName == NULL) {
                 gtk_widget_destroy(projet);
                 GtkDialog *dialog
@@ -583,13 +587,14 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProje
         gtk_widget_set_size_request(separatorV1, 5, -1);
         gtk_box_pack_start(GTK_BOX(dataP->tools.projectTaskBox[dataP->state.i]), separatorV1, FALSE, FALSE, 0);
 
-        GtkWidget *projectTitle;
+        GtkWidget *projectTitle = gtk_label_new("");
         if (dataP->state.repopulatedProject == 1) {
             projectTitle = gtk_label_new(projectName);
         }
         else if (dataP->state.repopulatedProject == 0) {
             projectTitle = gtk_label_new(selectProject(dataP->conn, presentProject));
         }
+
         gtk_box_pack_start(GTK_BOX(dataP->tools.projectTaskBox[dataP->state.i]), projectTitle, TRUE, FALSE, 0);
 
         GtkWidget *separatorV2 = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
@@ -1445,7 +1450,7 @@ int newConnectUpdate(int day, int month, int year)
 void financeButton(GtkButton *buttonPressed, gpointer data)
 {
     struct data *dataP = data;
-    int type;
+    int type = 0;
 
     GtkWidget *box = gtk_widget_get_parent(GTK_WIDGET(buttonPressed));
     GtkWidget *alignment = gtk_widget_get_parent(box);
