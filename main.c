@@ -4,10 +4,7 @@ Date: 24-11-2022
 Description: Main file of our Todo list software
 */
 
-#include "calculator.c"
-#include "functions.c"
 #include "functions.h"
-#include "settings/bdd.c"
 #include <curl/curl.h>
 #include <gtk/gtk.h>
 #include <libpq-fe.h>
