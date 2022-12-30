@@ -41,8 +41,8 @@ Ce projet a été réalisé sur Windows avec un environnement **WSL**, il est do
 cd Todo-list-software
 
 #Run the script to install the dependencies
-chmod +x script.sh
-./script.sh
+chmod +x install.sh
+./install.sh
 
 #Compile and run with CMake
 mkdir build && cd build
