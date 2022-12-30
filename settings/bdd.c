@@ -16,8 +16,9 @@ void bddExist(PGconn *conn, PGresult *res)
 PGconn *connectBdd()
 {
     PGconn *conn = PQconnectdb("user=projet password=Respons11 dbname=projet-todolist");
-    if (PQstatus(conn) == CONNECTION_BAD)
+    if (PQstatus(conn) == CONNECTION_BAD) {
         bddExist(conn, NULL);
+    }
 
     return conn;
 }
@@ -81,7 +82,7 @@ int createTables(PGconn *conn)
         char *line = NULL;
         size_t len = 0;
         while ((getline(&line, &len, file)) != -1) {
-            if (strstr(line, "init value") != NULL) {
+            if (strstr(line, "init db") != NULL) {
                 fseek(file, -3, SEEK_CUR); // -1 + '\n'
                 fprintf(file, "1");
                 break;
