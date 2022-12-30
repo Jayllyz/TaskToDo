@@ -49,7 +49,7 @@ int createTables(PGconn *conn)
     res = PQexec(conn,
         "CREATE TABLE IF NOT EXISTS Task(Id SERIAL PRIMARY KEY, Name VARCHAR(20), Description VARCHAR(100), Priority INT, Date TIMESTAMPTZ DEFAULT NOW(), Deadline "
         "TIMESTAMPTZ, "
-        "Status INT NOT NULL DEFAULT 0,DependGroup INT NOT NULL DEFAULT 0, ProjectName "
+        "Status INT NOT NULL DEFAULT 0,DependGroup INT NOT NULL DEFAULT -1, ProjectName "
         "VARCHAR(20), "
         "FOREIGN KEY (ProjectName) REFERENCES Project(Name) ON DELETE CASCADE)");
 
@@ -467,7 +467,7 @@ int updateStatus(PGconn *conn, int status, int id, gpointer data)
 
     int dependGroup = atoi(PQgetvalue(res, 0, 0));
 
-    if (dependGroup != 0) {
+    if (dependGroup != -1) {
         char *queryUpdateDepend = malloc(sizeof(char) * 1000);
         sprintf(queryUpdateDepend, "UPDATE Task SET status = '%d' WHERE DependGroup = '%d' AND ProjectName = '%s'", status, dependGroup, selectProjectName(conn, id));
         res = PQexec(conn, query);
@@ -503,7 +503,7 @@ int updateDeadline(PGconn *conn, int id, gchar *deadline, gpointer data)
 
     int dependGroup = atoi(PQgetvalue(res, 0, 0));
 
-    if (dependGroup != 0) {
+    if (dependGroup != -1) {
         char *queryUpdateDepend = malloc(sizeof(char) * 1000);
         sprintf(queryUpdateDepend, "UPDATE Task SET deadline = '%s' WHERE DependGroup = '%d' AND ProjectName = '%s'", deadline, dependGroup, selectProjectName(conn, id));
         res = PQexec(conn, query);
