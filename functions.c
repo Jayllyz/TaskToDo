@@ -16,7 +16,7 @@ void changeTaskStatus(GtkWidget *taskStatus, gpointer data)
     GtkWidget *idButton = g_list_nth_data(children, 5);
     int id = atoi(gtk_button_get_label(GTK_BUTTON(idButton)));
 
-    if (strcmp(gtk_button_get_label(GTK_BUTTON(taskStatus)), "Non completé") == 0) {
+    if (strcmp(gtk_button_get_label(GTK_BUTTON(taskStatus)), "Non complété") == 0) {
         int queryResult = updateStatus(dataP->conn, 1, id, data);
         if (queryResult == -1) {
             g_print("Error: update status failed");
@@ -28,9 +28,9 @@ void changeTaskStatus(GtkWidget *taskStatus, gpointer data)
         if (queryResult == -1)
             g_print("Error: update status failed");
 
-        gtk_button_set_label(GTK_BUTTON(taskStatus), "Completé");
+        gtk_button_set_label(GTK_BUTTON(taskStatus), "Complété");
     }
-    else if (strcmp(gtk_button_get_label(GTK_BUTTON(taskStatus)), "Completé") == 0) {
+    else if (strcmp(gtk_button_get_label(GTK_BUTTON(taskStatus)), "Complété") == 0) {
         int queryResult = updateStatus(dataP->conn, 3, id, data);
         if (queryResult == -1)
             g_print("Error: update status failed");
@@ -42,7 +42,7 @@ void changeTaskStatus(GtkWidget *taskStatus, gpointer data)
         if (queryResult == -1)
             g_print("Error: update status failed");
 
-        gtk_button_set_label(GTK_BUTTON(taskStatus), "Non completé");
+        gtk_button_set_label(GTK_BUTTON(taskStatus), "Non complété");
     }
 
     //Recherche de tâches du groupe de dépendance
@@ -383,19 +383,19 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask, char *presentProj
     gtk_box_reorder_child(GTK_BOX(pageBox), dataP->tools.boxTask[dataP->state.i], numberOfTask + 2);
 
     if (dataP->state.repopulatedTask == 1) {
-        dataP->tools.taskStatus[dataP->state.i] = gtk_button_new_with_label("Non completé");
+        dataP->tools.taskStatus[dataP->state.i] = gtk_button_new_with_label("Non complété");
     }
     else if (dataP->state.repopulatedTask == 0) {
         int queryResult = selectStatus(dataP->conn, dataP->state.i);
         gchar *status;
         if (queryResult == 0) {
-            status = "Non completé";
+            status = "Non complété";
         }
         else if (queryResult == 1) {
             status = "En cours";
         }
         else if (queryResult == 2) {
-            status = "Completé";
+            status = "Complété";
         }
         else if (queryResult == 3) {
             status = "Abandonné";
@@ -742,7 +742,7 @@ void addImportantTask(gpointer data, int id)
     int queryResult = selectStatus(dataP->conn, id);
     gchar *status;
     if (queryResult == 0) {
-        status = "Non completé";
+        status = "Non complété";
     }
     else if (queryResult == 1) {
         status = "En cours";
@@ -852,7 +852,7 @@ void addMinorTask(gpointer data, int id)
     int queryResult = selectStatus(dataP->conn, id);
     gchar *status;
     if (queryResult == 0) {
-        status = "Non completé";
+        status = "Non complété";
     }
     else if (queryResult == 1) {
         status = "En cours";
@@ -984,7 +984,7 @@ void addLateTask(gpointer data, int id)
     int queryResult = selectStatus(dataP->conn, id);
     gchar *status;
     if (queryResult == 0) {
-        status = "Non completé";
+        status = "Non complété";
     }
     else if (queryResult == 1) {
         status = "En cours";
@@ -1116,7 +1116,7 @@ void addPlannedTask(gpointer data, int id)
     int queryResult = selectStatus(dataP->conn, id);
     gchar *status;
     if (queryResult == 0) {
-        status = "Non completé";
+        status = "Non complété";
     }
     else if (queryResult == 1) {
         status = "En cours";
@@ -1291,7 +1291,7 @@ void updateTask(gpointer data, GtkWidget *task, int id)
     int queryResult = selectStatus(dataP->conn, id);
     gchar *status;
     if (queryResult == 0) {
-        status = "Non completé";
+        status = "Non complété";
     }
     else if (queryResult == 1) {
         status = "En cours";
@@ -1621,7 +1621,7 @@ void refreshTaskVisually(gpointer data, int id)
             int queryResult = selectStatus(dataP->conn, id);
             gchar *status;
             if (queryResult == 0) {
-                status = "Non completé";
+                status = "Non complété";
             }
             else if (queryResult == 1) {
                 status = "En cours";
