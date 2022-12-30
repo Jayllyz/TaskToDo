@@ -118,9 +118,9 @@ int main(int argc, char *argv[])
     data.state.repopulatedProject = 1;
 
     queryResult = allTask(data.conn);
-    if (queryResult == -1) {
+    if (queryResult == -1)
         g_print("Error: can't collect all tasks");
-    }
+
     for (int i = 0; i < queryResult; i++) {
         int taskToAdd = selectTaskId(data.conn, i);
         data.state.taskNumber[taskToAdd] = -1;
