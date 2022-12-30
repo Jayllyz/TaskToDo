@@ -4,7 +4,7 @@ last connect month:12
 last connect year:2022
 
 #bdd
-init value:1
+init db:1
 
 #set default values
 set deadline day:10

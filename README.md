@@ -37,38 +37,23 @@ Projet de "todolist" réalisé en C avec la librairie GTK+3.2, la partie graphiq
 Ce projet a été réalisé sur Windows avec un environnement **WSL**, il est donc conseiller de l'installer sur une distribution Linux ou de l'installer sur Windows avec un environnement WSL.
 
 ```bash
-#Upgrade the package list
-sudo apt update && sudo apt upgrade -y
-sudo apt install build-essential -y
+#Clone the repository and go to the project folder
+cd Todo-list-software
 
-#Install GTK+3.2
-sudo apt install libgtk-3-dev
+#Run the script to install the dependencies
+chmod +x install.sh
+./install.sh
 
-#Install cURL
-sudo apt install curl && sudo apt install libcurl4-openssl-dev
-
-#Install Glade
-sudo apt install glade
-
-#Install postgresql and libpq
-sudo apt install postgresql && sudo apt install libpq-dev
-
-#Configure postgresql
-sudo -u postgres createuser projet --superuser -p #Respons11
-sudo -u postgres createdb projet-todolist --owner projet
-
-#You can now clone the repository and compile the project
-gcc `pkg-config --cflags gtk+-3.0` main.c -o main `pkg-config --libs gtk+-3.0` -rdynamic -I/usr/include/postgresql -lpq -lcurl -Wall
-
-#Run the project
-./main
-
-#Or compile and run with CMake
+#Compile and run with CMake
 mkdir build && cd build
 cmake ../
 make
 ./todolist
 
+#Or compile with gcc and run
+gcc `pkg-config --cflags gtk+-3.0` main.c -o main `pkg-config --libs gtk+-3.0` -rdynamic -I/usr/include/postgresql -lpq -lcurl -Wall
+
+./main
 ```
 
 ## Contributors

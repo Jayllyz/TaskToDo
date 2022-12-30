@@ -5,8 +5,6 @@
 #include <string.h>
 #include <time.h>
 
-#define UTF8(string) g_locale_to_utf8(string, -1, NULL, NULL, NULL)
-
 void changeTaskStatus(GtkWidget *taskStatus, gpointer data)
 {
     struct data *dataP = data;
@@ -258,7 +256,7 @@ void deleteProject(GtkWidget *projectDelete, gpointer data)
 
     gint totalPage = gtk_notebook_get_n_pages(GTK_NOTEBOOK(dataP->tools.notebook));
     const gchar *nameOfProject = gtk_label_get_text(GTK_LABEL(child));
-    int numberToDelete;
+    int numberToDelete = 0;
 
     for (int i = 0; i < totalPage; i++) {
         GtkWidget *curPage = gtk_notebook_get_nth_page(GTK_NOTEBOOK(dataP->tools.notebook), i);
@@ -311,7 +309,6 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask, char *presentProj
     gchar *getText;
     char *projectName = malloc(strlen(presentProjectName) + 1 * sizeof(char));
     strcpy(projectName, presentProjectName);
-    projectName = UTF8(projectName);
     if (dataP->state.repopulatedTask == 0) {
 
         gtk_notebook_set_current_page(dataP->tools.notebook, 0);
@@ -527,6 +524,10 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProje
 
         if (dataP->state.repopulatedProject == 1) {
             projectName = get_text_of_entry(dataP->tools.projectNameEntry);
+            if (projectName == NULL) {
+                g_print("Error: projectName is null");
+                return;
+            }
             if (projectExist(dataP->conn, projectName) == 1 || projectName == NULL) {
                 gtk_widget_destroy(projet);
                 GtkDialog *dialog
@@ -536,7 +537,6 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProje
                 return;
             }
 
-            projectName = UTF8(projectName);
             char *query = malloc((strlen("INSERT INTO project VALUES ('','Placeholder', 0, 'now()', 'now()', 0)") + strlen(projectName) + 1) * sizeof(char));
             sprintf(query, "INSERT INTO project VALUES ('%s','Placeholder', 0, 'now()', 'now()', 0)", projectName);
             PGresult *res = PQexec(dataP->conn, query);
@@ -587,13 +587,14 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProje
         gtk_widget_set_size_request(separatorV1, 5, -1);
         gtk_box_pack_start(GTK_BOX(dataP->tools.projectTaskBox[dataP->state.i]), separatorV1, FALSE, FALSE, 0);
 
-        GtkWidget *projectTitle;
+        GtkWidget *projectTitle = gtk_label_new("");
         if (dataP->state.repopulatedProject == 1) {
             projectTitle = gtk_label_new(projectName);
         }
         else if (dataP->state.repopulatedProject == 0) {
             projectTitle = gtk_label_new(selectProject(dataP->conn, presentProject));
         }
+
         gtk_box_pack_start(GTK_BOX(dataP->tools.projectTaskBox[dataP->state.i]), projectTitle, TRUE, FALSE, 0);
 
         GtkWidget *separatorV2 = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
@@ -730,9 +731,8 @@ void addImportantTask(gpointer data, int id)
         return;
     }
 
-    if (checkTask == 1) { //Pour que le GList se free
+    if (checkTask == 1) //Pour que le GList se free
         return;
-    }
 
     GtkWidget *boxTask = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_box_pack_start(GTK_BOX(pageBox), boxTask, FALSE, FALSE, 0);
@@ -751,9 +751,9 @@ void addImportantTask(gpointer data, int id)
     else if (queryResult == 3) {
         status = "Abandonné";
     }
-    else {
+    else
         status = "Erreur";
-    }
+
     GtkWidget *statusButton = gtk_button_new_with_label(status);
 
     gtk_widget_set_margin_top(statusButton, 10);
@@ -840,9 +840,8 @@ void addMinorTask(gpointer data, int id)
         return;
     }
 
-    if (checkTask == 1) { //Pour que le GList se free
+    if (checkTask == 1) //Pour que le GList se free
         return;
-    }
 
     GtkWidget *boxTask = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_box_pack_start(GTK_BOX(pageBox), boxTask, FALSE, FALSE, 0);
@@ -861,9 +860,9 @@ void addMinorTask(gpointer data, int id)
     else if (queryResult == 3) {
         status = "Abandonné";
     }
-    else {
+    else
         status = "Erreur";
-    }
+
     GtkWidget *statusButton = gtk_button_new_with_label(status);
 
     gtk_widget_set_margin_top(statusButton, 10);
@@ -958,23 +957,21 @@ void addLateTask(gpointer data, int id)
             late = 0;
         }
         else if (deadlineMonth == local_time->tm_mon + 1) {
-            if (deadlineDay >= local_time->tm_mday) {
+            if (deadlineDay >= local_time->tm_mday)
                 late = 0;
-            }
         }
     }
 
     if (late == 0) {
-        if (checkTask == 1) {
+        if (checkTask == 1)
             scanForIdToDestroySpecific(dataP, id, 3);
-        }
+
         gtk_notebook_set_current_page(dataP->tools.notebook, startingPage);
         return;
     }
 
-    if (checkTask == 1) { //Pour que le GList se free
+    if (checkTask == 1) //Pour que le GList se free
         return;
-    }
 
     GtkWidget *boxTask = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_box_pack_start(GTK_BOX(pageBox), boxTask, FALSE, FALSE, 0);
@@ -993,9 +990,9 @@ void addLateTask(gpointer data, int id)
     else if (queryResult == 3) {
         status = "Abandonné";
     }
-    else {
+    else
         status = "Erreur";
-    }
+
     GtkWidget *statusButton = gtk_button_new_with_label(status);
 
     gtk_widget_set_margin_top(statusButton, 10);
@@ -1090,23 +1087,21 @@ void addPlannedTask(gpointer data, int id)
             late = 0;
         }
         else if (deadlineMonth == local_time->tm_mon + 1) {
-            if (deadlineDay >= local_time->tm_mday) {
+            if (deadlineDay >= local_time->tm_mday)
                 late = 0;
-            }
         }
     }
 
     if (late == 1) {
-        if (checkTask == 1) {
+        if (checkTask == 1)
             scanForIdToDestroySpecific(dataP, id, 4);
-        }
+
         gtk_notebook_set_current_page(dataP->tools.notebook, startingPage);
         return;
     }
 
-    if (checkTask == 1) { //Pour que le GList se free
+    if (checkTask == 1) //Pour que le GList se free
         return;
-    }
 
     GtkWidget *boxTask = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_box_pack_start(GTK_BOX(pageBox), boxTask, FALSE, FALSE, 0);
@@ -1125,9 +1120,9 @@ void addPlannedTask(gpointer data, int id)
     else if (queryResult == 3) {
         status = "Abandonné";
     }
-    else {
+    else
         status = "Erreur";
-    }
+
     GtkWidget *statusButton = gtk_button_new_with_label(status);
 
     gtk_widget_set_margin_top(statusButton, 10);
@@ -1190,10 +1185,12 @@ void scanForIdToDestroy(gpointer data, int idToDestroy)
             GList *children = gtk_container_get_children(GTK_CONTAINER(pageBox));
 
             int numberOfTask;
-            if (i == 1 || i == 2 || i == 3 || i == 4)
+            if (i == 1 || i == 2 || i == 3 || i == 4) {
                 numberOfTask = g_list_length(children) - 2;
-            else
+            }
+            else {
                 numberOfTask = g_list_length(children) - 3;
+            }
 
             for (int j = 2; j < numberOfTask + 2; j++) {
                 GtkWidget *boxTask = g_list_nth_data(children, j);
@@ -1202,9 +1199,8 @@ void scanForIdToDestroy(gpointer data, int idToDestroy)
                 g_list_free(taskList);
 
                 int id = atoi(gtk_button_get_label(GTK_BUTTON(idButton)));
-                if (id == idToDestroy) {
+                if (id == idToDestroy)
                     gtk_widget_destroy(boxTask);
-                }
             }
             g_list_free(children);
         }
@@ -1223,10 +1219,12 @@ void scanForIdToDestroySpecific(gpointer data, int idToDestroy, guint project)
     GList *children = gtk_container_get_children(GTK_CONTAINER(pageBox));
 
     int numberOfTask;
-    if (project == 1 || project == 2 || project == 3 || project == 4)
+    if (project == 1 || project == 2 || project == 3 || project == 4) {
         numberOfTask = g_list_length(children) - 2;
-    else
+    }
+    else {
         numberOfTask = g_list_length(children) - 3;
+    }
 
     for (int j = 2; j < numberOfTask + 2; j++) {
         GtkWidget *boxTask = g_list_nth_data(children, j);
@@ -1235,9 +1233,8 @@ void scanForIdToDestroySpecific(gpointer data, int idToDestroy, guint project)
         g_list_free(taskList);
 
         int id = atoi(gtk_button_get_label(GTK_BUTTON(idButton)));
-        if (id == idToDestroy) {
+        if (id == idToDestroy)
             gtk_widget_destroy(boxTask);
-        }
     }
     g_list_free(children);
 }
@@ -1257,10 +1254,12 @@ void scanForIdForUpdate(gpointer data, int idToSeek)
             GList *children = gtk_container_get_children(GTK_CONTAINER(pageBox));
 
             int numberOfTask;
-            if (i == 1 || i == 2 || i == 3 || i == 4)
+            if (i == 1 || i == 2 || i == 3 || i == 4) {
                 numberOfTask = g_list_length(children) - 2;
-            else
+            }
+            else {
                 numberOfTask = g_list_length(children) - 3;
+            }
 
             for (int j = 2; j < numberOfTask + 2; j++) {
                 GtkWidget *boxTask = g_list_nth_data(children, j);
@@ -1269,9 +1268,8 @@ void scanForIdForUpdate(gpointer data, int idToSeek)
                 g_list_free(taskList);
 
                 int id = atoi(gtk_button_get_label(GTK_BUTTON(idButton)));
-                if (id == idToSeek) {
+                if (id == idToSeek)
                     updateTask(dataP, boxTask, id);
-                }
             }
             g_list_free(children);
         }
@@ -1300,9 +1298,9 @@ void updateTask(gpointer data, GtkWidget *task, int id)
     else if (queryResult == 3) {
         status = "Abandonné";
     }
-    else {
+    else
         status = "Erreur";
-    }
+
     gtk_button_set_label(GTK_BUTTON(taskStatus), status);
 
     GtkWidget *taskName = g_list_nth_data(listOfWidget, 2);
@@ -1343,9 +1341,8 @@ void curlCalendar()
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
 
         res = curl_easy_perform(curl);
-        if (res != CURLE_OK) {
+        if (res != CURLE_OK)
             g_print("Erreur lors de l'exécution de la requête cURL : %s\n", curl_easy_strerror(res));
-        }
 
         curl_easy_cleanup(curl);
         fclose(fp);
@@ -1376,8 +1373,9 @@ gchar *warningMessage(gpointer data)
     message = malloc(sizeof(char) * strlen("Vous avez ??? tâches urgentes à réaliser et ??? tâches en retard")); //Le message le plus long possible
 
     if (urgent != 0) {
-        if (urgent == 1)
+        if (urgent == 1) {
             strcpy(message, "Vous avez 1 tâche urgente à réaliser");
+        }
         else {
             strcpy(message, "Vous avez ");
             sprintf(number, "%d", urgent);
@@ -1386,8 +1384,9 @@ gchar *warningMessage(gpointer data)
         }
 
         if (late != 0) {
-            if (late == 1)
+            if (late == 1) {
                 strcat(message, " et 1 tâche en retard");
+            }
             else {
                 strcat(message, " et ");
                 sprintf(number, "%d", late);
@@ -1397,8 +1396,9 @@ gchar *warningMessage(gpointer data)
         }
     }
     else if (late != 0) {
-        if (late == 1)
+        if (late == 1) {
             strcpy(message, "Vous avez 1 tâche en retard");
+        }
         else {
             strcpy(message, "Vous avez ");
             sprintf(number, "%d", late);
@@ -1424,6 +1424,7 @@ int newConnectUpdate(int day, int month, int year)
                 fseek(file, -3, SEEK_CUR);
             else
                 fseek(file, -4, SEEK_CUR);
+
             sprintf(insert, "%d", day);
             fprintf(file, "%s", insert);
         }
@@ -1432,6 +1433,7 @@ int newConnectUpdate(int day, int month, int year)
                 fseek(file, -3, SEEK_CUR);
             else
                 fseek(file, -4, SEEK_CUR);
+
             sprintf(insert, "%d", month);
             fprintf(file, "%s", insert);
         }
@@ -1449,7 +1451,7 @@ int newConnectUpdate(int day, int month, int year)
 void financeButton(GtkButton *buttonPressed, gpointer data)
 {
     struct data *dataP = data;
-    int type;
+    int type = 0;
 
     GtkWidget *box = gtk_widget_get_parent(GTK_WIDGET(buttonPressed));
     GtkWidget *alignment = gtk_widget_get_parent(box);
@@ -1584,9 +1586,8 @@ void updateFinance(gpointer data)
         strcat(showMoney, " €");
         gtk_label_set_text(dataP->tools.dailyCap, showMoney);
     }
-    else {
+    else
         gtk_label_set_text(dataP->tools.dailyCap, "Plafond: Aucun");
-    }
 
     cap = selectCap(dataP->conn, 3);
     if (cap != 0) {
@@ -1594,9 +1595,8 @@ void updateFinance(gpointer data)
         strcat(showMoney, " €");
         gtk_label_set_text(dataP->tools.monthlyCap, showMoney);
     }
-    else {
+    else
         gtk_label_set_text(dataP->tools.monthlyCap, "Plafond: Aucun");
-    }
 }
 
 void refreshTaskVisually(gpointer data, int id)
@@ -1630,9 +1630,9 @@ void refreshTaskVisually(gpointer data, int id)
             else if (queryResult == 3) {
                 status = "Abandonné";
             }
-            else {
+            else
                 status = "Erreur";
-            }
+
             gtk_button_set_label(GTK_BUTTON(taskStatus), status);
 
             GtkWidget *taskName = g_list_nth_data(taskList, 2);
