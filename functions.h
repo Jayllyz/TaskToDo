@@ -125,7 +125,7 @@ void updateFinance(gpointer data);
 PGconn *connectBdd();
 int createTables(PGconn *conn);
 void bddExist(PGconn *conn, PGresult *res);
-int insertTask(PGconn *conn, int id, char *name, char *description, int priority, char *deadline, int status, const gchar *projectName);
+int insertTask(PGconn *conn, int id, char *name, char *description, int priority, char *deadline, int status, int dependGroup, const gchar *projectName);
 int insertProject(PGconn *conn, char *name, char *description, int priority, char *deadline, char *color);
 int deleteTaskDB(PGconn *conn, int id);
 int deleteProjectDB(PGconn *conn, const gchar *name);
@@ -152,9 +152,9 @@ int updateCap(PGconn *conn, int typeOfCap, int amount);
 int selectExpense(PGconn *conn, int typeOfExpense);
 int selectCap(PGconn *conn, int typeOfCap);
 int updateDependGroup(PGconn *conn, int id, int dependGroup);
-char *selectDependGroup(PGconn *conn, int id);
-int selectAllTaskInGroup(PGconn *conn, int dependGroup, gpointer data);
-int refreshTaskInGroup(PGconn *conn, int id, int dependGroup);
+int selectDependGroup(PGconn *conn, int id);
+int AllDependGroup(PGconn *conn, int id, int dependGroup);
+int selectIdFromDependGroup(PGconn *conn, int row, int dependGroup, char *projectName);
 
 //calculator.c
 void btnClicked(GtkButton *button, gpointer data);

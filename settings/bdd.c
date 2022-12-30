@@ -98,12 +98,12 @@ int createTables(PGconn *conn)
     return 0;
 }
 
-int insertTask(PGconn *conn, int id, char *name, char *description, int priority, char *deadline, int status, const gchar *projectName)
+int insertTask(PGconn *conn, int id, char *name, char *description, int priority, char *deadline, int status, int dependGroup, const gchar *projectName)
 {
     PGresult *res;
     char *query = malloc(sizeof(char) * 1000);
-    sprintf(query, "INSERT INTO Task ( Id, Name, Description, Priority, Deadline, Status, ProjectName) VALUES ( %d,'%s', '%s', %d, '%s', %d, '%s')", id, name,
-        description, priority, deadline, status, projectName);
+    sprintf(query, "INSERT INTO Task ( Id, Name, Description, Priority, Deadline, Status, DependGroup, ProjectName) VALUES ( %d,'%s', '%s', %d, '%s', %d, %d, '%s')", id,
+        name, description, priority, deadline, status, dependGroup, projectName);
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
         bddExist(conn, res);
@@ -595,7 +595,7 @@ int selectCap(PGconn *conn, int typeOfCap)
     return value;
 }
 
-char *selectDependGroup(PGconn *conn, int id)
+int selectDependGroup(PGconn *conn, int id)
 {
     PGresult *res;
     char *query = malloc(sizeof(char) * 1000);
@@ -606,7 +606,7 @@ char *selectDependGroup(PGconn *conn, int id)
     }
     free(query);
 
-    char *dependGroup = PQgetvalue(res, 0, 0);
+    int dependGroup = atoi(PQgetvalue(res, 0, 0));
     PQclear(res);
     return dependGroup;
 }
@@ -626,46 +626,38 @@ int updateDependGroup(PGconn *conn, int id, int dependGroup)
     return 0;
 }
 
-int selectAllTaskInGroup(PGconn *conn, int dependGroup, gpointer data)
-{
-
-    PGresult *res;
-    char *query = malloc(sizeof(char) * 1000);
-    sprintf(query, "SELECT id FROM Task WHERE DependGroup = '%d' AND ProjectName = '%s'", dependGroup, selectProjectName(conn, dependGroup));
-    res = PQexec(conn, query);
-    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
-        g_print("Erreur lors de la récupération du groupe de dépendance de la tâche");
-    }
-    free(query);
-
-    int nbTas = PQntuples(res);
-    PQclear(res);
-    return nbTas;
-}
-
-int refreshTaskInGroup(PGconn *conn, int id, int dependGroup)
+int AllDependGroup(PGconn *conn, int id, int dependGroup)
 {
     PGresult *res;
     char *query = malloc(sizeof(char) * 1000);
-    sprintf(query, "SELECT status, deadline FROM Task WHERE DependGroup = '%d' AND ProjectName = '%s' AND id != '%d' ", dependGroup, selectProjectName(conn, id), id);
+    sprintf(query, "SELECT * FROM Task WHERE DependGroup = '%d' AND ProjectName = '%s'", dependGroup, selectProjectName(conn, id));
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
-        g_print("Erreur lors de la récupération du groupe de dépendance de la tâche");
-    }
-    free(query);
-
-    int status = atoi(PQgetvalue(res, 0, 0));
-    char *deadline = PQgetvalue(res, 0, 1);
-
-    char *queryUpdate = malloc(sizeof(char) * 1000);
-    sprintf(queryUpdate, "UPDATE Task SET status = '%d', deadline = '%s' WHERE id = '%d' AND ProjectName = '%s'", status, deadline, id, selectProjectName(conn, id));
-    res = PQexec(conn, queryUpdate);
-    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
-        bddExist(conn, res);
+        g_print("Error: Can't get all dependances");
         return -1;
     }
-    free(queryUpdate);
-    free(deadline);
+
+    int amountOfDependance = PQntuples(res);
+    free(query);
     PQclear(res);
-    return 0;
+    return amountOfDependance;
+}
+
+int selectIdFromDependGroup(PGconn *conn, int row, int dependGroup, char *projectName)
+{
+    PGresult *res;
+    char *query = malloc(sizeof(char) * 1000);
+    sprintf(query, "SELECT id FROM Task WHERE DependGroup = '%d' AND ProjectName = '%s' LIMIT 1 OFFSET %d", dependGroup, projectName, row);
+    res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        g_print("Error: Can't get id");
+        return -1;
+    }
+
+    int id = atoi(PQgetvalue(res, 0, 0));
+
+    free(query);
+    PQclear(res);
+
+    return id;
 }
