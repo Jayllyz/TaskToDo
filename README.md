@@ -25,6 +25,7 @@ Projet de "todolist" réalisé en C avec la librairie GTK+3.2, la partie graphiq
 
 - Ajouter/supprimer des tâches
 - Éditer les tâches (nom, description, date de fin, priorité)
+- Groupe de tâches pour synchroniser le statut et la date de fin
 - Ajouter des projets
 - Récupération du calendrier à l'aide de cURL
 - Suivi de ses finances
@@ -58,6 +59,12 @@ sudo -u postgres createdb projet-todolist --owner projet
 
 #You can now clone the repository and compile the project
 gcc `pkg-config --cflags gtk+-3.0` main.c -o main `pkg-config --libs gtk+-3.0` -rdynamic -I/usr/include/postgresql -lpq -lcurl -Wall
+
+#OR
+$ mkdir build && cd build
+$ cmake ../
+$ make
+$ ./todolist
 
 #Run the project
 ./main

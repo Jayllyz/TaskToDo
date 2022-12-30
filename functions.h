@@ -24,6 +24,7 @@ struct GTKTools {
     GtkLabel *outputLabel;
     GtkNotebook *notebook;
     GtkWidget *descriptionEntry;
+    GtkWidget *dependEntry;
     GtkWidget *inEditing;
     GtkWidget *projectNameEntry;
     GtkWidget *pageTitleBox[10];
@@ -119,12 +120,13 @@ gchar *warningMessage(gpointer data);
 int newConnectUpdate(int day, int month, int year);
 void financeButton(GtkButton *buttonPressed, gpointer data);
 void updateFinance(gpointer data);
+void refreshTaskVisually(gpointer data, int id);
 
 //bdd.c
 PGconn *connectBdd();
 int createTables(PGconn *conn);
 void bddExist(PGconn *conn, PGresult *res);
-int insertTask(PGconn *conn, int id, char *name, char *description, int priority, char *deadline, int status, const gchar *projectName);
+int insertTask(PGconn *conn, int id, char *name, char *description, int priority, char *deadline, int status, int dependGroup, const gchar *projectName);
 int insertProject(PGconn *conn, char *name, char *description, int priority, char *deadline, char *color);
 int deleteTaskDB(PGconn *conn, int id);
 int deleteProjectDB(PGconn *conn, const gchar *name);
@@ -144,12 +146,17 @@ char *selectProjectName(PGconn *conn, int id);
 char *selectDeadline(PGconn *conn, int id);
 int updateDescription(PGconn *conn, const gchar *description, int id);
 int updatePriority(PGconn *conn, int priority, int id);
-int updateStatus(PGconn *conn, int status, int id);
-int updateDeadline(PGconn *conn, int id, gchar *deadline);
+int updateStatus(PGconn *conn, int status, int id, gpointer data);
+int updateDeadline(PGconn *conn, int id, gchar *deadline, gpointer data);
 int updateExpense(PGconn *conn, int typeOfExpense, int amount);
 int updateCap(PGconn *conn, int typeOfCap, int amount);
 int selectExpense(PGconn *conn, int typeOfExpense);
 int selectCap(PGconn *conn, int typeOfCap);
+int updateDependGroup(PGconn *conn, int id, int dependGroup);
+int selectDependGroup(PGconn *conn, int id);
+int AllDependGroup(PGconn *conn, int id, int dependGroup);
+int selectIdFromDependGroup(PGconn *conn, int row, int dependGroup, char *projectName);
+int refreshTaskInGroup(PGconn *conn, int id, int dependGroup);
 
 //calculator.c
 void btnClicked(GtkButton *button, gpointer data);
