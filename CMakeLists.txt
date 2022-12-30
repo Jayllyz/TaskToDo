@@ -3,6 +3,7 @@ project(todolist)
 
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_FLAGS "-Wall")
+
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
 include_directories(${GTK3_INCLUDE_DIRS})
@@ -22,5 +23,20 @@ add_definitions(${CURL_DEFINITIONS})
 file(COPY data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY settings DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
+find_program(CLANG_FORMAT "clang-format")
+if(CLANG_FORMAT)
+    add_custom_target(
+        format
+        COMMENT "Running clang-format to change files"
+        COMMAND ${CLANG_FORMAT} -i -style=file ${CMAKE_CURRENT_SOURCE_DIR}/*.c
+        COMMAND ${CLANG_FORMAT} -i -style=file ${CMAKE_CURRENT_SOURCE_DIR}/*.h
+        COMMAND ${CLANG_FORMAT} -i -style=file ${CMAKE_CURRENT_SOURCE_DIR}/settings/*.c
+    )
+
+endif()
+
 add_executable(todolist main.c calculator.c functions.c settings/bdd.c)
+
 target_link_libraries(todolist ${GTK3_LIBRARIES} m ${PostgreSQL_LIBRARIES} m ${CURL_LIBRARIES})
+
+
