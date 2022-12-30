@@ -318,14 +318,14 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask, char *presentProj
 
         for (int i = 0; i < allProject(dataP->conn); i++) {
 
-            GtkWidget *projectPageBox = gtk_notebook_get_nth_page(GTK_NOTEBOOK(dataP->tools.notebook), i + 6);
+            GtkWidget *projectPageBox = gtk_notebook_get_nth_page(GTK_NOTEBOOK(dataP->tools.notebook), i + 7);
             GtkWidget *projectLabelBox = gtk_notebook_get_tab_label(GTK_NOTEBOOK(dataP->tools.notebook), projectPageBox);
             GList *projectBoxChildren = gtk_container_get_children(GTK_CONTAINER(projectLabelBox));
             GtkWidget *projectLabel = g_list_nth_data(projectBoxChildren, 0);
             const gchar *projectLabelName = gtk_label_get_label(GTK_LABEL(projectLabel));
 
             if (strcmp(projectLabelName, projectName) == 0)
-                gtk_notebook_set_current_page(dataP->tools.notebook, i + 6);
+                gtk_notebook_set_current_page(dataP->tools.notebook, i + 7);
 
             g_list_free(projectBoxChildren);
         }
@@ -1179,10 +1179,10 @@ void scanForIdToDestroy(gpointer data, int idToDestroy)
 {
     struct data *dataP = data;
     gint startingPage = gtk_notebook_get_current_page(GTK_NOTEBOOK(dataP->tools.notebook));
-    int numberOfProject = allProject(dataP->conn) + 6;
+    int numberOfProject = allProject(dataP->conn) + 7;
 
     for (int i = 0; i < numberOfProject; i++) {
-        if (i != 5) { //le i == 5 c'est la page finance
+        if (i != 5 && i != 6) { //le i == 5 c'est la page finance
             gtk_notebook_set_current_page(dataP->tools.notebook, i);
 
             gint currentPage = gtk_notebook_get_current_page(GTK_NOTEBOOK(dataP->tools.notebook));
