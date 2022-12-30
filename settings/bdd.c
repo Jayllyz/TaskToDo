@@ -193,8 +193,8 @@ int deleteAllTaskFromProject(PGconn *conn, const gchar *name)
 int allTask(PGconn *conn)
 {
     PGresult *res;
-    char *query = malloc(sizeof(char) * strlen("SELECT * FROM Task"));
-    sprintf(query, "SELECT * FROM Task");
+    char *query = malloc(sizeof(char) * strlen("SELECT * FROM Task") + 1);
+    strcpy(query, "SELECT * FROM Task");
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
         g_print("Error: Can't get all task");
@@ -210,8 +210,8 @@ int allTask(PGconn *conn)
 int allProject(PGconn *conn)
 {
     PGresult *res;
-    char *query = malloc(sizeof(char) * strlen("SELECT * FROM Project"));
-    sprintf(query, "SELECT * FROM Project");
+    char *query = malloc(sizeof(char) * strlen("SELECT * FROM Project") + 1);
+    strcpy(query, "SELECT * FROM Project");
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
         g_print("Error: Can't get all projects");
@@ -227,8 +227,8 @@ int allProject(PGconn *conn)
 int allImportantTask(PGconn *conn)
 {
     PGresult *res;
-    char *query = malloc(sizeof(char) * strlen("SELECT * FROM Task WHERE priority > 1"));
-    sprintf(query, "SELECT * FROM Task WHERE priority > 1");
+    char *query = malloc(sizeof(char) * strlen("SELECT * FROM Task WHERE priority > 1") + 1);
+    strcpy(query, "SELECT * FROM Task WHERE priority > 1");
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
         g_print("Error: Can't get all important task");
@@ -244,8 +244,8 @@ int allImportantTask(PGconn *conn)
 int allUrgentTask(PGconn *conn)
 {
     PGresult *res;
-    char *query = malloc(sizeof(char) * strlen("SELECT * FROM Task WHERE priority > 2"));
-    sprintf(query, "SELECT * FROM Task WHERE priority > 2");
+    char *query = malloc(sizeof(char) * strlen("SELECT * FROM Task WHERE priority > 2") + 1);
+    strcpy(query, "SELECT * FROM Task WHERE priority > 2");
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
         g_print("Error: Can't get all urgent task");
@@ -261,8 +261,8 @@ int allUrgentTask(PGconn *conn)
 int allLateTask(PGconn *conn)
 {
     PGresult *res;
-    char *query = malloc(sizeof(char) * strlen("SELECT * FROM Task WHERE deadline < now()"));
-    sprintf(query, "SELECT * FROM Task WHERE deadline < now()");
+    char *query = malloc(sizeof(char) * strlen("SELECT * FROM Task WHERE deadline < now()") + 1);
+    strcpy(query, "SELECT * FROM Task WHERE deadline < now()");
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
         g_print("Error: Can't get all late task");
