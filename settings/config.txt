@@ -1,10 +1,10 @@
 #last connexion
-last connect day:30
+last connect day:31
 last connect month:12
 last connect year:2022
 
 #bdd
-init db:1
+init db:0
 
 #set default values
 set deadline day:10

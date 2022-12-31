@@ -35,7 +35,4 @@ if(CLANG_FORMAT)
 endif()
 
 add_executable(todolist main.c calculator.c functions.c settings/bdd.c)
-
 target_link_libraries(todolist ${GTK3_LIBRARIES} m ${PostgreSQL_LIBRARIES} m ${CURL_LIBRARIES})
-
-

@@ -537,8 +537,8 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProje
                 return;
             }
 
-            char *query = malloc((strlen("INSERT INTO project VALUES ('','Placeholder', 0, 'now()', 'now()', 0)") + strlen(projectName) + 1) * sizeof(char));
-            sprintf(query, "INSERT INTO project VALUES ('%s','Placeholder', 0, 'now()', 'now()', 0)", projectName);
+            char *query = malloc((strlen("INSERT INTO project VALUES ('','Placeholder', 0, 'now()', 'now()')") + strlen(projectName) + 1) * sizeof(char));
+            sprintf(query, "INSERT INTO project VALUES ('%s','Placeholder', 0, 'now()', 'now()')", projectName);
             PGresult *res = PQexec(dataP->conn, query);
             if (PQresultStatus(res) != PGRES_COMMAND_OK) {
                 g_print("Error: addProject failed");

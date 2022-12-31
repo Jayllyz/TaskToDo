@@ -35,8 +35,7 @@ int createTables(PGconn *conn)
     PQclear(res);
 
     res = PQexec(conn,
-        "CREATE TABLE IF NOT EXISTS Project(Name VARCHAR(20) PRIMARY KEY, Description VARCHAR(100), Priority INT, Date TIMESTAMPTZ DEFAULT NOW(), Deadline TIMESTAMPTZ, "
-        "Color VARCHAR(20))");
+        "CREATE TABLE IF NOT EXISTS Project(Name VARCHAR(20) PRIMARY KEY, Description VARCHAR(100), Priority INT, Date TIMESTAMPTZ DEFAULT NOW(), Deadline TIMESTAMPTZ)");
 
     if (PQresultStatus(res) != PGRES_COMMAND_OK)
         bddExist(conn, res);
@@ -56,10 +55,10 @@ int createTables(PGconn *conn)
     PQclear(res);
 
     res = PQexec(conn,
-        "INSERT INTO Project (Name, Description, Priority, Date, Deadline, Color) VALUES ('Tâches', 'placeholder', 0, 'now()', 'now()', 'black'), "
-        "('Importantes/Urgentes', "
-        "'placeholder', 0, 'now()', 'now()', 'red'), ('Mineures', 'placeholder', 0, 'now()', 'now()', 'blue'), ('En retard', 'placeholder', 0, 'now()', 'now()', "
-        "'green'), ('Prévues', 'placeholder', 0, 'now()', 'now()', 'grey') , ('Finance', 'placeholder', 0, 'now()', 'now()', 'orange')");
+        "INSERT INTO Project (Name, Description, Priority, Date, Deadline) VALUES ('Tâches', 'placeholder', 0, 'now()', 'now()'), "
+        "('Importantes/Urgentes','placeholder', 0, 'now()', 'now()'), ('Mineures', 'placeholder', 0, 'now()', 'now()'), ('En retard', 'placeholder', 0, 'now()', "
+        "'now()'), "
+        "('Prévues', 'placeholder', 0, 'now()', 'now()') , ('Finance', 'placeholder', 0, 'now()', 'now()') ON CONFLICT DO NOTHING;");
 
     if (PQresultStatus(res) != PGRES_COMMAND_OK)
         bddExist(conn, res);
@@ -71,8 +70,9 @@ int createTables(PGconn *conn)
     if (PQresultStatus(res) != PGRES_COMMAND_OK)
         bddExist(conn, res);
 
-    res = PQexec(
-        conn, "INSERT INTO Finance (Name, Value) VALUES ('Dépenses journalières', 0), ('Dépenses mensuelles', 0), ('Plafond journalier', 0), ('Plafond mensuel', 0)");
+    res = PQexec(conn,
+        "INSERT INTO Finance (Name, Value) VALUES ('Dépenses journalières', 0), ('Dépenses mensuelles', 0), ('Plafond journalier', 0), ('Plafond mensuel', 0) ON "
+        "CONFLICT DO NOTHING;");
 
     if (PQresultStatus(res) != PGRES_COMMAND_OK)
         bddExist(conn, res);
@@ -112,12 +112,11 @@ int insertTask(PGconn *conn, int id, char *name, char *description, int priority
     return 0;
 }
 
-int insertProject(PGconn *conn, char *name, char *description, int priority, char *deadline, char *color)
+int insertProject(PGconn *conn, char *name, char *description, int priority, char *deadline)
 {
     PGresult *res;
     char *query = malloc(sizeof(char) * 200);
-    sprintf(
-        query, "INSERT INTO Project ( Name, Description, Priority, Deadline, Color) VALUES ('%s', '%s', %d, '%s', '%s')", name, description, priority, deadline, color);
+    sprintf(query, "INSERT INTO Project ( Name, Description, Priority, Deadline, Color) VALUES ('%s', '%s', %d, '%s')", name, description, priority, deadline);
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
         bddExist(conn, res);
