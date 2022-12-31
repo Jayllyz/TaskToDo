@@ -1,8 +1,8 @@
 #!/bin/bash
-#Install all the dependencies for the project
-#If the script doesn't work, try to run
+# Install all the dependencies for the project
+# If the script doesn't work, try to run
 #sudo apt install dos2unix -y
-#and then to convert the file to unix format
+# and then to convert the file to unix format
 #dos2unix install.sh
 
 # Upgrade the package list
