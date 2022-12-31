@@ -39,6 +39,16 @@ int main(int argc, char *argv[])
     if (readOneConfigValue("last connect year") != local_time->tm_year + 1900)
         newConnect = 1;
 
+    data.home.builderHome = gtk_builder_new();
+    gtk_builder_add_from_file(data.home.builderHome, "data/window_home.glade", NULL);
+    data.home.windowHome = GTK_WIDGET(gtk_builder_get_object(data.home.builderHome, "window_home"));
+    data.home.openHome = GTK_BUTTON(gtk_builder_get_object(data.home.builderHome, "openHome"));
+    data.home.clearData = GTK_BUTTON(gtk_builder_get_object(data.home.builderHome, "clearData"));
+    gtk_widget_show(data.home.windowHome);
+
+    g_signal_connect(data.home.openHome, "clicked", G_CALLBACK(openHome), &data);
+    g_signal_connect(data.home.clearData, "clicked", G_CALLBACK(clearData), &data);
+
     data.tools.builder = gtk_builder_new();
     gtk_builder_add_from_file(data.tools.builder, "data/window_main.glade", NULL);
 
@@ -168,12 +178,10 @@ int main(int argc, char *argv[])
     g_signal_connect(data.tools.setExpense, "clicked", G_CALLBACK(financeButton), &data);
     g_signal_connect(data.tools.desetExpense, "clicked", G_CALLBACK(financeButton), &data);
 
-    g_signal_connect(data.tools.window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+    // g_signal_connect(data.tools.window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
     gtk_builder_connect_signals(data.tools.builder, NULL);
 
     g_object_unref(data.tools.builder);
-
-    gtk_widget_show(data.tools.window);
 
     if (newConnect == 1) {
         newConnectUpdate(local_time->tm_mday, local_time->tm_mon + 1, local_time->tm_year + 1900);

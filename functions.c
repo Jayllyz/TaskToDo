@@ -5,6 +5,43 @@
 #include <string.h>
 #include <time.h>
 
+void openHome(GtkWidget *button, gpointer data)
+{
+    struct data *dataP = data;
+    gtk_widget_show(dataP->tools.window);
+    gtk_widget_destroy(dataP->home.windowHome);
+}
+
+void clearData(GtkWidget *button, gpointer data)
+{
+    struct data *dataP = data;
+    PGresult *res = PQexec(dataP->conn, "DELETE FROM task");
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        g_print("Error: delete task failed");
+        return;
+    }
+    PQclear(res);
+    res = PQexec(dataP->conn,
+        "DELETE FROM project WHERE Name != 'Tâches' AND Name != 'En retard' AND Name != 'Importantes/Urgentes' AND Name != 'Mineures' AND Name != 'Prévues' AND Name != "
+        "'Finance'");
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        g_print("Error: delete projects failed");
+        return;
+    }
+    PQclear(res);
+    res = PQexec(dataP->conn, "UPDATE finance SET Value = 0");
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        g_print("Error: delete finance failed");
+        return;
+    }
+    PQclear(res);
+
+    dataP->state.projectCount = 0;
+
+    g_print("Data cleared");
+    gtk_main_quit();
+}
+
 void changeTaskStatus(GtkWidget *taskStatus, gpointer data)
 {
     struct data *dataP = data;
@@ -234,7 +271,7 @@ void deleteTask(GtkWidget *taskDelete, gpointer data)
     int queryResult = deleteTaskDB(dataP->conn, numberToChange);
 
     if (queryResult == -1) {
-        g_print("Error: insertTask failed");
+        g_print("Error: deleteTask failed");
         return;
     }
 
@@ -537,7 +574,7 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProje
                 return;
             }
 
-            insertProject(dataP->conn, projectName, 0, "now()");
+            insertProject(dataP->conn, projectName);
         }
 
         for (dataP->state.i = 0; dataP->state.i < dataP->state.maxProject; dataP->state.i++) {
