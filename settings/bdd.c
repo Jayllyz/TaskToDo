@@ -116,7 +116,7 @@ int insertProject(PGconn *conn, char *name, char *description, int priority, cha
 {
     PGresult *res;
     char *query = malloc(sizeof(char) * 200);
-    sprintf(query, "INSERT INTO Project ( Name, Description, Priority, Deadline, Color) VALUES ('%s', '%s', %d, '%s')", name, description, priority, deadline);
+    sprintf(query, "INSERT INTO Project ( Name, Description, Priority, Deadline) VALUES ('%s', '%s', %d, '%s')", name, description, priority, deadline);
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
         bddExist(conn, res);
