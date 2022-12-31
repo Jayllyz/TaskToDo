@@ -1,4 +1,4 @@
-<h1 align="center"> Todo list software </h1>
+<h1 align="center"> TaskTodo software </h1>
 
 <p align="center">
   ESGI Project
@@ -19,7 +19,7 @@
 
 ## Introduction
 
-Projet de "todolist" réalisé en C avec la librairie GTK+3.2, l'UI est réalisé avec Glade.
+Projet de "todolist" réalisé en C avec la librairie GTK+3.2, l'UI est réalisée avec Glade.
 
 ## Features
 
@@ -53,6 +53,8 @@ make
 ./todolist
 
 #Edit in build/settings/config.txt to change the settings
+#Make sure to set init db to 0 the first time you run the program to insert
+#the values in the database
 ```
 
 ## Contributors
