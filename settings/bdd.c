@@ -318,7 +318,7 @@ char *selectProject(PGconn *conn, int row)
 {
     PGresult *res;
     char *query = malloc(sizeof(char) * 100);
-    sprintf(query, "SELECT name FROM Project ORDER BY date LIMIT 1 OFFSET %d", 7 + row);
+    sprintf(query, "SELECT name FROM Project ORDER BY date LIMIT 1 OFFSET %d", 6 + row);
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
         g_print("Error: Can't get project name");
