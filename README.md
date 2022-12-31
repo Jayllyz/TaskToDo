@@ -37,24 +37,24 @@ Projet de "todolist" réalisé en C avec la librairie GTK+3.2, l'UI est réalis�
 Ce projet a été réalisé sur Windows avec un environnement **WSL**, il est donc conseiller de l'installer sur une distribution Linux ou de l'installer sur Windows avec un environnement WSL.
 
 ```bash
-#Clone the repository and go to the project folder
+# Clone the repository and go to the project folder
 cd Todo-list-software
 
-#Run the script to install the dependencies
-#Read the script before running it
-#You may need to change some lines to fit your needs
+# Run the script to install the dependencies
+# Read the script before running it
+# You may need to change some lines to fit your needs
 chmod +x install.sh
 ./install.sh
 
-#Compile and run with CMake
+# Compile and run with CMake
 mkdir build && cd build
 cmake ../
 make
 ./todolist
 
-#Edit in build/settings/config.txt to change the settings
-#Make sure to set init db to 0 the first time you run the program to insert
-#the values in the database
+#E dit in build/settings/config.txt to change the settings
+# Make sure to set init db to 0 the first time you run the program to insert
+# the values in the database
 ```
 
 ## Contributors
