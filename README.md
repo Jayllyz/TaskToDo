@@ -19,7 +19,7 @@
 
 ## Introduction
 
-Projet de "todolist" réalisé en C avec la librairie GTK+3.2, la partie graphique est réalisée avec Glade.
+Projet de "todolist" réalisé en C avec la librairie GTK+3.2, l'UI est réalisé avec Glade.
 
 ## Features
 
@@ -41,6 +41,8 @@ Ce projet a été réalisé sur Windows avec un environnement **WSL**, il est do
 cd Todo-list-software
 
 #Run the script to install the dependencies
+#Read the script before running it
+#You may need to change some lines to fit your needs
 chmod +x install.sh
 ./install.sh
 
@@ -50,10 +52,7 @@ cmake ../
 make
 ./todolist
 
-#Or compile with gcc and run
-gcc `pkg-config --cflags gtk+-3.0` main.c -o main `pkg-config --libs gtk+-3.0` -rdynamic -I/usr/include/postgresql -lpq -lcurl -Wall
-
-./main
+#Edit `build/settings/config.txt` to change the settings
 ```
 
 ## Contributors

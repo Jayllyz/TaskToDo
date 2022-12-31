@@ -304,7 +304,7 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask, char *presentProj
     }
 
     char deadlineDate[20];
-    sprintf(deadlineDate, "%d-%d-%d", local_time->tm_year + 1900, local_time->tm_mon + 1, local_time->tm_mday);
+    snprintf(deadlineDate, 20, "%u-%u-%u", local_time->tm_year + 1900, local_time->tm_mon + 1, local_time->tm_mday);
 
     gchar *getText;
     char *projectName = malloc(strlen(presentProjectName) + 1 * sizeof(char));
@@ -520,7 +520,7 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProje
 {
     struct data *dataP = data;
     if (clicked == GTK_RESPONSE_OK) {
-        gchar *projectName;
+        gchar *projectName = NULL;
 
         if (dataP->state.repopulatedProject == 1) {
             projectName = get_text_of_entry(dataP->tools.projectNameEntry);
@@ -537,15 +537,7 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProje
                 return;
             }
 
-            char *query = malloc((strlen("INSERT INTO project VALUES ('','Placeholder', 0, 'now()', 'now()', 0)") + strlen(projectName) + 1) * sizeof(char));
-            sprintf(query, "INSERT INTO project VALUES ('%s','Placeholder', 0, 'now()', 'now()', 0)", projectName);
-            PGresult *res = PQexec(dataP->conn, query);
-            if (PQresultStatus(res) != PGRES_COMMAND_OK) {
-                g_print("Error: addProject failed");
-                return;
-            }
-            free(query);
-            PQclear(res);
+            insertProject(dataP->conn, projectName, 0, "now()");
         }
 
         for (dataP->state.i = 0; dataP->state.i < dataP->state.maxProject; dataP->state.i++) {
@@ -578,6 +570,7 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProje
         gtk_box_pack_start(GTK_BOX(box), separatorH, FALSE, FALSE, 0);
 
         GtkWidget *status = gtk_label_new("Status");
+        gtk_label_set_markup(GTK_LABEL(status), "<b>Status</b>");
         gtk_widget_set_margin_top(status, 10);
         gtk_widget_set_margin_bottom(status, 10);
         gtk_widget_set_size_request(status, 150, -1);
@@ -602,6 +595,7 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProje
         gtk_box_pack_start(GTK_BOX(dataP->tools.projectTaskBox[dataP->state.i]), separatorV2, FALSE, FALSE, 0);
 
         GtkWidget *deadline = gtk_label_new("Date limite");
+        gtk_label_set_markup(GTK_LABEL(deadline), "<b>Date limite</b>");
         gtk_widget_set_margin_top(deadline, 10);
         gtk_widget_set_margin_bottom(deadline, 10);
         gtk_widget_set_size_request(deadline, 150, -1);
@@ -637,6 +631,7 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProje
         gtk_widget_show(GTK_WIDGET(dataP->tools.pageTitleBox[dataP->state.i]));
         gtk_widget_show(box);
         dataP->state.projectCount++;
+        gtk_notebook_set_current_page(GTK_NOTEBOOK(dataP->tools.notebook), dataP->state.projectCount + 6);
     }
     if (dataP->state.repopulatedProject == 1)
         gtk_widget_destroy(projet);
@@ -673,7 +668,7 @@ void changeDeadline(GtkWidget *deadline, gint clicked, gpointer data)
 
         gtk_calendar_get_date(GTK_CALENDAR(calendar), &year, &month, &day);
         gchar *changedDeadline = malloc(11 * sizeof(gchar));
-        sprintf(changedDeadline, "%d-%d-%d", year, month + 1, day);
+        sprintf(changedDeadline, "%u-%u-%u", year, month + 1, day);
         updateDeadline(dataP->conn, dataP->state.inEditingId, changedDeadline, data);
         gtk_button_set_label(GTK_BUTTON(dataP->tools.taskDeadline[dataP->state.inEditingId]), changedDeadline);
         addLateTask(dataP, dataP->state.inEditingId);
@@ -1318,9 +1313,9 @@ void curlCalendar()
 {
     time_t t = time(NULL);
     struct tm *tm = localtime(&t);
-    int yearInt = tm->tm_year + 1900;
+    long unsigned yearInt = tm->tm_year + 1900;
     char year[5];
-    sprintf(year, "%d", yearInt);
+    sprintf(year, "%lu", yearInt);
     CURL *curl;
     CURLcode res;
     FILE *fp;
