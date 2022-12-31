@@ -52,7 +52,7 @@ cmake ../
 make
 ./todolist
 
-#E dit in build/settings/config.txt to change the settings
+# Edit in build/settings/config.txt to change the settings
 # Make sure to set init db to 0 the first time you run the program to insert
 # the values in the database
 ```

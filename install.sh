@@ -39,4 +39,5 @@ sudo -u postgres createdb projet-todolist --owner projet
 # the default method is peer and it doesn't work.
 sudo nano /etc/postgresql/*/main/pg_hba.conf  # Change peer to scram-sha-256 
 sudo service postgresql restart
+
 # You can now compile the project with CMake and run it.
