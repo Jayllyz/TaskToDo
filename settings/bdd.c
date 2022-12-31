@@ -54,10 +54,9 @@ int createTables(PGconn *conn)
     PQclear(res);
 
     res = PQexec(conn,
-        "INSERT INTO Project (Name, Priority, Date, Deadline) VALUES ('Tâches', 'placeholder', 0, 'now()', 'now()'), "
-        "('Importantes/Urgentes', 0, 'now()', 'now()'), ('Mineures', 0, 'now()', 'now()'), ('En retard', 0, 'now()', "
-        "'now()'), "
-        "('Prévues', 0, 'now()', 'now()') , ('Finance', 0, 'now()', 'now()') ON CONFLICT DO NOTHING;");
+        "INSERT INTO Project (Name, Priority, Date) VALUES ('Tâches', 0, 'now()'), "
+        "('Importantes/Urgentes', 0, 'now()'), ('Mineures', 0, 'now()'), ('En retard', 0, 'now()'), "
+        "('Prévues', 0, 'now()') , ('Finance', 0, 'now()') ON CONFLICT DO NOTHING;");
 
     if (PQresultStatus(res) != PGRES_COMMAND_OK)
         bddExist(conn, res);

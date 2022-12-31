@@ -5,6 +5,13 @@
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
 
+struct home {
+    GtkBuilder *builderHome;
+    GtkWidget *windowHome;
+    GtkButton *openHome;
+    GtkButton *clearData;
+};
+
 struct GTKTools {
     GtkBuilder *builder;
     GtkWidget *window;
@@ -88,10 +95,13 @@ struct data {
     struct GTKTools tools;
     struct TaskProjectState state;
     struct Calculator calc;
+    struct home home;
     PGconn *conn;
 };
 
 //function.c
+void openHome(GtkWidget *button, gpointer data);
+void clearData(GtkWidget *button, gpointer data);
 void changeTaskStatus(GtkWidget *taskStatus, gpointer data);
 void changeTaskPriority(GtkWidget *taskPriority, gpointer data);
 void editTaskWindow(GtkWidget *taskEdit, gpointer data);
