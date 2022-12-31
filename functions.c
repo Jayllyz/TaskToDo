@@ -304,7 +304,7 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask, char *presentProj
     }
 
     char deadlineDate[20];
-    sprintf(deadlineDate, "%d-%d-%d", local_time->tm_year + 1900, local_time->tm_mon + 1, local_time->tm_mday);
+    snprintf(deadlineDate, 20, "%u-%u-%u", local_time->tm_year + 1900, local_time->tm_mon + 1, local_time->tm_mday);
 
     gchar *getText;
     char *projectName = malloc(strlen(presentProjectName) + 1 * sizeof(char));
@@ -520,7 +520,7 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProje
 {
     struct data *dataP = data;
     if (clicked == GTK_RESPONSE_OK) {
-        gchar *projectName;
+        gchar *projectName = NULL;
 
         if (dataP->state.repopulatedProject == 1) {
             projectName = get_text_of_entry(dataP->tools.projectNameEntry);
@@ -668,7 +668,7 @@ void changeDeadline(GtkWidget *deadline, gint clicked, gpointer data)
 
         gtk_calendar_get_date(GTK_CALENDAR(calendar), &year, &month, &day);
         gchar *changedDeadline = malloc(11 * sizeof(gchar));
-        sprintf(changedDeadline, "%d-%d-%d", year, month + 1, day);
+        sprintf(changedDeadline, "%u-%u-%u", year, month + 1, day);
         updateDeadline(dataP->conn, dataP->state.inEditingId, changedDeadline, data);
         gtk_button_set_label(GTK_BUTTON(dataP->tools.taskDeadline[dataP->state.inEditingId]), changedDeadline);
         addLateTask(dataP, dataP->state.inEditingId);
@@ -1313,9 +1313,9 @@ void curlCalendar()
 {
     time_t t = time(NULL);
     struct tm *tm = localtime(&t);
-    int yearInt = tm->tm_year + 1900;
+    long unsigned yearInt = tm->tm_year + 1900;
     char year[5];
-    sprintf(year, "%d", yearInt);
+    sprintf(year, "%lu", yearInt);
     CURL *curl;
     CURLcode res;
     FILE *fp;
