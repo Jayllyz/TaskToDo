@@ -54,9 +54,9 @@ int createTables(PGconn *conn)
     PQclear(res);
 
     res = PQexec(conn,
-        "INSERT INTO Project (Name, Priority, Date) VALUES ('Tâches', 0, 'now()'), "
-        "('Importantes/Urgentes', 0, 'now()'), ('Mineures', 0, 'now()'), ('En retard', 0, 'now()'), "
-        "('Prévues', 0, 'now()') , ('Finance', 0, 'now()') ON CONFLICT DO NOTHING;");
+        "INSERT INTO Project (Name) VALUES ('Tâches'), "
+        "('Importantes/Urgentes'), ('Mineures'), ('En retard'), "
+        "('Prévues') , ('Finance') ON CONFLICT DO NOTHING;");
 
     if (PQresultStatus(res) != PGRES_COMMAND_OK)
         bddExist(conn, res);
@@ -110,11 +110,11 @@ int insertTask(PGconn *conn, int id, char *name, char *description, int priority
     return 0;
 }
 
-int insertProject(PGconn *conn, char *name, int priority, char *date)
+int insertProject(PGconn *conn, char *name)
 {
     PGresult *res;
-    char *query = malloc(sizeof(char) * 200);
-    sprintf(query, "INSERT INTO Project ( Name, Priority, Date) VALUES ('%s', %d, '%s')", name, priority, date);
+    char *query = malloc(sizeof(char) * 100);
+    sprintf(query, "INSERT INTO Project ( Name) VALUES ('%s')", name);
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
         bddExist(conn, res);

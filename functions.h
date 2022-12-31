@@ -137,7 +137,7 @@ PGconn *connectBdd();
 int createTables(PGconn *conn);
 void bddExist(PGconn *conn, PGresult *res);
 int insertTask(PGconn *conn, int id, char *name, char *description, int priority, char *deadline, int status, int dependGroup, const gchar *projectName);
-int insertProject(PGconn *conn, char *name, int priority, char *date);
+int insertProject(PGconn *conn, char *name);
 int deleteTaskDB(PGconn *conn, int id);
 int deleteProjectDB(PGconn *conn, const gchar *name);
 int deleteAllTaskFromProject(PGconn *conn, const gchar *name);
