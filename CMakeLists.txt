@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(todolist)
+project(TaskTodo VERSION 0.1.0)
 
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_FLAGS "-Wall")
@@ -34,5 +34,5 @@ if(CLANG_FORMAT)
     )
 endif()
 
-add_executable(todolist main.c calculator.c functions.c settings/bdd.c)
-target_link_libraries(todolist ${GTK3_LIBRARIES} m ${PostgreSQL_LIBRARIES} m ${CURL_LIBRARIES})
+add_executable(TaskTodo main.c calculator.c functions.c settings/bdd.c)
+target_link_libraries(TaskTodo ${GTK3_LIBRARIES} m ${PostgreSQL_LIBRARIES} m ${CURL_LIBRARIES})
