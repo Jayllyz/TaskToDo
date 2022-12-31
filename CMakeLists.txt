@@ -20,9 +20,6 @@ include_directories(${CURL_INCLUDE_DIR})
 link_directories(${CURL_LIBRARY_DIRS})
 add_definitions(${CURL_DEFINITIONS})
 
-file(COPY data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY settings DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-
 find_program(CLANG_FORMAT "clang-format")
 if(CLANG_FORMAT)
     add_custom_target(
