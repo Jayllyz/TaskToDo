@@ -578,6 +578,7 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProje
         gtk_box_pack_start(GTK_BOX(box), separatorH, FALSE, FALSE, 0);
 
         GtkWidget *status = gtk_label_new("Status");
+        gtk_label_set_markup(GTK_LABEL(status), "<b>Status</b>");
         gtk_widget_set_margin_top(status, 10);
         gtk_widget_set_margin_bottom(status, 10);
         gtk_widget_set_size_request(status, 150, -1);
@@ -602,6 +603,7 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProje
         gtk_box_pack_start(GTK_BOX(dataP->tools.projectTaskBox[dataP->state.i]), separatorV2, FALSE, FALSE, 0);
 
         GtkWidget *deadline = gtk_label_new("Date limite");
+        gtk_label_set_markup(GTK_LABEL(deadline), "<b>Date limite</b>");
         gtk_widget_set_margin_top(deadline, 10);
         gtk_widget_set_margin_bottom(deadline, 10);
         gtk_widget_set_size_request(deadline, 150, -1);
@@ -637,6 +639,7 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProje
         gtk_widget_show(GTK_WIDGET(dataP->tools.pageTitleBox[dataP->state.i]));
         gtk_widget_show(box);
         dataP->state.projectCount++;
+        gtk_notebook_set_current_page(GTK_NOTEBOOK(dataP->tools.notebook), dataP->state.projectCount + 6);
     }
     if (dataP->state.repopulatedProject == 1)
         gtk_widget_destroy(projet);
