@@ -52,7 +52,7 @@ cmake ../
 make
 ./todolist
 
-#Edit `build/settings/config.txt` to change the settings
+#Edit in build/settings/config.txt to change the settings
 ```
 
 ## Contributors
