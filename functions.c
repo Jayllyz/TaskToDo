@@ -537,7 +537,7 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProje
                 return;
             }
 
-            insertProject(dataP->conn, projectName, "Placeholder", 0, "now()", "now()");
+            insertProject(dataP->conn, projectName, 0, "now()");
         }
 
         for (dataP->state.i = 0; dataP->state.i < dataP->state.maxProject; dataP->state.i++) {

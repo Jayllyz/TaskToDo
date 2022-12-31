@@ -34,8 +34,7 @@ int createTables(PGconn *conn)
 
     PQclear(res);
 
-    res = PQexec(conn,
-        "CREATE TABLE IF NOT EXISTS Project(Name VARCHAR(20) PRIMARY KEY, Description VARCHAR(100), Priority INT, Date TIMESTAMPTZ DEFAULT NOW(), Deadline TIMESTAMPTZ)");
+    res = PQexec(conn, "CREATE TABLE IF NOT EXISTS Project(Name VARCHAR(20) PRIMARY KEY, Description VARCHAR(100), Priority INT, Date TIMESTAMPTZ DEFAULT NOW())");
 
     if (PQresultStatus(res) != PGRES_COMMAND_OK)
         bddExist(conn, res);
@@ -55,10 +54,10 @@ int createTables(PGconn *conn)
     PQclear(res);
 
     res = PQexec(conn,
-        "INSERT INTO Project (Name, Description, Priority, Date, Deadline) VALUES ('Tâches', 'placeholder', 0, 'now()', 'now()'), "
-        "('Importantes/Urgentes','placeholder', 0, 'now()', 'now()'), ('Mineures', 'placeholder', 0, 'now()', 'now()'), ('En retard', 'placeholder', 0, 'now()', "
+        "INSERT INTO Project (Name, Priority, Date, Deadline) VALUES ('Tâches', 'placeholder', 0, 'now()', 'now()'), "
+        "('Importantes/Urgentes', 0, 'now()', 'now()'), ('Mineures', 0, 'now()', 'now()'), ('En retard', 0, 'now()', "
         "'now()'), "
-        "('Prévues', 'placeholder', 0, 'now()', 'now()') , ('Finance', 'placeholder', 0, 'now()', 'now()') ON CONFLICT DO NOTHING;");
+        "('Prévues', 0, 'now()', 'now()') , ('Finance', 0, 'now()', 'now()') ON CONFLICT DO NOTHING;");
 
     if (PQresultStatus(res) != PGRES_COMMAND_OK)
         bddExist(conn, res);
@@ -112,11 +111,11 @@ int insertTask(PGconn *conn, int id, char *name, char *description, int priority
     return 0;
 }
 
-int insertProject(PGconn *conn, char *name, char *description, int priority, char *deadline, char *date)
+int insertProject(PGconn *conn, char *name, int priority, char *date)
 {
     PGresult *res;
     char *query = malloc(sizeof(char) * 200);
-    sprintf(query, "INSERT INTO Project ( Name, Description, Priority, Deadline, Date) VALUES ('%s', '%s', %d, '%s', '%s')", name, description, priority, date, deadline);
+    sprintf(query, "INSERT INTO Project ( Name, Priority, Date) VALUES ('%s', %d, '%s')", name, priority, date);
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
         bddExist(conn, res);
