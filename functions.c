@@ -1491,6 +1491,8 @@ int newConnectUpdate(char *day, char *month, int year, gpointer data)
                     fputc('0', file);
                     fprintf(file, "%d", atoi(day));
                 }
+                else
+                    fprintf(file, "%d", atoi(day));
             }
             else
                 fprintf(file, "%s", day);
@@ -1506,6 +1508,8 @@ int newConnectUpdate(char *day, char *month, int year, gpointer data)
                     fputc('0', file);
                     fprintf(file, "%d", atoi(month));
                 }
+                else
+                    fprintf(file, "%d", atoi(month));
             }
             else
                 fprintf(file, "%s", month);
