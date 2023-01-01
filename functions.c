@@ -7,17 +7,17 @@
 
 void openHome(GtkWidget *button, gpointer data)
 {
-    struct data *dataP = data;
+    struct Data *dataP = data;
     gtk_widget_show(dataP->tools.window);
     gtk_widget_destroy(dataP->home.windowHome);
 }
 
 void clearData(GtkWidget *button, gpointer data)
 {
-    struct data *dataP = data;
+    struct Data *dataP = data;
     PGresult *res = PQexec(dataP->conn, "DELETE FROM task");
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
-        g_print("Error: delete task failed");
+        g_print("Error: delete task failed\n");
         return;
     }
     PQclear(res);
@@ -25,26 +25,24 @@ void clearData(GtkWidget *button, gpointer data)
         "DELETE FROM project WHERE Name != 'Tâches' AND Name != 'En retard' AND Name != 'Importantes/Urgentes' AND Name != 'Mineures' AND Name != 'Prévues' AND Name != "
         "'Finance'");
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
-        g_print("Error: delete projects failed");
+        g_print("Error: delete projects failed\n");
         return;
     }
     PQclear(res);
     res = PQexec(dataP->conn, "UPDATE finance SET Value = 0");
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
-        g_print("Error: delete finance failed");
+        g_print("Error: delete finance failed\n");
         return;
     }
     PQclear(res);
 
-    dataP->state.projectCount = 0;
-
-    g_print("Data cleared");
+    g_print("Data cleared!\n");
     gtk_main_quit();
 }
 
 void changeTaskStatus(GtkWidget *taskStatus, gpointer data)
 {
-    struct data *dataP = data;
+    struct Data *dataP = data;
 
     GtkWidget *parent = gtk_widget_get_parent(taskStatus);
     GList *children = gtk_container_get_children(GTK_CONTAINER(parent));
@@ -54,34 +52,34 @@ void changeTaskStatus(GtkWidget *taskStatus, gpointer data)
     if (strcmp(gtk_button_get_label(GTK_BUTTON(taskStatus)), "Non complété") == 0) {
         int queryResult = updateStatus(dataP->conn, 1, id, data);
         if (queryResult == -1) {
-            g_print("Error: update status failed");
+            g_print("Error: update status failed\n");
         }
         gtk_button_set_label(GTK_BUTTON(taskStatus), "En cours");
     }
     else if (strcmp(gtk_button_get_label(GTK_BUTTON(taskStatus)), "En cours") == 0) {
         int queryResult = updateStatus(dataP->conn, 2, id, data);
         if (queryResult == -1)
-            g_print("Error: update status failed");
+            g_print("Error: update status failed\n");
 
         gtk_button_set_label(GTK_BUTTON(taskStatus), "Complété");
     }
     else if (strcmp(gtk_button_get_label(GTK_BUTTON(taskStatus)), "Complété") == 0) {
         int queryResult = updateStatus(dataP->conn, 3, id, data);
         if (queryResult == -1)
-            g_print("Error: update status failed");
+            g_print("Error: update status failed\n");
 
         gtk_button_set_label(GTK_BUTTON(taskStatus), "Abandonné");
     }
     else if (strcmp(gtk_button_get_label(GTK_BUTTON(taskStatus)), "Abandonné") == 0) {
         int queryResult = updateStatus(dataP->conn, 0, id, data);
         if (queryResult == -1)
-            g_print("Error: update status failed");
+            g_print("Error: update status failed\n");
 
         gtk_button_set_label(GTK_BUTTON(taskStatus), "Non complété");
     }
 
     //Recherche de tâches du groupe de dépendance
-    char *projectName = malloc(sizeof(char) * 1000);
+    char *projectName = malloc(sizeof(char) * strlen(selectProjectName(dataP->conn, id) + 1));
     sprintf(projectName, "%s", selectProjectName(dataP->conn, id));
     int dependGroup = selectDependGroup(dataP->conn, id);
     if (dependGroup != -1) {
@@ -113,7 +111,7 @@ void changeTaskPriority(GtkWidget *taskPriority, gpointer data)
 
 void editTaskWindow(GtkWidget *taskEdit, gpointer data)
 {
-    struct data *dataP = data;
+    struct Data *dataP = data;
 
     GtkWidget *parent = gtk_widget_get_parent(taskEdit);
     GList *children = gtk_container_get_children(GTK_CONTAINER(parent));
@@ -181,7 +179,7 @@ void editTaskWindow(GtkWidget *taskEdit, gpointer data)
 
 void editTaskDB(GtkDialog *window, gint clicked, gpointer data)
 {
-    struct data *dataP = data;
+    struct Data *dataP = data;
 
     if (clicked == GTK_RESPONSE_OK) {
         GtkWidget *input = GTK_WIDGET(dataP->tools.descriptionEntry);
@@ -197,7 +195,7 @@ void editTaskDB(GtkDialog *window, gint clicked, gpointer data)
 
         queryResult = updateDescription(dataP->conn, text, dataP->state.inEditingId);
         if (queryResult != 0) {
-            g_print("Erreur de la modification de la base");
+            g_print("Erreur lors de la mise à jour de la description\n");
             return;
         }
 
@@ -215,7 +213,7 @@ void editTaskDB(GtkDialog *window, gint clicked, gpointer data)
         }
 
         if (queryResult != 0) {
-            g_print("Erreur de la modification de la base");
+            g_print("Erreur lors de la mise à jour de la priorité\n");
             return;
         }
 
@@ -230,13 +228,12 @@ void editTaskDB(GtkDialog *window, gint clicked, gpointer data)
         if (strcmp(dependText, "") != 0 && onlyDigits == 1 && atoi(dependText) >= 0) {
             queryResult = updateDependGroup(dataP->conn, dataP->state.inEditingId, atoi(dependText));
             if (queryResult != 0) {
-                g_print("Erreur de la modification du groupe de dépendance");
+                g_print("Erreur de la modification du groupe de dépendance\n");
                 return;
             }
             if (AllDependGroup(dataP->conn, dataP->state.inEditingId, atoi(dependText)) > 1) {
                 queryResult = refreshTaskInGroup(dataP->conn, dataP->state.inEditingId, atoi(dependText));
                 if (queryResult != 0) {
-                    g_print("Erreur de la modification du groupe de dépendance");
                     return;
                 }
                 scanForIdForUpdate(dataP, dataP->state.inEditingId);
@@ -245,7 +242,7 @@ void editTaskDB(GtkDialog *window, gint clicked, gpointer data)
         else if (strcmp(dependText, "") == 0 && atoi(dependText) >= 0) {
             queryResult = updateDependGroup(dataP->conn, dataP->state.inEditingId, -1);
             if (queryResult != 0) {
-                g_print("Erreur de la modification du groupe de dépendance");
+                g_print("Erreur de la modification du groupe de dépendance\n");
                 return;
             }
         }
@@ -259,7 +256,7 @@ void editTaskDB(GtkDialog *window, gint clicked, gpointer data)
 
 void deleteTask(GtkWidget *taskDelete, gpointer data)
 {
-    struct data *dataP = data;
+    struct Data *dataP = data;
     GtkWidget *taskToDelete = gtk_widget_get_parent(taskDelete);
     GList *boxChildren = gtk_container_get_children(GTK_CONTAINER(taskToDelete));
     GtkWidget *numberToFree = g_list_nth_data(boxChildren, 5);
@@ -271,7 +268,7 @@ void deleteTask(GtkWidget *taskDelete, gpointer data)
     int queryResult = deleteTaskDB(dataP->conn, numberToChange);
 
     if (queryResult == -1) {
-        g_print("Error: deleteTask failed");
+        g_print("Error: deleteTask failed\n");
         return;
     }
 
@@ -281,7 +278,7 @@ void deleteTask(GtkWidget *taskDelete, gpointer data)
 
 void deleteProject(GtkWidget *projectDelete, gpointer data)
 {
-    struct data *dataP = data;
+    struct Data *dataP = data;
 
     GtkWidget *projectBox = gtk_widget_get_parent(projectDelete);
     GList *boxChildren = gtk_container_get_children(GTK_CONTAINER(projectBox));
@@ -311,13 +308,13 @@ void deleteProject(GtkWidget *projectDelete, gpointer data)
 
     int queryResult = deleteAllTaskFromProject(dataP->conn, nameOfProject);
     if (queryResult == -1) {
-        g_print("Error: delete all task from project failed");
+        g_print("Error: delete all task from project failed\n");
         return;
     }
 
     queryResult = deleteProjectDB(dataP->conn, nameOfProject);
     if (queryResult == -1) {
-        g_print("Error: deleteProject failed");
+        g_print("Error: deleteProject failed\n");
         return;
     }
 
@@ -328,7 +325,7 @@ void deleteProject(GtkWidget *projectDelete, gpointer data)
 
 void addTasks(GtkWidget *task, gpointer data, int presentTask, char *presentProjectName)
 {
-    struct data *dataP = data;
+    struct Data *dataP = data;
 
     time_t now = time(NULL);
     struct tm *local_time = localtime(&now);
@@ -497,7 +494,7 @@ void addTasks(GtkWidget *task, gpointer data, int presentTask, char *presentProj
     if (dataP->state.repopulatedTask == 1) {
         int queryResult = insertTask(dataP->conn, dataP->state.i, getText, "", 1, deadlineDate, 0, -1, name); //insert in db
         if (queryResult == -1)
-            g_print("Error: insertTask failed");
+            g_print("Error: insertTask failed\n");
     }
 }
 
@@ -517,7 +514,7 @@ int readOneConfigValue(char *propName)
     }
     FILE *file = fopen("settings/config.txt", "r");
     if (file == NULL) {
-        g_print("Error: config file not found");
+        g_print("Error: config file not found\n");
         return -1;
     }
     char *line = NULL;
@@ -536,7 +533,7 @@ int readOneConfigValue(char *propName)
 
 void addProjectWindow(GtkWidget *project, gpointer data)
 {
-    struct data *dataP = data;
+    struct Data *dataP = data;
 
     if (dataP->state.projectCount >= dataP->state.maxProject) {
         return;
@@ -555,14 +552,14 @@ void addProjectWindow(GtkWidget *project, gpointer data)
 
 void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProject)
 {
-    struct data *dataP = data;
+    struct Data *dataP = data;
     if (clicked == GTK_RESPONSE_OK) {
         gchar *projectName = NULL;
 
         if (dataP->state.repopulatedProject == 1) {
             projectName = get_text_of_entry(dataP->tools.projectNameEntry);
             if (projectName == NULL) {
-                g_print("Error: projectName is null");
+                g_print("Error: projectName is null\n");
                 return;
             }
             if (projectExist(dataP->conn, projectName) == 1 || projectName == NULL) {
@@ -574,7 +571,11 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProje
                 return;
             }
 
-            insertProject(dataP->conn, projectName);
+            int queryResult = insertProject(dataP->conn, projectName);
+            if (queryResult == -1) {
+                g_print("Error: insertProject failed\n");
+                return;
+            }
         }
 
         for (dataP->state.i = 0; dataP->state.i < dataP->state.maxProject; dataP->state.i++) {
@@ -676,7 +677,7 @@ void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProje
 
 void changeDeadlineWindow(GtkWidget *deadline, gpointer data)
 {
-    struct data *dataP = data;
+    struct Data *dataP = data;
     GtkWidget *changeDeadlineDialog
         = gtk_dialog_new_with_buttons("Changer de date limite", NULL, GTK_DIALOG_MODAL, "Confirmer", GTK_RESPONSE_OK, "Annuler", GTK_RESPONSE_CANCEL, NULL);
     GtkWidget *calendar = gtk_calendar_new();
@@ -695,7 +696,7 @@ void changeDeadlineWindow(GtkWidget *deadline, gpointer data)
 
 void changeDeadline(GtkWidget *deadline, gint clicked, gpointer data)
 {
-    struct data *dataP = data;
+    struct Data *dataP = data;
     if (clicked == GTK_RESPONSE_OK) {
         GtkWidget *box = GTK_WIDGET(gtk_dialog_get_content_area(GTK_DIALOG(deadline)));
         GList *child = gtk_container_get_children(GTK_CONTAINER(box));
@@ -730,7 +731,7 @@ void changeDeadline(GtkWidget *deadline, gint clicked, gpointer data)
 
 void addImportantTask(gpointer data, int id)
 {
-    struct data *dataP = data;
+    struct Data *dataP = data;
 
     gint startingPage = gtk_notebook_get_current_page(GTK_NOTEBOOK(dataP->tools.notebook));
     gtk_notebook_set_current_page(dataP->tools.notebook, 1);
@@ -838,7 +839,7 @@ void addImportantTask(gpointer data, int id)
 
 void addMinorTask(gpointer data, int id)
 {
-    struct data *dataP = data;
+    struct Data *dataP = data;
 
     gint startingPage = gtk_notebook_get_current_page(GTK_NOTEBOOK(dataP->tools.notebook));
 
@@ -947,7 +948,7 @@ void addMinorTask(gpointer data, int id)
 
 void addLateTask(gpointer data, int id)
 {
-    struct data *dataP = data;
+    struct Data *dataP = data;
 
     gint startingPage = gtk_notebook_get_current_page(GTK_NOTEBOOK(dataP->tools.notebook));
 
@@ -1077,7 +1078,7 @@ void addLateTask(gpointer data, int id)
 
 void addPlannedTask(gpointer data, int id)
 {
-    struct data *dataP = data;
+    struct Data *dataP = data;
 
     gint startingPage = gtk_notebook_get_current_page(GTK_NOTEBOOK(dataP->tools.notebook));
 
@@ -1207,7 +1208,7 @@ void addPlannedTask(gpointer data, int id)
 
 void scanForIdToDestroy(gpointer data, int idToDestroy)
 {
-    struct data *dataP = data;
+    struct Data *dataP = data;
     gint startingPage = gtk_notebook_get_current_page(GTK_NOTEBOOK(dataP->tools.notebook));
     int numberOfProject = allProject(dataP->conn) + 7;
 
@@ -1245,7 +1246,7 @@ void scanForIdToDestroy(gpointer data, int idToDestroy)
 
 void scanForIdToDestroySpecific(gpointer data, int idToDestroy, guint project)
 {
-    struct data *dataP = data;
+    struct Data *dataP = data;
 
     gtk_notebook_set_current_page(dataP->tools.notebook, project);
 
@@ -1276,7 +1277,7 @@ void scanForIdToDestroySpecific(gpointer data, int idToDestroy, guint project)
 
 void scanForIdForUpdate(gpointer data, int idToSeek)
 {
-    struct data *dataP = data;
+    struct Data *dataP = data;
     gint startingPage = gtk_notebook_get_current_page(GTK_NOTEBOOK(dataP->tools.notebook));
     int numberOfProject = allProject(dataP->conn) + 7;
 
@@ -1314,7 +1315,7 @@ void scanForIdForUpdate(gpointer data, int idToSeek)
 
 void updateTask(gpointer data, GtkWidget *task, int id)
 {
-    struct data *dataP = data;
+    struct Data *dataP = data;
 
     GList *listOfWidget = gtk_container_get_children(GTK_CONTAINER(task));
 
@@ -1386,7 +1387,7 @@ void curlCalendar()
 
 void calendarDialog(GtkButton *calendar, gpointer data)
 {
-    struct data *dataP = data;
+    struct Data *dataP = data;
     curlCalendar();
     GtkWidget *dialog = gtk_dialog_new_with_buttons("Calendrier", GTK_WINDOW(dataP->tools.window), GTK_DIALOG_MODAL, NULL, GTK_RESPONSE_CLOSE, NULL);
     GtkWidget *contentArea = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
@@ -1399,7 +1400,7 @@ void calendarDialog(GtkButton *calendar, gpointer data)
 
 gchar *warningMessage(gpointer data)
 {
-    struct data *dataP = data;
+    struct Data *dataP = data;
     int urgent = allUrgentTask(dataP->conn);
     int late = allLateTask(dataP->conn);
     gchar *message;
@@ -1485,7 +1486,7 @@ int newConnectUpdate(int day, int month, int year)
 
 void financeButton(GtkButton *buttonPressed, gpointer data)
 {
-    struct data *dataP = data;
+    struct Data *dataP = data;
     int type = 0;
 
     GtkWidget *box = gtk_widget_get_parent(GTK_WIDGET(buttonPressed));
@@ -1602,7 +1603,7 @@ void financeButton(GtkButton *buttonPressed, gpointer data)
 
 void updateFinance(gpointer data)
 {
-    struct data *dataP = data;
+    struct Data *dataP = data;
     char showMoney[25];
 
     int money = selectExpense(dataP->conn, 0);
@@ -1636,7 +1637,7 @@ void updateFinance(gpointer data)
 
 void refreshTaskVisually(gpointer data, int id)
 {
-    struct data *dataP = data;
+    struct Data *dataP = data;
 
     gint currentPage = gtk_notebook_get_current_page(GTK_NOTEBOOK(dataP->tools.notebook));
     GtkWidget *pageBox = gtk_notebook_get_nth_page(GTK_NOTEBOOK(dataP->tools.notebook), currentPage);

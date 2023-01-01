@@ -5,7 +5,7 @@
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
 
-struct home {
+struct Home {
     GtkBuilder *builderHome;
     GtkWidget *windowHome;
     GtkButton *openHome;
@@ -91,11 +91,11 @@ struct Calculator {
     GtkLabel *txtResult;
 };
 
-struct data {
+struct Data {
     struct GTKTools tools;
     struct TaskProjectState state;
     struct Calculator calc;
-    struct home home;
+    struct Home home;
     PGconn *conn;
 };
 
@@ -130,7 +130,6 @@ gchar *warningMessage(gpointer data);
 int newConnectUpdate(int day, int month, int year);
 void financeButton(GtkButton *buttonPressed, gpointer data);
 void updateFinance(gpointer data);
-void refreshTaskVisually(gpointer data, int id);
 
 //bdd.c
 PGconn *connectBdd();
