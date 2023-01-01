@@ -62,6 +62,7 @@ struct TaskProjectState {
     int repopulatedTask;
     int repopulatedProject;
     int inEditingId;
+    int crlf;
 };
 
 struct Calculator {
@@ -102,6 +103,7 @@ struct Data {
 //function.c
 void openHome(GtkWidget *button, gpointer data);
 void clearData(GtkWidget *button, gpointer data);
+void checkEol(gpointer data, const char *filename);
 void changeTaskStatus(GtkWidget *taskStatus, gpointer data);
 void changeTaskPriority(GtkWidget *taskPriority, gpointer data);
 void editTaskWindow(GtkWidget *taskEdit, gpointer data);
@@ -127,7 +129,7 @@ void updateTask(gpointer data, GtkWidget *task, int id);
 void curlCalendar();
 void calendarDialog(GtkButton *calendar, gpointer data);
 gchar *warningMessage(gpointer data);
-int newConnectUpdate(int day, int month, int year);
+int newConnectUpdate(char *day, char *month, int year, gpointer data);
 void financeButton(GtkButton *buttonPressed, gpointer data);
 void updateFinance(gpointer data);
 

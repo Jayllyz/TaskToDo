@@ -21,11 +21,18 @@ int main(int argc, char *argv[])
         g_print("Error: can't connect to database");
         return EXIT_FAILURE;
     }
+
+    data.state.crlf = 0;
+    checkEol(&data, "settings/config.txt");
     if (readOneConfigValue("init db") == 0)
         createTables(data.conn);
 
     time_t now = time(NULL);
     struct tm *local_time = localtime(&now);
+    char *day = malloc(sizeof(char) * 2);
+    char *month = malloc(sizeof(char) * 2);
+    sprintf(day, "%02d\n", local_time->tm_mday);
+    sprintf(month, "%02d\n", local_time->tm_mon + 1);
     int newConnect = 0;
     int newMonth = 0;
 
@@ -189,7 +196,8 @@ int main(int argc, char *argv[])
 
     //Warning message one time per day
     if (newConnect == 1) {
-        newConnectUpdate(local_time->tm_mday, local_time->tm_mon + 1, local_time->tm_year + 1900);
+
+        newConnectUpdate(day, month, local_time->tm_year + 1900, &data);
 
         gchar *message = malloc(sizeof(char) * strlen("Vous avez ??? tâches urgentes à réaliser et ??? tâches en retard"));
         message = warningMessage(&data);
