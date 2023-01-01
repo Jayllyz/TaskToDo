@@ -4,7 +4,7 @@
 
 void btnClicked(GtkButton *button, gpointer data)
 {
-    struct data *dataP = data;
+    struct Data *dataP = data;
     const char *text = gtk_button_get_label(button);
     if (dataP->calc.resultB == 1) {
         dataP->calc.firstNumber = (int)dataP->calc.result > 0 ? (int)dataP->calc.result : (int)(dataP->calc.result - 1) + 1;
@@ -38,7 +38,7 @@ void addDigit(const char *digit, gpointer data)
 {
     int temp = atoi(digit);
     int i = 0;
-    struct data *dataP = data;
+    struct Data *dataP = data;
     if (dataP->calc.operator== '0') {
 
         if (dataP->calc.firstB == 1)
@@ -79,7 +79,7 @@ void addDigit(const char *digit, gpointer data)
 
 void addOperator(const char *operator, gpointer data)
 {
-    struct data *dataP = data;
+    struct Data *dataP = data;
     dataP->calc.operator=(char) operator[0];
     char operatorString[2];
     sprintf(operatorString, "%c", dataP->calc.operator);
@@ -92,7 +92,7 @@ void addOperator(const char *operator, gpointer data)
 
 void calculate(gpointer data)
 {
-    struct data *dataP = data;
+    struct Data *dataP = data;
     switch (dataP->calc.operator) {
     case '+':
         dataP->calc.result = dataP->calc.firstNumber + dataP->calc.secondNumber;
@@ -118,7 +118,7 @@ void calculate(gpointer data)
 
 void clearCalc(gpointer data)
 {
-    struct data *dataP = data;
+    struct Data *dataP = data;
 
     dataP->calc.firstNumber = 0;
     dataP->calc.firstB = 0;
@@ -130,7 +130,7 @@ void clearCalc(gpointer data)
 
 void showResult(GtkLabel *outputLabel, gpointer data)
 {
-    struct data *dataP = data;
+    struct Data *dataP = data;
     double tempResult = dataP->calc.result;
     int tempFirst = dataP->calc.firstNumber;
     int tempSecond = dataP->calc.secondNumber;

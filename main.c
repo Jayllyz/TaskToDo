@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
 {
     //Init
     gtk_init(&argc, &argv);
-    struct data data;
+    struct Data data;
     data.conn = connectBdd();
     if (data.conn == NULL) {
         g_print("Error: can't connect to database");
@@ -35,10 +35,10 @@ int main(int argc, char *argv[])
         newConnect = 1;
         newMonth = 1;
     }
-
     if (readOneConfigValue("last connect year") != local_time->tm_year + 1900)
         newConnect = 1;
 
+    //Home window
     data.home.builderHome = gtk_builder_new();
     gtk_builder_add_from_file(data.home.builderHome, "data/window_home.glade", NULL);
     data.home.windowHome = GTK_WIDGET(gtk_builder_get_object(data.home.builderHome, "window_home"));
@@ -49,15 +49,15 @@ int main(int argc, char *argv[])
     g_signal_connect(data.home.openHome, "clicked", G_CALLBACK(openHome), &data);
     g_signal_connect(data.home.clearData, "clicked", G_CALLBACK(clearData), &data);
 
+    //Main window
     data.tools.builder = gtk_builder_new();
     gtk_builder_add_from_file(data.tools.builder, "data/window_main.glade", NULL);
+    data.tools.window = GTK_WIDGET(gtk_builder_get_object(data.tools.builder, "window_main"));
 
     //Datas
     data.state.maxTaskTotal = readOneConfigValue("maxTaskTotal") > 0 ? readOneConfigValue("maxTaskTotal") : 200;
     data.state.maxTaskPerProject = readOneConfigValue("maxTaskPerProject") > 0 ? readOneConfigValue("maxTaskPerProject") : 15;
     data.state.maxProject = readOneConfigValue("maxProject") > 0 ? readOneConfigValue("maxProject") : 10;
-
-    data.tools.window = GTK_WIDGET(gtk_builder_get_object(data.tools.builder, "window_main"));
     data.tools.addTask = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "addTask"));
     data.tools.addProject = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "addProject"));
     data.tools.boxV = GTK_BOX(gtk_builder_get_object(data.tools.builder, "boxV"));
@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
     data.tools.inputEntry = GTK_WIDGET(gtk_builder_get_object(data.tools.builder, "inputEntry"));
     data.tools.notebook = GTK_NOTEBOOK(gtk_builder_get_object(data.tools.builder, "project_notebook"));
     data.tools.calendar = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "calendar"));
-    //calculator
+    //Calculator
     data.calc.clear = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "clear"));
     data.calc.plus = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "plus"));
     data.calc.minus = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "minus"));
@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
     data.calc.result = 0;
     data.calc.resultB = 0;
     data.calc.operator= '0';
-    //finances
+    //Finances
     data.tools.dailyCap = GTK_LABEL(gtk_builder_get_object(data.tools.builder, "dailyCap"));
     data.tools.monthlyCap = GTK_LABEL(gtk_builder_get_object(data.tools.builder, "monthlyCap"));
     data.tools.dailyExpense = GTK_LABEL(gtk_builder_get_object(data.tools.builder, "dailyExpense"));
@@ -115,12 +115,11 @@ int main(int argc, char *argv[])
         data.state.projectNumber[i] = i;
     }
 
-    //signals
-    gtk_entry_set_max_length(GTK_ENTRY(data.tools.inputEntry), readOneConfigValue("limitCharInput"));
+    gtk_entry_set_max_length(GTK_ENTRY(data.tools.inputEntry), readOneConfigValue("limitCharInput") > 0 ? readOneConfigValue("limitCharInput") : 35);
 
     int queryResult = allProject(data.conn);
     if (queryResult == -1)
-        g_print("Error: can't collect all projects");
+        g_print("Error: can't collect all projects\n");
 
     for (int i = 0; i < queryResult; i++) {
         addProject(GTK_WIDGET(data.tools.addProject), GTK_RESPONSE_OK, &data, i);
@@ -129,7 +128,7 @@ int main(int argc, char *argv[])
 
     queryResult = allTask(data.conn);
     if (queryResult == -1)
-        g_print("Error: can't collect all tasks");
+        g_print("Error: can't collect all tasks\n");
 
     for (int i = 0; i < queryResult; i++) {
         int taskToAdd = selectTaskId(data.conn, i);
@@ -143,6 +142,7 @@ int main(int argc, char *argv[])
     }
     data.state.repopulatedTask = 1;
 
+    //Update finance data
     if (newConnect == 1) {
         updateExpense(data.conn, 2, 0);
         if (newMonth == 1)
@@ -183,6 +183,7 @@ int main(int argc, char *argv[])
 
     g_object_unref(data.tools.builder);
 
+    //Warning message one time per day
     if (newConnect == 1) {
         newConnectUpdate(local_time->tm_mday, local_time->tm_mon + 1, local_time->tm_year + 1900);
 
@@ -201,7 +202,7 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-// called when window is closed
+// Called when window is closed
 void on_window_main_destroy()
 {
     gtk_main_quit();
