@@ -115,7 +115,11 @@ int main(int argc, char *argv[])
         data.state.projectNumber[i] = i;
     }
 
-    gtk_entry_set_max_length(GTK_ENTRY(data.tools.inputEntry), readOneConfigValue("limitCharInput") > 0 ? readOneConfigValue("limitCharInput") : 35);
+    gtk_entry_set_max_length(GTK_ENTRY(data.tools.inputEntry), 35);
+    gtk_entry_set_max_length(GTK_ENTRY(data.tools.dailyCapEntry), 10);
+    gtk_entry_set_max_length(GTK_ENTRY(data.tools.monthlyCapEntry), 10);
+    gtk_entry_set_max_length(GTK_ENTRY(data.tools.expenseEntry), 10);
+    gtk_entry_set_max_length(GTK_ENTRY(data.tools.savedEntry), 10);
 
     int queryResult = allProject(data.conn);
     if (queryResult == -1)

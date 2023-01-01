@@ -126,11 +126,13 @@ void editTaskWindow(GtkWidget *taskEdit, gpointer data)
     GtkWidget *editWindow = gtk_dialog_new_with_buttons(taskName, NULL, GTK_DIALOG_MODAL, "Confirmer", GTK_RESPONSE_OK, "Annuler", GTK_RESPONSE_CANCEL, NULL);
     GtkWidget *descriptionLabel = gtk_label_new("Description de la tâche");
     dataP->tools.descriptionEntry = gtk_entry_new();
+    gtk_entry_set_max_length(GTK_ENTRY(dataP->tools.descriptionEntry), 100);
     gtk_widget_set_size_request(dataP->tools.descriptionEntry, 200, 50);
 
     GtkWidget *dependLabel = gtk_label_new("Groupe de tâches");
     dataP->tools.dependEntry = gtk_entry_new();
     gtk_widget_set_size_request(dataP->tools.dependEntry, 200, 50);
+    gtk_entry_set_max_length(GTK_ENTRY(dataP->tools.dependEntry), 5);
 
     GtkWidget *priorityButton = gtk_button_new();
     int priority = selectPriority(dataP->conn, id);
@@ -543,6 +545,7 @@ void addProjectWindow(GtkWidget *project, gpointer data)
         = gtk_dialog_new_with_buttons("Nouveau projet", NULL, GTK_DIALOG_MODAL, "Confirmer", GTK_RESPONSE_OK, "Annuler", GTK_RESPONSE_CANCEL, NULL);
     GtkWidget *nameLabel = gtk_label_new("Nom du projet");
     dataP->tools.projectNameEntry = gtk_entry_new();
+    gtk_entry_set_max_length(GTK_ENTRY(dataP->tools.projectNameEntry), 20);
     gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(addProjectDialog))), nameLabel);
     gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(addProjectDialog))), dataP->tools.projectNameEntry);
     gtk_widget_show_all(addProjectDialog);
