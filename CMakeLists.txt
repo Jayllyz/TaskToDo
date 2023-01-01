@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(TaskTodo VERSION 0.1.0)
+project(TaskTodo VERSION 1.0.0)
 
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_FLAGS "-Wall")

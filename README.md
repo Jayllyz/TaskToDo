@@ -19,7 +19,7 @@
 
 ## Introduction
 
-Projet de "todolist" réalisé en C avec la librairie GTK+3.2, l'UI est réalisée avec Glade.
+Projet de logiciel de planification de tâches réalisé en C avec la librairie GTK+3.2, l'UI est réalisée avec Glade.
 
 ## Features
 
@@ -38,7 +38,7 @@ Ce projet a été réalisé sur Windows avec un environnement **WSL**, il est do
 
 ```bash
 # Clone the repository and go to the project folder
-cd Todo-list-software
+cd TaskToDo
 
 # Run the script to install the dependencies
 # Read the script before running it
@@ -50,7 +50,7 @@ chmod +x install.sh
 mkdir build && cd build
 cmake ../
 make
-./todolist
+./TaskToDo
 
 # Edit in build/settings/config.txt to change the settings
 # Make sure to set init db to 0 the first time you run the program to insert
