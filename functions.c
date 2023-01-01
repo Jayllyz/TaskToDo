@@ -40,6 +40,28 @@ void clearData(GtkWidget *button, gpointer data)
     gtk_main_quit();
 }
 
+void checkEol(gpointer data, const char *filename)
+{
+    struct Data *dataP = data;
+    FILE *fp;
+    char line[1024];
+    if ((fp = fopen(filename, "r")) == NULL) {
+        g_print(stderr, "Error: unable to open file %s\n", filename);
+        return;
+    }
+
+    while (fgets(line, sizeof(line), fp) != NULL) {
+        if (strchr(line, '\r') != NULL) {
+            dataP->state.crlf = 1;
+            g_print("Looks like config.txt is formatted in CRLF, you should change it to LF for better compatibility\n");
+            break;
+        }
+        if (strchr(line, '\n') != NULL)
+            dataP->state.crlf = 0;
+    }
+    fclose(fp);
+}
+
 void changeTaskStatus(GtkWidget *taskStatus, gpointer data)
 {
     struct Data *dataP = data;
@@ -1451,33 +1473,37 @@ gchar *warningMessage(gpointer data)
     return message;
 }
 
-int newConnectUpdate(int day, int month, int year)
+int newConnectUpdate(char *day, char *month, int year, gpointer data)
 {
+    struct Data *dataP = data;
     FILE *file = fopen("settings/config.txt", "r+");
     char *line = NULL;
     size_t len = 0;
     char insert[4];
     while ((getline(&line, &len, file)) != -1) {
         if (strstr(line, "last connect day") != NULL) {
-            if (day < 10)
-                fseek(file, -3, SEEK_CUR);
-            else
-                fseek(file, -4, SEEK_CUR);
 
-            sprintf(insert, "%d", day);
-            fprintf(file, "%s", insert);
+            if (dataP->state.crlf == 1)
+                fseek(file, -4, SEEK_CUR);
+            else
+                fseek(file, -3, SEEK_CUR);
+
+            fprintf(file, "%s", day);
         }
         if (strstr(line, "last connect month") != NULL) {
-            if (month < 10)
-                fseek(file, -3, SEEK_CUR);
-            else
-                fseek(file, -4, SEEK_CUR);
 
-            sprintf(insert, "%d", month);
-            fprintf(file, "%s", insert);
+            if (dataP->state.crlf == 1)
+                fseek(file, -4, SEEK_CUR);
+            else
+                fseek(file, -3, SEEK_CUR);
+
+            fprintf(file, "%s", month);
         }
         if (strstr(line, "last connect year") != NULL) {
-            fseek(file, -6, SEEK_CUR);
+            if (dataP->state.crlf == 1)
+                fseek(file, -6, SEEK_CUR);
+            else
+                fseek(file, -5, SEEK_CUR);
             sprintf(insert, "%d", year);
             fprintf(file, "%s", insert);
             break;

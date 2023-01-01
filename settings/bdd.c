@@ -81,7 +81,7 @@ int createTables(PGconn *conn)
         size_t len = 0;
         while ((getline(&line, &len, file)) != -1) {
             if (strstr(line, "init db") != NULL) {
-                fseek(file, -3, SEEK_CUR); // -1 + '\n'
+                fseek(file, -2, SEEK_CUR); // -1 + '\n'
                 fprintf(file, "1");
                 break;
             }
