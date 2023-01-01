@@ -46,7 +46,7 @@ void checkEol(gpointer data, const char *filename)
     FILE *fp;
     char line[1024];
     if ((fp = fopen(filename, "r")) == NULL) {
-        g_print(stderr, "Error: unable to open file %s\n", filename);
+        g_print("Error: unable to open file %s\n", filename);
         return;
     }
 
@@ -1482,28 +1482,40 @@ int newConnectUpdate(char *day, char *month, int year, gpointer data)
     char insert[4];
     while ((getline(&line, &len, file)) != -1) {
         if (strstr(line, "last connect day") != NULL) {
-
             if (dataP->state.crlf == 1)
                 fseek(file, -4, SEEK_CUR);
             else
                 fseek(file, -3, SEEK_CUR);
-
-            fprintf(file, "%s", day);
+            if (dataP->state.crlf == 1) {
+                if (atoi(day) < 10) {
+                    fputc('0', file);
+                    fprintf(file, "%d", atoi(day));
+                }
+            }
+            else
+                fprintf(file, "%s", day);
         }
         if (strstr(line, "last connect month") != NULL) {
-
             if (dataP->state.crlf == 1)
                 fseek(file, -4, SEEK_CUR);
             else
                 fseek(file, -3, SEEK_CUR);
 
-            fprintf(file, "%s", month);
+            if (dataP->state.crlf == 1) {
+                if (atoi(month) < 10) {
+                    fputc('0', file);
+                    fprintf(file, "%d", atoi(month));
+                }
+            }
+            else
+                fprintf(file, "%s", month);
         }
         if (strstr(line, "last connect year") != NULL) {
             if (dataP->state.crlf == 1)
                 fseek(file, -6, SEEK_CUR);
             else
                 fseek(file, -5, SEEK_CUR);
+
             sprintf(insert, "%d", year);
             fprintf(file, "%s", insert);
             break;
