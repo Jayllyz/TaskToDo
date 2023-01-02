@@ -83,7 +83,7 @@ int createTables(PGconn *conn, gpointer data)
         while ((getline(&line, &len, file)) != -1) {
             if (strstr(line, "init db") != NULL) {
                 if (dataP->state.crlf == 1)
-                    fseek(file, -3, SEEK_CUR); // -1 + '\n'
+                    fseek(file, -3, SEEK_CUR); // -1 + '\r\n'
                 else
                     fseek(file, -2, SEEK_CUR); // -1 + '\n'
                 fprintf(file, "1");
