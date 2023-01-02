@@ -46,13 +46,18 @@ cd TaskToDo
 chmod +x install.sh
 ./install.sh
 
+# If the script doesn't work, run the following commands
+sudo apt install dos2unix -y
+# and then convert the file to unix format
+dos2unix install.sh
+
 # Compile and run with CMake
 mkdir build && cd build
 cmake ../
 make
 ./TaskToDo
 
-# Edit in build/settings/config.txt to change the settings
+# Edit in settings/config.txt to change the settings
 # Make sure to set init db to 0 the first time you run the program to insert
 # the values in the database
 ```
