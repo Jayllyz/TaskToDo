@@ -15,7 +15,7 @@ void bddExist(PGconn *conn, PGresult *res)
 
 PGconn *connectBdd()
 {
-    PGconn *conn = PQconnectdb("user=projet password=Respons11 dbname=projet-todolist");
+    PGconn *conn = PQconnectdb("user=project password=Respons11 dbname=TaskToDo");
     if (PQstatus(conn) == CONNECTION_BAD) {
         bddExist(conn, NULL);
     }

@@ -1,9 +1,5 @@
 #!/bin/bash
-# Install all the dependencies for the project
-# If the script doesn't work, try to run
-#sudo apt install dos2unix -y
-# and then to convert the file to unix format
-#dos2unix install.sh
+# This script install all the dependencies for the project
 
 # Upgrade the package list
 sudo apt update -y 
@@ -32,8 +28,8 @@ sudo apt install postgresql -y
 sudo apt install libpq-dev -y
 
 # Configure postgresql
-sudo -i -u postgres psql -c "CREATE USER projet WITH PASSWORD 'Respons11';"
-sudo -u postgres createdb projet-todolist --owner projet
+sudo -i -u postgres psql -c "CREATE USER project WITH PASSWORD 'Respons11';"
+sudo -u postgres createdb TaskToDo --owner project
 
 # Change the authentication method to scram-sha-256 in pg_hba.conf because
 # the default method is peer and it doesn't work.

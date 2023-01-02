@@ -9,7 +9,7 @@ void openHome(GtkWidget *button, gpointer data)
 {
     struct Data *dataP = data;
     gtk_widget_show(dataP->tools.window);
-    gtk_widget_destroy(dataP->home.windowHome);
+    gtk_widget_hide(dataP->home.windowHome);
 }
 
 void clearData(GtkWidget *button, gpointer data)
