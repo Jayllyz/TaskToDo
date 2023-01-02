@@ -135,7 +135,7 @@ void updateFinance(gpointer data);
 
 //bdd.c
 PGconn *connectBdd();
-int createTables(PGconn *conn);
+int createTables(PGconn *conn, gpointer data);
 void bddExist(PGconn *conn, PGresult *res);
 int insertTask(PGconn *conn, int id, char *name, char *description, int priority, char *deadline, int status, int dependGroup, const gchar *projectName);
 int insertProject(PGconn *conn, char *name);

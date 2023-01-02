@@ -23,8 +23,9 @@ PGconn *connectBdd()
     return conn;
 }
 
-int createTables(PGconn *conn)
+int createTables(PGconn *conn, gpointer data)
 {
+    struct Data *dataP = data;
     PGresult *res;
 
     res = PQexec(conn, "SET TIME ZONE 'Europe/Paris'");
@@ -81,7 +82,10 @@ int createTables(PGconn *conn)
         size_t len = 0;
         while ((getline(&line, &len, file)) != -1) {
             if (strstr(line, "init db") != NULL) {
-                fseek(file, -2, SEEK_CUR); // -1 + '\n'
+                if (dataP->state.crlf == 1)
+                    fseek(file, -3, SEEK_CUR); // -1 + '\n'
+                else
+                    fseek(file, -2, SEEK_CUR); // -1 + '\n'
                 fprintf(file, "1");
                 break;
             }

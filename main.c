@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
     data.state.crlf = 0;
     checkEol(&data, "settings/config.txt");
     if (readOneConfigValue("init db") == 0)
-        createTables(data.conn);
+        createTables(data.conn, &data);
 
     time_t now = time(NULL);
     struct tm *local_time = localtime(&now);
