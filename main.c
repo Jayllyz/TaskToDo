@@ -27,24 +27,6 @@ int main(int argc, char *argv[])
     if (readOneConfigValue("init db") == 0)
         createTables(data.conn, &data);
 
-    time_t now = time(NULL);
-    struct tm *local_time = localtime(&now);
-    char *day = malloc(sizeof(char) * 2);
-    char *month = malloc(sizeof(char) * 2);
-    sprintf(day, "%02d\n", local_time->tm_mday);
-    sprintf(month, "%02d\n", local_time->tm_mon + 1);
-    int newConnect = 0;
-    int newMonth = 0;
-
-    if (readOneConfigValue("last connect day") != local_time->tm_mday)
-        newConnect = 1;
-    if (readOneConfigValue("last connect month") != local_time->tm_mon + 1) {
-        newConnect = 1;
-        newMonth = 1;
-    }
-    if (readOneConfigValue("last connect year") != local_time->tm_year + 1900)
-        newConnect = 1;
-
     //Home window
     data.home.builderHome = gtk_builder_new();
     gtk_builder_add_from_file(data.home.builderHome, "data/window_home.glade", NULL);
@@ -53,7 +35,7 @@ int main(int argc, char *argv[])
     data.home.clearData = GTK_BUTTON(gtk_builder_get_object(data.home.builderHome, "clearData"));
     gtk_widget_show(data.home.windowHome);
 
-    g_signal_connect(data.home.openHome, "clicked", G_CALLBACK(openHome), &data);
+    g_signal_connect(data.home.openHome, "clicked", G_CALLBACK(openApp), &data);
     g_signal_connect(data.home.clearData, "clicked", G_CALLBACK(clearData), &data);
 
     //Main window
@@ -153,14 +135,6 @@ int main(int argc, char *argv[])
     }
     data.state.repopulatedTask = 1;
 
-    //Update finance data
-    if (newConnect == 1) {
-        updateExpense(data.conn, 2, 0);
-        if (newMonth == 1)
-            updateExpense(data.conn, 3, 0);
-    }
-    updateFinance(&data);
-
     gtk_notebook_set_current_page(data.tools.notebook, 0);
 
     g_signal_connect(data.tools.addTask, "clicked", G_CALLBACK(addTasks), &data);
@@ -194,21 +168,6 @@ int main(int argc, char *argv[])
     gtk_builder_connect_signals(data.tools.builder, NULL);
 
     g_object_unref(data.tools.builder);
-
-    //Warning message one time per day
-    if (newConnect == 1) {
-
-        newConnectUpdate(day, month, local_time->tm_year + 1900, &data);
-
-        gchar *message = malloc(sizeof(char) * strlen("Vous avez ??? tâches urgentes à réaliser et ??? tâches en retard"));
-        message = warningMessage(&data);
-        if (strcmp(message, "empty") != 0) {
-            GtkDialog *dialog = GTK_DIALOG(gtk_message_dialog_new(GTK_WINDOW(data.tools.window), GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "%s", message));
-            gtk_dialog_run(dialog);
-            gtk_widget_destroy(GTK_WIDGET(dialog));
-        }
-        free(message);
-    }
 
     gtk_main();
 

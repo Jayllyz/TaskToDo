@@ -23,9 +23,8 @@ PGconn *connectBdd()
     return conn;
 }
 
-int createTables(PGconn *conn, gpointer data)
+int createTables(PGconn *conn, struct Data *data)
 {
-    struct Data *dataP = data;
     PGresult *res;
 
     res = PQexec(conn, "SET TIME ZONE 'Europe/Paris'");
@@ -82,7 +81,7 @@ int createTables(PGconn *conn, gpointer data)
         size_t len = 0;
         while ((getline(&line, &len, file)) != -1) {
             if (strstr(line, "init db") != NULL) {
-                if (dataP->state.crlf == 1)
+                if (data->state.crlf == 1)
                     fseek(file, -3, SEEK_CUR); // -1 + '\r\n'
                 else
                     fseek(file, -2, SEEK_CUR); // -1 + '\n'
@@ -459,7 +458,7 @@ int updatePriority(PGconn *conn, int priority, int id)
     return 0;
 }
 
-int updateStatus(PGconn *conn, int status, int id, gpointer data)
+int updateStatus(PGconn *conn, int status, int id)
 {
     PGresult *res;
     char *query = malloc(sizeof(char) * 150);
@@ -497,7 +496,7 @@ int updateStatus(PGconn *conn, int status, int id, gpointer data)
     return 0;
 }
 
-int updateDeadline(PGconn *conn, int id, gchar *deadline, gpointer data)
+int updateDeadline(PGconn *conn, int id, gchar *deadline)
 {
     PGresult *res;
     char *query = malloc(sizeof(char) * 150);

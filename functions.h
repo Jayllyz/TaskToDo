@@ -101,41 +101,41 @@ struct Data {
 };
 
 //function.c
-void openHome(GtkWidget *button, gpointer data);
-void clearData(GtkWidget *button, gpointer data);
-void checkEol(gpointer data, const char *filename);
-void changeTaskStatus(GtkWidget *taskStatus, gpointer data);
-void changeTaskPriority(GtkWidget *taskPriority, gpointer data);
-void editTaskWindow(GtkWidget *taskEdit, gpointer data);
-void editTaskDB(GtkDialog *window, gint clicked, gpointer entry);
-void addTasks(GtkWidget *task, gpointer data, int presentTask, char *projectName);
-void deleteTask(GtkWidget *taskDelete, gpointer data);
-void deleteProject(GtkWidget *projectDelete, gpointer data);
+void openApp(GtkWidget *button, struct Data *data);
+void clearData(GtkWidget *button, struct Data *data);
+void checkEol(struct Data *data, const char *filename);
+void changeTaskStatus(GtkWidget *taskStatus, struct Data *data);
+void changeTaskPriority(GtkWidget *taskPriority, struct Data *data);
+void editTaskWindow(GtkWidget *taskEdit, struct Data *data);
+void editTaskDB(GtkDialog *window, gint clicked, struct Data *data);
+void addTasks(GtkWidget *task, struct Data *data, int presentTask, char *projectName);
+void deleteTask(GtkWidget *taskDelete, struct Data *data);
+void deleteProject(GtkWidget *projectDelete, struct Data *data);
 gchar *get_text_of_entry(GtkWidget *testEntry);
 int readOneConfigValue(char *propName);
 int projectExist(PGconn *conn, const gchar *name);
-void addProjectWindow(GtkWidget *project, gpointer data);
-void addProject(GtkWidget *projet, gint clicked, gpointer data, int presentProject);
-void changeDeadlineWindow(GtkWidget *deadline, gpointer data);
-void changeDeadline(GtkWidget *deadline, gint clicked, gpointer data);
-void addImportantTask(gpointer data, int id);
-void addMinorTask(gpointer data, int id);
-void addLateTask(gpointer data, int id);
-void addPlannedTask(gpointer data, int id);
-void scanForIdToDestroy(gpointer data, int id);
-void scanForIdToDestroySpecific(gpointer data, int idToDestroy, guint project);
-void scanForIdForUpdate(gpointer data, int idToSeek);
-void updateTask(gpointer data, GtkWidget *task, int id);
+void addProjectWindow(GtkWidget *project, struct Data *data);
+void addProject(GtkWidget *projet, gint clicked, struct Data *data, int presentProject);
+void changeDeadlineWindow(GtkWidget *deadline, struct Data *data);
+void changeDeadline(GtkWidget *deadline, gint clicked, struct Data *data);
+void addImportantTask(struct Data *data, int id);
+void addMinorTask(struct Data *data, int id);
+void addLateTask(struct Data *data, int id);
+void addPlannedTask(struct Data *data, int id);
+void scanForIdToDestroy(struct Data *data, int id);
+void scanForIdToDestroySpecific(struct Data *data, int idToDestroy, guint project);
+void scanForIdForUpdate(struct Data *data, int idToSeek);
+void updateTask(struct Data *data, GtkWidget *task, int id);
 void curlCalendar();
-void calendarDialog(GtkButton *calendar, gpointer data);
-gchar *warningMessage(gpointer data);
-int newConnectUpdate(char *day, char *month, int year, gpointer data);
-void financeButton(GtkButton *buttonPressed, gpointer data);
-void updateFinance(gpointer data);
+void calendarDialog(GtkButton *calendar, struct Data *data);
+gchar *warningMessage(struct Data *data);
+int newConnectUpdate(char *day, char *month, int year, struct Data *data);
+void financeButton(GtkButton *buttonPressed, struct Data *data);
+void updateFinance(struct Data *data);
 
 //bdd.c
 PGconn *connectBdd();
-int createTables(PGconn *conn, gpointer data);
+int createTables(PGconn *conn, struct Data *data);
 void bddExist(PGconn *conn, PGresult *res);
 int insertTask(PGconn *conn, int id, char *name, char *description, int priority, char *deadline, int status, int dependGroup, const gchar *projectName);
 int insertProject(PGconn *conn, char *name);
@@ -157,8 +157,8 @@ char *selectProjectName(PGconn *conn, int id);
 char *selectDeadline(PGconn *conn, int id);
 int updateDescription(PGconn *conn, const gchar *description, int id);
 int updatePriority(PGconn *conn, int priority, int id);
-int updateStatus(PGconn *conn, int status, int id, gpointer data);
-int updateDeadline(PGconn *conn, int id, gchar *deadline, gpointer data);
+int updateStatus(PGconn *conn, int status, int id);
+int updateDeadline(PGconn *conn, int id, gchar *deadline);
 int updateExpense(PGconn *conn, int typeOfExpense, int amount);
 int updateCap(PGconn *conn, int typeOfCap, int amount);
 int selectExpense(PGconn *conn, int typeOfExpense);
@@ -170,11 +170,11 @@ int selectIdFromDependGroup(PGconn *conn, int row, int dependGroup, char *projec
 int refreshTaskInGroup(PGconn *conn, int id, int dependGroup);
 
 //calculator.c
-void btnClicked(GtkButton *button, gpointer data);
-void addDigit(const char *digit, gpointer data);
-void addOperator(const char *operator, gpointer data);
-void calculate(gpointer data);
-void clearCalc(gpointer data);
-void showResult(GtkLabel *outputLabel, gpointer data);
+void btnClicked(GtkButton *button, struct Data *data);
+void addDigit(const char *digit, struct Data *data);
+void addOperator(const char *operator, struct Data * data);
+void calculate(struct Data *data);
+void clearCalc(struct Data *data);
+void showResult(GtkLabel *outputLabel, struct Data *data);
 
 #endif
