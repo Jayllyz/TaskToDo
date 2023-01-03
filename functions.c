@@ -28,6 +28,42 @@ void openApp(GtkWidget *button, struct Data *data)
     if (readOneConfigValue("last connect year") != local_time->tm_year + 1900)
         newConnect = 1;
 
+    //Max project and tasks
+    for (int i = 0; i < data->state.maxTaskTotal; i++) {
+        data->tools.task[i] = gtk_label_new("");
+        data->state.taskNumber[i] = i;
+    }
+    for (int i = 0; i < data->state.maxProject; i++) {
+        data->state.projectNumber[i] = i;
+    }
+
+    //Projects
+    int queryResult = allProject(data->conn);
+    if (queryResult == -1)
+        g_print("Error: can't collect all projects\n");
+
+    for (int i = 0; i < queryResult; i++) {
+        addProject(GTK_WIDGET(data->tools.addProject), GTK_RESPONSE_OK, data, i);
+    }
+    data->state.repopulatedProject = 1;
+
+    //Tasks
+    queryResult = allTask(data->conn);
+    if (queryResult == -1)
+        g_print("Error: can't collect all tasks\n");
+
+    for (int i = 0; i < queryResult; i++) {
+        int taskToAdd = selectTaskId(data->conn, i);
+        data->state.taskNumber[taskToAdd] = -1;
+        char *project = selectProjectName(data->conn, taskToAdd);
+        addTasks(GTK_WIDGET(data->tools.addTask), data, taskToAdd, project);
+        addImportantTask(data, taskToAdd);
+        addMinorTask(data, taskToAdd);
+        addLateTask(data, taskToAdd);
+        addPlannedTask(data, taskToAdd);
+    }
+    data->state.repopulatedTask = 1;
+
     //Update finance data
     if (newConnect == 1) {
         updateExpense(data->conn, 2, 0);
