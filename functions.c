@@ -12,10 +12,10 @@ void openApp(GtkWidget *button, struct Data *data)
 
     time_t now = time(NULL);
     struct tm *local_time = localtime(&now);
-    char *day = malloc(sizeof(char) * 2);
-    char *month = malloc(sizeof(char) * 2);
-    sprintf(day, "%02d\n", local_time->tm_mday);
-    sprintf(month, "%02d\n", local_time->tm_mon + 1);
+    char *day = malloc(sizeof(char) * 3);
+    char *month = malloc(sizeof(char) * 3);
+    sprintf(day, "%02u", local_time->tm_mday);
+    sprintf(month, "%02u", local_time->tm_mon + 1);
     int newConnect = 0;
     int newMonth = 0;
 
