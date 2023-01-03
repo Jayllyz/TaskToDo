@@ -378,6 +378,7 @@ void deleteProject(GtkWidget *projectDelete, struct Data *data)
 
 void addTasks(GtkWidget *task, struct Data *data, int presentTask, char *presentProjectName)
 {
+    g_print("Avant: %s\n", presentProjectName);
     time_t now = time(NULL);
     struct tm *local_time = localtime(&now);
     if (readOneConfigValue("set deadline day") != -1) {
@@ -392,8 +393,11 @@ void addTasks(GtkWidget *task, struct Data *data, int presentTask, char *present
     snprintf(deadlineDate, 20, "%u-%u-%u", local_time->tm_year + 1900, local_time->tm_mon + 1, local_time->tm_mday);
 
     gchar *getText;
-    char *projectName = malloc(strlen(presentProjectName) + 1 * sizeof(char));
+    char *projectName = NULL;
+    g_print("Avant: %s\n", presentProjectName);
+    projectName = malloc((strlen(presentProjectName) + 1) * sizeof(char));
     strcpy(projectName, presentProjectName);
+    g_print("Apres: %s\n", projectName);
     if (data->state.repopulatedTask == 0) {
 
         gtk_notebook_set_current_page(data->tools.notebook, 0);
