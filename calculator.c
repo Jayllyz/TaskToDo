@@ -2,138 +2,132 @@
 #include <gtk/gtk.h>
 #include <stdio.h>
 
-void btnClicked(GtkButton *button, gpointer data)
+void btnClicked(GtkButton *button, struct Data *data)
 {
-    struct Data *dataP = data;
     const char *text = gtk_button_get_label(button);
-    if (dataP->calc.resultB == 1) {
-        dataP->calc.firstNumber = (int)dataP->calc.result > 0 ? (int)dataP->calc.result : (int)(dataP->calc.result - 1) + 1;
-        dataP->calc.resultB = 0;
-        dataP->calc.firstB = 1;
-        dataP->calc.operator= '0';
-        dataP->calc.secondNumber = 0;
+    if (data->calc.resultB == 1) {
+        data->calc.firstNumber = (int)data->calc.result > 0 ? (int)data->calc.result : (int)(data->calc.result - 1) + 1;
+        data->calc.resultB = 0;
+        data->calc.firstB = 1;
+        data->calc.operator= '0';
+        data->calc.secondNumber = 0;
     }
     if (strcmp(text, "C") == 0) {
-        clearCalc(dataP);
-        gtk_label_set_text(dataP->calc.txtResult, "");
+        clearCalc(data);
+        gtk_label_set_text(data->calc.txtResult, "");
     }
     else if (strcmp(text, "=") == 0) {
-        calculate(dataP);
-        gtk_label_set_text(dataP->calc.txtResult, "");
-        showResult(dataP->calc.txtResult, dataP);
+        calculate(data);
+        gtk_label_set_text(data->calc.txtResult, "");
+        showResult(data->calc.txtResult, data);
     }
     else if (strcmp(text, "+") == 0 || strcmp(text, "-") == 0 || strcmp(text, "*") == 0 || strcmp(text, "/") == 0) {
-        if (dataP->calc.firstB == 1)
-            addOperator(text, dataP);
+        if (data->calc.firstB == 1)
+            addOperator(text, data);
     }
     else {
-        if (dataP->calc.resultB == 1)
-            clearCalc(dataP);
+        if (data->calc.resultB == 1)
+            clearCalc(data);
 
-        addDigit(text, dataP);
+        addDigit(text, data);
     }
 }
 
-void addDigit(const char *digit, gpointer data)
+void addDigit(const char *digit, struct Data *data)
 {
     int temp = atoi(digit);
     int i = 0;
-    struct Data *dataP = data;
-    if (dataP->calc.operator== '0') {
 
-        if (dataP->calc.firstB == 1)
-            dataP->calc.firstNumber = dataP->calc.firstNumber * 10 + atoi(digit);
+    if (data->calc.operator== '0') {
+
+        if (data->calc.firstB == 1)
+            data->calc.firstNumber = data->calc.firstNumber * 10 + atoi(digit);
         else
-            dataP->calc.firstNumber = atoi(digit);
+            data->calc.firstNumber = atoi(digit);
 
         while (temp > 0) {
             temp /= 10;
             ++i;
         }
         char *first = malloc(i + 1 * sizeof(char));
-        dataP->calc.firstB = 1;
-        sprintf(first, "%d", dataP->calc.firstNumber);
-        gtk_label_set_text(dataP->calc.txtResult, first);
+        data->calc.firstB = 1;
+        sprintf(first, "%d", data->calc.firstNumber);
+        gtk_label_set_text(data->calc.txtResult, first);
     }
-    if (dataP->calc.operator!= '0' && dataP->calc.firstNumber != 0) {
+    if (data->calc.operator!= '0' && data->calc.firstNumber != 0) {
 
-        if (dataP->calc.secondNumber != 0) {
-            char *label = (char *)gtk_label_get_text(dataP->calc.txtResult);
+        if (data->calc.secondNumber != 0) {
+            char *label = (char *)gtk_label_get_text(data->calc.txtResult);
             char *newLabel = malloc(strlen(label) + strlen(digit) + 1);
             label[strlen(label) - 1] = '\0';
             strcpy(newLabel, label);
-            dataP->calc.secondNumber = (dataP->calc.secondNumber * 10) + atoi(digit);
+            data->calc.secondNumber = (data->calc.secondNumber * 10) + atoi(digit);
         }
         else
-            dataP->calc.secondNumber = atoi(digit);
+            data->calc.secondNumber = atoi(digit);
 
         char *second = malloc(i + 1 * sizeof(char));
-        sprintf(second, "%d", dataP->calc.secondNumber);
-        char *label = (char *)gtk_label_get_text(dataP->calc.txtResult);
+        sprintf(second, "%d", data->calc.secondNumber);
+        char *label = (char *)gtk_label_get_text(data->calc.txtResult);
         char *newLabel = malloc(strlen(label) + strlen(second) + 1);
         strcpy(newLabel, label);
         strcat(newLabel, second);
-        gtk_label_set_text(dataP->calc.txtResult, newLabel);
+        gtk_label_set_text(data->calc.txtResult, newLabel);
     }
 }
 
-void addOperator(const char *operator, gpointer data)
+void addOperator(const char *operator, struct Data * data)
 {
-    struct Data *dataP = data;
-    dataP->calc.operator=(char) operator[0];
+    data->calc.operator=(char) operator[0];
     char operatorString[2];
-    sprintf(operatorString, "%c", dataP->calc.operator);
-    char *label = (char *)gtk_label_get_text(dataP->calc.txtResult);
+    sprintf(operatorString, "%c", data->calc.operator);
+    char *label = (char *)gtk_label_get_text(data->calc.txtResult);
     char *newLabel = malloc(strlen(label) + strlen(operatorString) + 1);
     strcpy(newLabel, label);
     strcat(newLabel, operatorString);
-    gtk_label_set_text(dataP->calc.txtResult, newLabel);
+    gtk_label_set_text(data->calc.txtResult, newLabel);
 }
 
-void calculate(gpointer data)
+void calculate(struct Data *data)
 {
-    struct Data *dataP = data;
-    switch (dataP->calc.operator) {
+    switch (data->calc.operator) {
     case '+':
-        dataP->calc.result = dataP->calc.firstNumber + dataP->calc.secondNumber;
-        dataP->calc.resultB = 1;
+        data->calc.result = data->calc.firstNumber + data->calc.secondNumber;
+        data->calc.resultB = 1;
         break;
     case '-':
-        dataP->calc.result = dataP->calc.firstNumber - dataP->calc.secondNumber;
-        dataP->calc.resultB = 1;
+        data->calc.result = data->calc.firstNumber - data->calc.secondNumber;
+        data->calc.resultB = 1;
         break;
     case '*':
-        dataP->calc.result = dataP->calc.firstNumber * dataP->calc.secondNumber;
-        dataP->calc.resultB = 1;
+        data->calc.result = data->calc.firstNumber * data->calc.secondNumber;
+        data->calc.resultB = 1;
         break;
     case '/':
-        dataP->calc.result = (double)dataP->calc.firstNumber / (double)dataP->calc.secondNumber;
-        dataP->calc.resultB = 1;
+        data->calc.result = (double)data->calc.firstNumber / (double)data->calc.secondNumber;
+        data->calc.resultB = 1;
         break;
     default:
-        dataP->calc.result = 0;
+        data->calc.result = 0;
         break;
     }
 }
 
-void clearCalc(gpointer data)
+void clearCalc(struct Data *data)
 {
-    struct Data *dataP = data;
-
-    dataP->calc.firstNumber = 0;
-    dataP->calc.firstB = 0;
-    dataP->calc.secondNumber = 0;
-    dataP->calc.result = 0;
-    dataP->calc.operator= '0';
-    dataP->calc.resultB = 0;
+    data->calc.firstNumber = 0;
+    data->calc.firstB = 0;
+    data->calc.secondNumber = 0;
+    data->calc.result = 0;
+    data->calc.operator= '0';
+    data->calc.resultB = 0;
 }
 
-void showResult(GtkLabel *outputLabel, gpointer data)
+void showResult(GtkLabel *outputLabel, struct Data *data)
 {
-    struct Data *dataP = data;
-    double tempResult = dataP->calc.result;
-    int tempFirst = dataP->calc.firstNumber;
-    int tempSecond = dataP->calc.secondNumber;
+    double tempResult = data->calc.result;
+    int tempFirst = data->calc.firstNumber;
+    int tempSecond = data->calc.secondNumber;
     int iR = 0;
     int iF = 0;
     int iS = 0;
@@ -149,22 +143,22 @@ void showResult(GtkLabel *outputLabel, gpointer data)
         tempSecond /= 10;
         ++iS;
     }
-    if (dataP->calc.firstNumber == 0 && dataP->calc.secondNumber == 0 && dataP->calc.result == 0 && dataP->calc.resultB == 0)
+    if (data->calc.firstNumber == 0 && data->calc.secondNumber == 0 && data->calc.result == 0 && data->calc.resultB == 0)
         return;
-    if (dataP->calc.result != 0 || dataP->calc.resultB == 1) {
+    if (data->calc.result != 0 || data->calc.resultB == 1) {
         char *result = malloc(iR + 1 * sizeof(char));
-        sprintf(result, "%.2lf", dataP->calc.result);
+        sprintf(result, "%.2lf", data->calc.result);
         gtk_label_set_text(outputLabel, result);
     }
     else {
         char *first = malloc(iF + 1 * sizeof(char));
         char operator[2];
         char *second = malloc(iS + 1 * sizeof(char));
-        sprintf(first, "%d", dataP->calc.firstNumber);
+        sprintf(first, "%d", data->calc.firstNumber);
         gtk_label_set_text(outputLabel, first);
-        sprintf(operator, "%c", dataP->calc.operator);
+        sprintf(operator, "%c", data->calc.operator);
         gtk_label_set_text(outputLabel, operator);
-        sprintf(second, "%d", dataP->calc.secondNumber);
+        sprintf(second, "%d", data->calc.secondNumber);
         gtk_label_set_text(outputLabel, second);
     }
 }
