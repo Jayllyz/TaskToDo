@@ -93,6 +93,7 @@ int createTables(PGconn *conn, struct Data *data)
     }
     else {
         g_print("Impossible d'ouvrir le fichier de configuration");
+        fclose(file);
     }
     return 0;
 }
@@ -394,7 +395,7 @@ char *selectProjectName(PGconn *conn, int id)
 {
     PGresult *res;
     char *query = malloc(sizeof(char) * 100);
-    sprintf(query, "SELECT projectName FROM Task WHERE id = '%d'", id);
+    sprintf(query, "SELECT ProjectName FROM Task WHERE id = '%d'", id);
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
         g_print("Error: Can't get the task project name");

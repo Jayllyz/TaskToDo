@@ -12,10 +12,10 @@ void openApp(GtkWidget *button, struct Data *data)
 
     time_t now = time(NULL);
     struct tm *local_time = localtime(&now);
-    char *day = malloc(sizeof(char) * 2);
-    char *month = malloc(sizeof(char) * 2);
-    sprintf(day, "%02d\n", local_time->tm_mday);
-    sprintf(month, "%02d\n", local_time->tm_mon + 1);
+    char *day = malloc(sizeof(char) * 3);
+    char *month = malloc(sizeof(char) * 3);
+    sprintf(day, "%02u", local_time->tm_mday);
+    sprintf(month, "%02u", local_time->tm_mon + 1);
     int newConnect = 0;
     int newMonth = 0;
 
@@ -378,6 +378,10 @@ void deleteProject(GtkWidget *projectDelete, struct Data *data)
 
 void addTasks(GtkWidget *task, struct Data *data, int presentTask, char *presentProjectName)
 {
+    char *projectName = NULL;
+    projectName = malloc((strlen(presentProjectName) + 1) * sizeof(char));
+    strcpy(projectName, presentProjectName);
+
     time_t now = time(NULL);
     struct tm *local_time = localtime(&now);
     if (readOneConfigValue("set deadline day") != -1) {
@@ -392,8 +396,6 @@ void addTasks(GtkWidget *task, struct Data *data, int presentTask, char *present
     snprintf(deadlineDate, 20, "%u-%u-%u", local_time->tm_year + 1900, local_time->tm_mon + 1, local_time->tm_mday);
 
     gchar *getText;
-    char *projectName = malloc(strlen(presentProjectName) + 1 * sizeof(char));
-    strcpy(projectName, presentProjectName);
     if (data->state.repopulatedTask == 0) {
 
         gtk_notebook_set_current_page(data->tools.notebook, 0);
@@ -576,9 +578,11 @@ int readOneConfigValue(char *propName)
             while (line[i] != ':') {
                 i++;
             }
+            fclose(file);
             return atoi(&line[i + 1]);
         }
     }
+    fclose(file);
     return -1;
 }
 
