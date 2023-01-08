@@ -71,7 +71,7 @@ struct Calculator {
     int secondNumber;
     double result;
     int resultB;
-    char operator;
+    char op;
 
     GtkButton *clear;
     GtkButton *plus;
@@ -144,7 +144,6 @@ int deleteProjectDB(PGconn *conn, const gchar *name);
 int deleteAllTaskFromProject(PGconn *conn, const gchar *name);
 int allTask(PGconn *conn);
 int allProject(PGconn *conn);
-int allImportantTask(PGconn *conn);
 int allUrgentTask(PGconn *conn);
 int allLateTask(PGconn *conn);
 char *selectTask(PGconn *conn, int row);
@@ -172,7 +171,7 @@ int refreshTaskInGroup(PGconn *conn, int id, int dependGroup);
 //calculator.c
 void btnClicked(GtkButton *button, struct Data *data);
 void addDigit(const char *digit, struct Data *data);
-void addOperator(const char *operator, struct Data * data);
+void addOperator(const char *op, struct Data *data);
 void calculate(struct Data *data);
 void clearCalc(struct Data *data);
 void showResult(GtkLabel *outputLabel, struct Data *data);

@@ -3,6 +3,9 @@ project(TaskTodo VERSION 1.0.0)
 
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_FLAGS "-Wall")
+set(CMAKE_C_FLAGS "-Wextra")
+set(CMAKE_C_FLAGS "-Werror")
+
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
