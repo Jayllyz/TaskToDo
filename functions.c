@@ -14,8 +14,8 @@ void openApp(GtkWidget *button, struct Data *data)
     struct tm *local_time = localtime(&now);
     char *day = malloc(sizeof(char) * 3);
     char *month = malloc(sizeof(char) * 3);
-    sprintf(day, "%02u", local_time->tm_mday);
-    sprintf(month, "%02u", local_time->tm_mon + 1);
+    snprintf(day, 3, "%02u", local_time->tm_mday);
+    snprintf(month, 3, "%02u", local_time->tm_mon + 1);
     int newConnect = 0;
     int newMonth = 0;
 
@@ -77,8 +77,7 @@ void openApp(GtkWidget *button, struct Data *data)
 
         newConnectUpdate(day, month, local_time->tm_year + 1900, data);
 
-        gchar *message = malloc(sizeof(char) * strlen("Vous avez ??? tâches urgentes à réaliser et ??? tâches en retard"));
-        message = warningMessage(data);
+        gchar *message = warningMessage(data);
         if (strcmp(message, "empty") != 0) {
             GtkDialog *dialog = GTK_DIALOG(gtk_message_dialog_new(GTK_WINDOW(data->tools.window), GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "%s", message));
             gtk_dialog_run(dialog);
@@ -112,27 +111,27 @@ void clearData(GtkWidget *button, struct Data *data)
     PQclear(res);
 
     g_print("Data cleared!\n");
-    gtk_main_quit();
 }
 
 void checkEol(struct Data *data, const char *filename)
 {
     FILE *fp;
-    char line[1024];
+    char *line = malloc(1000 * sizeof(char));
     if ((fp = fopen(filename, "r")) == NULL) {
         g_print("Error: unable to open file %s\n", filename);
+        free(line);
         return;
     }
 
     while (fgets(line, sizeof(line), fp) != NULL) {
         if (strchr(line, '\r') != NULL) {
             data->state.crlf = 1;
-            g_print("Looks like config.txt is formatted in CRLF, you should change it to LF for better compatibility\n");
             break;
         }
         if (strchr(line, '\n') != NULL)
             data->state.crlf = 0;
     }
+    free(line);
     fclose(fp);
 }
 
@@ -173,12 +172,13 @@ void changeTaskStatus(GtkWidget *taskStatus, struct Data *data)
     }
 
     //Recherche de tâches du groupe de dépendance
-    char *projectName = malloc(sizeof(char) * strlen(selectProjectName(data->conn, id) + 1));
-    sprintf(projectName, "%s", selectProjectName(data->conn, id));
+    size_t size = strlen(selectProjectName(data->conn, id)) + 1;
+    char *projectName = malloc(size);
+    snprintf(projectName, size, "%s", selectProjectName(data->conn, id));
+
     int dependGroup = selectDependGroup(data->conn, id);
     if (dependGroup != -1) {
         int amountOfDependance = AllDependGroup(data->conn, id, dependGroup);
-
         for (int i = 0; i < amountOfDependance; i++) {
             int dependanceId = selectIdFromDependGroup(data->conn, i, dependGroup, projectName);
             scanForIdForUpdate(data, dependanceId);
@@ -249,8 +249,8 @@ void editTaskWindow(GtkWidget *taskEdit, struct Data *data)
     gtk_entry_set_text(GTK_ENTRY(data->tools.descriptionEntry), selectDescription(data->conn, id));
 
     int groupNumber = selectDependGroup(data->conn, id);
-    char interDepend[3];
-    sprintf(interDepend, "%d", selectDependGroup(data->conn, id));
+    char *interDepend = malloc(sizeof(char) * 3);
+    snprintf(interDepend, 3, "%d", selectDependGroup(data->conn, id));
     const gchar *dependGroup = interDepend;
     if (groupNumber == -1) {
         gtk_entry_set_text(GTK_ENTRY(data->tools.dependEntry), "");
@@ -465,11 +465,17 @@ void addTasks(GtkWidget *task, struct Data *data, int presentTask, char *present
     getText = malloc(sizeof(gchar) * strlen(get_text_of_entry(entry)) + 1);
     strcpy(getText, get_text_of_entry(entry));
 
-    if (strcmp(getText, "") == 0 && data->state.repopulatedTask == 1)
+    if (strcmp(getText, "") == 0 && data->state.repopulatedTask == 1) {
+        free(getText);
+        free(projectName);
         return;
+    }
 
-    if (numberOfTask >= data->state.maxTaskPerProject)
+    if (numberOfTask >= data->state.maxTaskPerProject) {
+        free(getText);
+        free(projectName);
         return;
+    }
 
     //Attribution de l'id
     if (data->state.repopulatedTask == 1) {
@@ -553,7 +559,7 @@ void addTasks(GtkWidget *task, struct Data *data, int presentTask, char *present
     g_signal_connect(data->tools.taskDelete[data->state.i], "clicked", G_CALLBACK(deleteTask), data);
 
     char numberToTransfer[3];
-    sprintf(numberToTransfer, "%d", data->state.i);
+    snprintf(numberToTransfer, sizeof(numberToTransfer), "%d", data->state.i);
     GtkWidget *taskNumberMarker = gtk_button_new_with_label(numberToTransfer);
     gtk_box_pack_start(GTK_BOX(data->tools.boxTask[data->state.i]), taskNumberMarker, FALSE, FALSE, 0);
 
@@ -651,7 +657,7 @@ void addProject(GtkWidget *projet, gint clicked, struct Data *data, int presentP
                 g_print("Error: projectName is null\n");
                 return;
             }
-            if (projectExist(data->conn, projectName) == 1 || projectName == NULL) {
+            if (projectExist(data->conn, projectName) == 1) {
                 gtk_widget_destroy(projet);
                 GtkDialog *dialog
                     = GTK_DIALOG(gtk_message_dialog_new(GTK_WINDOW(data->tools.window), GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "Ce projet existe déjà"));
@@ -685,7 +691,7 @@ void addProject(GtkWidget *projet, gint clicked, struct Data *data, int presentP
 
         GtkWidget *titleButton = gtk_button_new_with_label("X");
         char numberToTransfer[3];
-        sprintf(numberToTransfer, "%d", data->state.i);
+        snprintf(numberToTransfer, sizeof(numberToTransfer), "%d", data->state.i);
         GtkWidget *projectNumberMarker = gtk_button_new_with_label(numberToTransfer);
 
         GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
@@ -793,7 +799,7 @@ void changeDeadline(GtkWidget *deadline, gint clicked, struct Data *data)
 
         gtk_calendar_get_date(GTK_CALENDAR(calendar), &year, &month, &day);
         gchar *changedDeadline = malloc(11 * sizeof(gchar));
-        sprintf(changedDeadline, "%u-%u-%u", year, month + 1, day);
+        snprintf(changedDeadline, 11, "%u-%u-%u", year, month + 1, day);
         updateDeadline(data->conn, data->state.inEditingId, changedDeadline);
         gtk_button_set_label(GTK_BUTTON(data->tools.taskDeadline[data->state.inEditingId]), changedDeadline);
         addLateTask(data, data->state.inEditingId);
@@ -801,7 +807,7 @@ void changeDeadline(GtkWidget *deadline, gint clicked, struct Data *data)
         //Recherche de tâches du groupe de dépendance
 
         char *projectName = malloc(sizeof(char) * 1000);
-        sprintf(projectName, "%s", selectProjectName(data->conn, data->state.inEditingId));
+        snprintf(projectName, 1000, "%s", selectProjectName(data->conn, data->state.inEditingId));
         int dependGroup = selectDependGroup(data->conn, data->state.inEditingId);
         if (dependGroup != -1) {
             int amountOfDependance = AllDependGroup(data->conn, data->state.inEditingId, dependGroup);
@@ -900,7 +906,7 @@ void addImportantTask(struct Data *data, int id)
     g_signal_connect(taskDelete, "clicked", G_CALLBACK(deleteTask), data);
 
     char numberToTransfer[3];
-    sprintf(numberToTransfer, "%d", id);
+    snprintf(numberToTransfer, sizeof(numberToTransfer), "%d", id);
     GtkWidget *taskNumberMarker = gtk_button_new_with_label(numberToTransfer);
     gtk_box_pack_start(GTK_BOX(boxTask), taskNumberMarker, FALSE, FALSE, 0);
 
@@ -1007,7 +1013,7 @@ void addMinorTask(struct Data *data, int id)
     g_signal_connect(taskDelete, "clicked", G_CALLBACK(deleteTask), data);
 
     char numberToTransfer[3];
-    sprintf(numberToTransfer, "%d", id);
+    snprintf(numberToTransfer, sizeof(numberToTransfer), "%d", id);
     GtkWidget *taskNumberMarker = gtk_button_new_with_label(numberToTransfer);
     gtk_box_pack_start(GTK_BOX(boxTask), taskNumberMarker, FALSE, FALSE, 0);
 
@@ -1035,7 +1041,6 @@ void addLateTask(struct Data *data, int id)
 
     time_t now = time(NULL);
     struct tm *local_time = localtime(&now);
-    local_time = localtime(&now);
 
     gtk_notebook_set_current_page(data->tools.notebook, 3);
 
@@ -1135,7 +1140,7 @@ void addLateTask(struct Data *data, int id)
     g_signal_connect(taskDelete, "clicked", G_CALLBACK(deleteTask), data);
 
     char numberToTransfer[3];
-    sprintf(numberToTransfer, "%d", id);
+    snprintf(numberToTransfer, sizeof(numberToTransfer), "%d", id);
     GtkWidget *taskNumberMarker = gtk_button_new_with_label(numberToTransfer);
     gtk_box_pack_start(GTK_BOX(boxTask), taskNumberMarker, FALSE, FALSE, 0);
 
@@ -1163,7 +1168,6 @@ void addPlannedTask(struct Data *data, int id)
 
     time_t now = time(NULL);
     struct tm *local_time = localtime(&now);
-    local_time = localtime(&now);
 
     gtk_notebook_set_current_page(data->tools.notebook, 4);
 
@@ -1263,7 +1267,7 @@ void addPlannedTask(struct Data *data, int id)
     g_signal_connect(taskDelete, "clicked", G_CALLBACK(deleteTask), data);
 
     char numberToTransfer[3];
-    sprintf(numberToTransfer, "%d", id);
+    snprintf(numberToTransfer, sizeof(numberToTransfer), "%d", id);
     GtkWidget *taskNumberMarker = gtk_button_new_with_label(numberToTransfer);
     gtk_box_pack_start(GTK_BOX(boxTask), taskNumberMarker, FALSE, FALSE, 0);
 
@@ -1426,35 +1430,35 @@ void curlCalendar()
     struct tm *tm = localtime(&t);
     long unsigned yearInt = tm->tm_year + 1900;
     char year[5];
-    sprintf(year, "%lu", yearInt);
+    snprintf(year, sizeof(year), "%lu", yearInt);
     CURL *curl;
     CURLcode res;
-    FILE *fp;
     char *url = malloc(60 * sizeof(char));
     strcpy(url, "https://cdn.vertex42.com/calendars/");
     strcat(url, year);
     strcat(url, "/");
     strcat(url, year);
     strcat(url, "-calendar.png");
-    char *outfile = "data/calendar.png";
 
     curl = curl_easy_init();
     if (curl) {
+        char *outfile = "data/calendar.png";
+        FILE *fp;
         fp = fopen(outfile, "wb");
-        if (fp == NULL) {
-            g_print("Impossible d'ouvrir le fichier '%s'\n", outfile);
-            return;
+        if (fp != NULL) {
+            curl_easy_setopt(curl, CURLOPT_URL, url);
+            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
+            curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+
+            res = curl_easy_perform(curl);
+            if (res != CURLE_OK)
+                g_print("Erreur lors de l'exécution de la requête cURL : %s\n", curl_easy_strerror(res));
+
+            curl_easy_cleanup(curl);
+            fclose(fp);
         }
-        curl_easy_setopt(curl, CURLOPT_URL, url);
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
-
-        res = curl_easy_perform(curl);
-        if (res != CURLE_OK)
-            g_print("Erreur lors de l'exécution de la requête cURL : %s\n", curl_easy_strerror(res));
-
-        curl_easy_cleanup(curl);
-        fclose(fp);
+        else
+            g_print("Erreur lors de l'ouverture du fichier %s\n", outfile);
     }
 }
 
@@ -1485,7 +1489,7 @@ gchar *warningMessage(struct Data *data)
         }
         else {
             strcpy(message, "Vous avez ");
-            sprintf(number, "%d", urgent);
+            snprintf(number, sizeof(number), "%d", urgent);
             strcat(message, number);
             strcat(message, " tâches urgentes à réaliser");
         }
@@ -1496,7 +1500,7 @@ gchar *warningMessage(struct Data *data)
             }
             else {
                 strcat(message, " et ");
-                sprintf(number, "%d", late);
+                snprintf(number, sizeof(number), "%d", late);
                 strcat(message, number);
                 strcat(message, " tâches en retard");
             }
@@ -1508,7 +1512,7 @@ gchar *warningMessage(struct Data *data)
         }
         else {
             strcpy(message, "Vous avez ");
-            sprintf(number, "%d", late);
+            snprintf(number, sizeof(number), "%d", late);
             strcat(message, number);
             strcat(message, " tâches en retard");
         }
@@ -1565,7 +1569,7 @@ int newConnectUpdate(char *day, char *month, int year, struct Data *data)
             else
                 fseek(file, -5, SEEK_CUR);
 
-            sprintf(insert, "%d", year);
+            snprintf(insert, sizeof(insert), "%d", year);
             fprintf(file, "%s", insert);
             break;
         }
@@ -1695,18 +1699,18 @@ void updateFinance(struct Data *data)
     char showMoney[25];
 
     int money = selectExpense(data->conn, 0);
-    sprintf(showMoney, "%d", money);
+    snprintf(showMoney, sizeof(showMoney), "%d", money);
     strcat(showMoney, " €");
     gtk_label_set_text(data->tools.dailyExpense, showMoney);
 
     money = selectExpense(data->conn, 1);
-    sprintf(showMoney, "%d", money);
+    snprintf(showMoney, sizeof(showMoney), "%d", money);
     strcat(showMoney, " €");
     gtk_label_set_text(data->tools.monthlyExpense, showMoney);
 
     int cap = selectCap(data->conn, 2);
     if (cap != 0) {
-        sprintf(showMoney, "Plafond: %d", cap);
+        snprintf(showMoney, sizeof(showMoney), "Plafond: %d", cap);
         strcat(showMoney, " €");
         gtk_label_set_text(data->tools.dailyCap, showMoney);
     }
@@ -1715,7 +1719,7 @@ void updateFinance(struct Data *data)
 
     cap = selectCap(data->conn, 3);
     if (cap != 0) {
-        sprintf(showMoney, "Plafond: %d", cap);
+        snprintf(showMoney, sizeof(showMoney), "Plafond: %d", cap);
         strcat(showMoney, " €");
         gtk_label_set_text(data->tools.monthlyCap, showMoney);
     }

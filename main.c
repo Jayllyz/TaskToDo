@@ -77,7 +77,8 @@ int main(int argc, char *argv[])
     data.calc.secondNumber = 0;
     data.calc.result = 0;
     data.calc.resultB = 0;
-    data.calc.operator= '0';
+    data.calc.op = '0';
+
     //Finances
     data.tools.dailyCap = GTK_LABEL(gtk_builder_get_object(data.tools.builder, "dailyCap"));
     data.tools.monthlyCap = GTK_LABEL(gtk_builder_get_object(data.tools.builder, "monthlyCap"));
@@ -139,10 +140,4 @@ int main(int argc, char *argv[])
     gtk_main();
 
     return 0;
-}
-
-// Called when window is closed
-void on_window_main_destroy()
-{
-    gtk_main_quit();
 }
