@@ -540,6 +540,19 @@ int updateCap(PGconn *conn, int typeOfCap, int amount)
     PGresult *res;
     size_t size = sizeof(char) * strlen("UPDATE Capital SET Value =  WHERE name = 'Capital journalier'") + sizeof(amount) + 1;
     char *query = malloc(size);
+
+    if (typeOfCap == 0) {
+        int monthlyCap = selectCap(conn, 3);
+        if (amount > monthlyCap && amount != 0 && monthlyCap != 0)
+            return -2;
+    }
+
+    if (typeOfCap == 1) {
+        int dailyCap = selectCap(conn, 2);
+        if (amount < dailyCap && amount != 0)
+            return -3;
+    }
+
     if (typeOfCap == 0)
         snprintf(query, size, "UPDATE Finance SET Value = %d WHERE name = 'Plafond journalier'", amount);
     else if (typeOfCap == 1)
