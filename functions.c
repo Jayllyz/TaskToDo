@@ -1630,7 +1630,22 @@ void financeButton(GtkButton *buttonPressed, struct Data *data)
     int exceededMonthly = 0;
 
     if (type == 0 || type == 1) {
-        updateCap(data->conn, type, amount);
+        int query = updateCap(data->conn, type, amount);
+        if (query == -3) {
+            GtkDialog *dialog = GTK_DIALOG(gtk_message_dialog_new(GTK_WINDOW(data->tools.window), GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK,
+                "Vous avez saisit un plafond mensuel inférieur à votre plafond journalier."));
+            gtk_dialog_run(dialog);
+            gtk_widget_destroy(GTK_WIDGET(dialog));
+            return;
+        }
+        if (query == -2) {
+            GtkDialog *dialog = GTK_DIALOG(gtk_message_dialog_new(GTK_WINDOW(data->tools.window), GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK,
+                "Vous avez saisit un plafond journalier supérieur à votre plafond mensuel."));
+            gtk_dialog_run(dialog);
+            gtk_widget_destroy(GTK_WIDGET(dialog));
+            return;
+        }
+
         if (type == 0)
             gtk_entry_set_text(GTK_ENTRY(data->tools.dailyCapEntry), "");
         if (type == 1)
