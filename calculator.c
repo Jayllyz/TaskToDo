@@ -8,9 +8,8 @@ void btnClicked(GtkButton *button, struct Data *data)
     if (data->calc.resultB == 1) {
         data->calc.firstNumber = (int)data->calc.result > 0 ? (int)data->calc.result : (int)(data->calc.result - 1) + 1;
         data->calc.resultB = 0;
-        data->calc.firstB = 1;
         data->calc.op = '0';
-        data->calc.secondNumber = 0;
+        data->calc.secondNumber = -1;
     }
     if (strcmp(text, "C") == 0) {
         clearCalc(data);
@@ -22,7 +21,7 @@ void btnClicked(GtkButton *button, struct Data *data)
         showResult(data->calc.txtResult, data);
     }
     else if (strcmp(text, "+") == 0 || strcmp(text, "-") == 0 || strcmp(text, "*") == 0 || strcmp(text, "/") == 0) {
-        if (data->calc.firstB == 1)
+        if (data->calc.firstNumber != -1)
             addOperator(text, data);
     }
     else {
@@ -35,37 +34,29 @@ void btnClicked(GtkButton *button, struct Data *data)
 
 void addDigit(const char *digit, struct Data *data)
 {
-    int temp = atoi(digit);
-    int i = 0;
-
-    while (temp > 0) {
-        temp /= 10;
-        ++i;
-    }
     if (data->calc.op == '0') {
 
-        if (data->calc.firstB == 1)
+        if (data->calc.firstNumber != -1)
             data->calc.firstNumber = data->calc.firstNumber * 10 + atoi(digit);
         else
             data->calc.firstNumber = atoi(digit);
 
-        char *first = malloc(i + 1 * sizeof(char));
-        data->calc.firstB = 1;
-        snprintf(first, i + 1, "%d", data->calc.firstNumber);
+        char *first = malloc(100 * sizeof(char));
+        snprintf(first, 100, "%d", data->calc.firstNumber);
         gtk_label_set_text(data->calc.txtResult, first);
         free(first);
     }
-    if (data->calc.op != '0' && data->calc.firstNumber != 0) {
+    if (data->calc.op != '0' && data->calc.firstNumber != -1) {
 
-        if (data->calc.secondNumber != 0)
+        if (data->calc.secondNumber != -1)
             data->calc.secondNumber = (data->calc.secondNumber * 10) + atoi(digit);
         else
             data->calc.secondNumber = atoi(digit);
 
-        char *second = malloc(i + 1 * sizeof(char));
-        snprintf(second, i + 1, "%d", data->calc.secondNumber);
+        char *second = malloc(100 * sizeof(char));
+        snprintf(second, 100, "%d", data->calc.secondNumber);
         char *label = (char *)gtk_label_get_text(data->calc.txtResult);
-        char *newLabel = malloc(strlen(label) + strlen(second) + 10);
+        char *newLabel = malloc(strlen(label) + strlen(second) + 1);
         strcpy(newLabel, label);
         strcat(newLabel, second);
         gtk_label_set_text(data->calc.txtResult, newLabel);
@@ -115,9 +106,8 @@ void calculate(struct Data *data)
 
 void clearCalc(struct Data *data)
 {
-    data->calc.firstNumber = 0;
-    data->calc.firstB = 0;
-    data->calc.secondNumber = 0;
+    data->calc.firstNumber = -1;
+    data->calc.secondNumber = -1;
     data->calc.result = 0;
     data->calc.op = '0';
     data->calc.resultB = 0;
@@ -143,7 +133,7 @@ void showResult(GtkLabel *outputLabel, struct Data *data)
         tempSecond /= 10;
         ++iS;
     }
-    if (data->calc.firstNumber == 0 && data->calc.secondNumber == 0 && data->calc.result == 0 && data->calc.resultB == 0)
+    if (data->calc.firstNumber == -1 && data->calc.secondNumber == -1 && data->calc.result == 0 && data->calc.resultB == 0)
         return;
     if (data->calc.result != 0 || data->calc.resultB == 1) {
         char *result = malloc(iR + 1 * sizeof(char));
