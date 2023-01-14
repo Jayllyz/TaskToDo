@@ -53,12 +53,13 @@ void addDigit(const char *digit, struct Data *data)
         else
             data->calc.secondNumber = atoi(digit);
 
+        g_print("%d\n", data->calc.secondNumber);
         char *second = malloc(100 * sizeof(char));
         snprintf(second, 100, "%d", data->calc.secondNumber);
         char *label = (char *)gtk_label_get_text(data->calc.txtResult);
         char *newLabel = malloc(strlen(label) + strlen(second) + 1);
         strcpy(newLabel, label);
-        strcat(newLabel, second);
+        strcat(newLabel, digit);
         gtk_label_set_text(data->calc.txtResult, newLabel);
         free(second);
         free(newLabel);
@@ -118,9 +119,9 @@ void showResult(GtkLabel *outputLabel, struct Data *data)
     double tempResult = data->calc.result;
     int tempFirst = data->calc.firstNumber;
     int tempSecond = data->calc.secondNumber;
-    int iR = 0;
-    int iF = 0;
-    int iS = 0;
+    int iR = 1;
+    int iF = 1;
+    int iS = 1;
     while (tempResult > 0) {
         tempResult /= 10;
         ++iR;
