@@ -72,9 +72,8 @@ int main(int argc, char *argv[])
     data.calc.eight = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "eight"));
     data.calc.nine = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "nine"));
     data.calc.txtResult = GTK_LABEL(gtk_builder_get_object(data.tools.builder, "txtResult"));
-    data.calc.firstNumber = 0;
-    data.calc.firstB = 0;
-    data.calc.secondNumber = 0;
+    data.calc.firstNumber = -1;
+    data.calc.secondNumber = -1;
     data.calc.result = 0;
     data.calc.resultB = 0;
     data.calc.op = '0';
