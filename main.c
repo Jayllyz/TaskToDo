@@ -45,8 +45,8 @@ int main(int argc, char *argv[])
 
     //Datas
     data.state.maxTaskTotal = readOneConfigValue("maxTaskTotal") > 0 ? readOneConfigValue("maxTaskTotal") : 200;
-    data.state.maxTaskPerProject = readOneConfigValue("maxTaskPerProject") > 0 ? readOneConfigValue("maxTaskPerProject") : 15;
     data.state.maxProject = readOneConfigValue("maxProject") > 0 ? readOneConfigValue("maxProject") : 10;
+    data.state.maxTaskPerProject = readOneConfigValue("maxTaskPerProject") > 0 ? readOneConfigValue("maxTaskPerProject") : 15;
     data.tools.addTask = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "addTask"));
     data.tools.addProject = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "addProject"));
     data.tools.boxV = GTK_BOX(gtk_builder_get_object(data.tools.builder, "boxV"));

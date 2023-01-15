@@ -620,10 +620,12 @@ int readOneConfigValue(char *propName)
             while (line[i] != ':') {
                 i++;
             }
+            free(line);
             fclose(file);
             return atoi(&line[i + 1]);
         }
     }
+    free(line);
     fclose(file);
     return -1;
 }
