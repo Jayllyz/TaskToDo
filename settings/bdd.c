@@ -543,14 +543,18 @@ int updateCap(PGconn *conn, int typeOfCap, int amount)
 
     if (typeOfCap == 0) {
         int monthlyCap = selectCap(conn, 3);
-        if (amount > monthlyCap && amount != 0 && monthlyCap != 0)
+        if (amount > monthlyCap && amount != 0 && monthlyCap != 0) {
+            free(query);
             return -2;
+        }
     }
 
     if (typeOfCap == 1) {
         int dailyCap = selectCap(conn, 2);
-        if (amount < dailyCap && amount != 0)
+        if (amount < dailyCap && amount != 0) {
+            free(query);
             return -3;
+        }
     }
 
     if (typeOfCap == 0)
