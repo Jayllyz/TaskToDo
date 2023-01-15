@@ -504,8 +504,8 @@ void addTasks(GtkWidget *task, struct Data *data, int presentTask, char *present
     }
 
     //Attribution de l'id
-    int tooMany = 1;
     if (data->state.repopulatedTask == 1) {
+        int tooMany = 1;
         for (data->state.i = 0; data->state.i < data->state.maxTaskTotal; data->state.i++) {
             if (data->state.taskNumber[data->state.i] != -1) {
                 tooMany = 0;
@@ -653,12 +653,10 @@ int readOneConfigValue(char *propName)
             while (line[i] != ':') {
                 i++;
             }
-            free(line);
             fclose(file);
             return atoi(&line[i + 1]);
         }
     }
-    free(line);
     fclose(file);
     return -1;
 }
