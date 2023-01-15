@@ -101,6 +101,7 @@ struct Data {
 
 //function.c
 void openApp(GtkWidget *button, struct Data *data);
+void closeApp(struct Data *data);
 void clearData(GtkWidget *button, struct Data *data);
 void checkEol(struct Data *data, const char *filename);
 void changeTaskStatus(GtkWidget *taskStatus, struct Data *data);

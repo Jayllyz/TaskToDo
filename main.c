@@ -55,17 +55,6 @@ int main(int argc, char *argv[])
     data.tools.notebook = GTK_NOTEBOOK(gtk_builder_get_object(data.tools.builder, "project_notebook"));
     data.tools.calendar = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "calendar"));
 
-    //Allocate memory
-    data.tools.taskStatus = (GtkWidget **)malloc(sizeof(GtkWidget *) * data.state.maxTaskTotal);
-    data.tools.taskSeparator1 = (GtkWidget **)malloc(sizeof(GtkWidget *) * data.state.maxTaskTotal);
-    data.tools.taskSeparator2 = (GtkWidget **)malloc(sizeof(GtkWidget *) * data.state.maxTaskTotal);
-    data.tools.boxTask = (GtkWidget **)malloc(sizeof(GtkWidget *) * data.state.maxTaskTotal);
-    data.tools.task = (GtkWidget **)malloc(sizeof(GtkWidget *) * data.state.maxTaskTotal);
-    data.tools.taskPriority = (GtkWidget **)malloc(sizeof(GtkWidget *) * data.state.maxTaskTotal);
-    data.tools.taskEdit = (GtkWidget **)malloc(sizeof(GtkWidget *) * data.state.maxTaskTotal);
-    data.tools.taskDelete = (GtkWidget **)malloc(sizeof(GtkWidget *) * data.state.maxTaskTotal);
-    data.tools.taskDeadline = (GtkWidget **)malloc(sizeof(GtkWidget *) * data.state.maxTaskTotal);
-
     //Calculator
     data.calc.clear = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "clear"));
     data.calc.plus = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "plus"));
@@ -143,18 +132,8 @@ int main(int argc, char *argv[])
     g_signal_connect(data.tools.desetExpense, "clicked", G_CALLBACK(financeButton), &data);
 
     g_signal_connect(data.home.windowHome, "destroy", G_CALLBACK(gtk_main_quit), NULL);
-    g_signal_connect(data.tools.window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+    g_signal_connect(data.tools.window, "destroy", G_CALLBACK(closeApp), &data);
     gtk_builder_connect_signals(data.tools.builder, NULL);
-
-    // free(data.tools.taskStatus);
-    // free(data.tools.taskSeparator1);
-    // free(data.tools.taskSeparator2);
-    // free(data.tools.boxTask);
-    // free(data.tools.task);
-    // free(data.tools.taskPriority);
-    // free(data.tools.taskEdit);
-    // free(data.tools.taskDelete);
-    // free(data.tools.taskDeadline);
 
     g_object_unref(data.tools.builder);
 
