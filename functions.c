@@ -99,20 +99,6 @@ void openApp(GtkWidget *button, struct Data *data)
     }
 }
 
-void closeApp(struct Data *data)
-{
-    free(data->tools.taskStatus);
-    free(data->tools.taskSeparator1);
-    free(data->tools.taskSeparator2);
-    free(data->tools.boxTask);
-    free(data->tools.task);
-    free(data->tools.taskPriority);
-    free(data->tools.taskEdit);
-    free(data->tools.taskDelete);
-    free(data->tools.taskDeadline);
-    gtk_main_quit();
-}
-
 void clearData(GtkWidget *button, struct Data *data)
 {
     PGresult *res = PQexec(data->conn, "DELETE FROM task");
@@ -504,8 +490,8 @@ void addTasks(GtkWidget *task, struct Data *data, int presentTask, char *present
     }
 
     //Attribution de l'id
-    int tooMany = 1;
     if (data->state.repopulatedTask == 1) {
+        int tooMany = 1;
         for (data->state.i = 0; data->state.i < data->state.maxTaskTotal; data->state.i++) {
             if (data->state.taskNumber[data->state.i] != -1) {
                 tooMany = 0;
@@ -653,12 +639,10 @@ int readOneConfigValue(char *propName)
             while (line[i] != ':') {
                 i++;
             }
-            free(line);
             fclose(file);
             return atoi(&line[i + 1]);
         }
     }
-    free(line);
     fclose(file);
     return -1;
 }
