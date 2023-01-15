@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
     g_signal_connect(data.tools.desetExpense, "clicked", G_CALLBACK(financeButton), &data);
 
     g_signal_connect(data.home.windowHome, "destroy", G_CALLBACK(gtk_main_quit), NULL);
-    g_signal_connect(data.tools.window, "destroy", G_CALLBACK(closeApp), &data);
+    g_signal_connect(data.tools.window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
     gtk_builder_connect_signals(data.tools.builder, NULL);
 
     g_object_unref(data.tools.builder);

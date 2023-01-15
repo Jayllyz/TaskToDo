@@ -99,20 +99,6 @@ void openApp(GtkWidget *button, struct Data *data)
     }
 }
 
-void closeApp(struct Data *data)
-{
-    free(data->tools.taskStatus);
-    free(data->tools.taskSeparator1);
-    free(data->tools.taskSeparator2);
-    free(data->tools.boxTask);
-    free(data->tools.task);
-    free(data->tools.taskPriority);
-    free(data->tools.taskEdit);
-    free(data->tools.taskDelete);
-    free(data->tools.taskDeadline);
-    gtk_main_quit();
-}
-
 void clearData(GtkWidget *button, struct Data *data)
 {
     PGresult *res = PQexec(data->conn, "DELETE FROM task");
