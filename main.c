@@ -146,15 +146,15 @@ int main(int argc, char *argv[])
     g_signal_connect(data.tools.window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
     gtk_builder_connect_signals(data.tools.builder, NULL);
 
-    free(data.tools.taskStatus);
-    free(data.tools.taskSeparator1);
-    free(data.tools.taskSeparator2);
-    free(data.tools.boxTask);
-    free(data.tools.task);
-    free(data.tools.taskPriority);
-    free(data.tools.taskEdit);
-    free(data.tools.taskDelete);
-    free(data.tools.taskDeadline);
+    // free(data.tools.taskStatus);
+    // free(data.tools.taskSeparator1);
+    // free(data.tools.taskSeparator2);
+    // free(data.tools.boxTask);
+    // free(data.tools.task);
+    // free(data.tools.taskPriority);
+    // free(data.tools.taskEdit);
+    // free(data.tools.taskDelete);
+    // free(data.tools.taskDeadline);
 
     g_object_unref(data.tools.builder);
 
