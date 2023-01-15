@@ -203,10 +203,32 @@ int allTask(PGconn *conn)
         return -1;
     }
 
-    int amountOfTask = PQntuples(res);
+    int amountOfTask = 0;
+    if (PQntuples(res) > 0)
+        amountOfTask = PQntuples(res);
+
     free(query);
     PQclear(res);
     return amountOfTask;
+}
+
+int maxTaskInAllProject(PGconn *conn)
+{
+    PGresult *res;
+    char *query = malloc(sizeof(char) * strlen("SELECT ProjectName, COUNT(*) AS Count FROM Task GROUP BY ProjectName ORDER BY Count DESC LIMIT 1") + 1);
+    strcpy(query, "SELECT ProjectName, COUNT(*) AS Count FROM Task GROUP BY ProjectName ORDER BY Count DESC LIMIT 1");
+    res = PQexec(conn, query);
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        g_print("Error: Can't get max task in all project");
+        return -1;
+    }
+    free(query);
+    int maxTask = 0;
+    if (PQntuples(res) > 0)
+        maxTask = atoi(PQgetvalue(res, 0, 1));
+
+    PQclear(res);
+    return maxTask;
 }
 
 int allProject(PGconn *conn)

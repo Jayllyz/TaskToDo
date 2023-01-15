@@ -146,6 +146,7 @@ int allProject(PGconn *conn);
 int allUrgentTask(PGconn *conn);
 int allLateTask(PGconn *conn);
 char *selectTask(PGconn *conn, int row);
+int maxTaskInAllProject(PGconn *conn);
 int selectTaskId(PGconn *conn, int row);
 char *selectProject(PGconn *conn, int row);
 char *selectDescription(PGconn *conn, int id);
