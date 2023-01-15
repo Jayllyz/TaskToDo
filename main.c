@@ -69,6 +69,7 @@ int main(int argc, char *argv[])
     data.tools.inputEntry = GTK_WIDGET(gtk_builder_get_object(data.tools.builder, "inputEntry"));
     data.tools.notebook = GTK_NOTEBOOK(gtk_builder_get_object(data.tools.builder, "project_notebook"));
     data.tools.calendar = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "calendar"));
+
     //Calculator
     data.calc.clear = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "clear"));
     data.calc.plus = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "plus"));
@@ -146,7 +147,7 @@ int main(int argc, char *argv[])
     g_signal_connect(data.tools.desetExpense, "clicked", G_CALLBACK(financeButton), &data);
 
     g_signal_connect(data.home.windowHome, "destroy", G_CALLBACK(gtk_main_quit), NULL);
-    g_signal_connect(data.tools.window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+    g_signal_connect(data.tools.window, "destroy", G_CALLBACK(closeApp), &data);
     gtk_builder_connect_signals(data.tools.builder, NULL);
 
     g_object_unref(data.tools.builder);

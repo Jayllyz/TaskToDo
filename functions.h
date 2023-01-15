@@ -17,16 +17,16 @@ struct GTKTools {
     GtkWidget *window;
     GtkButton *addTask;
     GtkButton *addProject;
-    GtkWidget *taskStatus[50];
-    GtkWidget *taskSeparator1[50];
-    GtkWidget *taskSeparator2[50];
+    GtkWidget **taskStatus;
+    GtkWidget **taskSeparator1;
+    GtkWidget **taskSeparator2;
     GtkBox *boxV;
-    GtkWidget *boxTask[50];
-    GtkWidget *task[50];
-    GtkWidget *taskPriority[50];
-    GtkWidget *taskEdit[50];
-    GtkWidget *taskDelete[50];
-    GtkWidget *taskDeadline[50];
+    GtkWidget **boxTask;
+    GtkWidget **task;
+    GtkWidget **taskPriority;
+    GtkWidget **taskEdit;
+    GtkWidget **taskDelete;
+    GtkWidget **taskDeadline;
     GtkWidget *inputEntry;
     GtkLabel *outputLabel;
     GtkNotebook *notebook;
@@ -101,6 +101,7 @@ struct Data {
 
 //function.c
 void openApp(GtkWidget *button, struct Data *data);
+void closeApp(struct Data *data);
 void clearData(GtkWidget *button, struct Data *data);
 void checkEol(struct Data *data, const char *filename);
 void changeTaskStatus(GtkWidget *taskStatus, struct Data *data);

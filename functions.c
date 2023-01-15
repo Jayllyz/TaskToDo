@@ -10,6 +10,17 @@ void openApp(GtkWidget *button, struct Data *data)
     gtk_widget_show(data->tools.window);
     gtk_widget_hide(data->home.windowHome);
 
+    //Allocate memory
+    data->tools.taskStatus = (GtkWidget **)malloc(sizeof(GtkWidget *) * data->state.maxTaskTotal);
+    data->tools.taskSeparator1 = (GtkWidget **)malloc(sizeof(GtkWidget *) * data->state.maxTaskTotal);
+    data->tools.taskSeparator2 = (GtkWidget **)malloc(sizeof(GtkWidget *) * data->state.maxTaskTotal);
+    data->tools.boxTask = (GtkWidget **)malloc(sizeof(GtkWidget *) * data->state.maxTaskTotal);
+    data->tools.task = (GtkWidget **)malloc(sizeof(GtkWidget *) * data->state.maxTaskTotal);
+    data->tools.taskPriority = (GtkWidget **)malloc(sizeof(GtkWidget *) * data->state.maxTaskTotal);
+    data->tools.taskEdit = (GtkWidget **)malloc(sizeof(GtkWidget *) * data->state.maxTaskTotal);
+    data->tools.taskDelete = (GtkWidget **)malloc(sizeof(GtkWidget *) * data->state.maxTaskTotal);
+    data->tools.taskDeadline = (GtkWidget **)malloc(sizeof(GtkWidget *) * data->state.maxTaskTotal);
+
     time_t now = time(NULL);
     struct tm *local_time = localtime(&now);
     char *day = malloc(sizeof(char) * 3);
@@ -86,6 +97,20 @@ void openApp(GtkWidget *button, struct Data *data)
         }
         free(message);
     }
+}
+
+void closeApp(struct Data *data)
+{
+    free(data->tools.taskStatus);
+    free(data->tools.taskSeparator1);
+    free(data->tools.taskSeparator2);
+    free(data->tools.boxTask);
+    free(data->tools.task);
+    free(data->tools.taskPriority);
+    free(data->tools.taskEdit);
+    free(data->tools.taskDelete);
+    free(data->tools.taskDeadline);
+    gtk_main_quit();
 }
 
 void clearData(GtkWidget *button, struct Data *data)
