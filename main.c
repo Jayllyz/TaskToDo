@@ -45,8 +45,23 @@ int main(int argc, char *argv[])
 
     //Datas
     data.state.maxTaskTotal = readOneConfigValue("maxTaskTotal") > 0 ? readOneConfigValue("maxTaskTotal") : 200;
-    data.state.maxTaskPerProject = readOneConfigValue("maxTaskPerProject") > 0 ? readOneConfigValue("maxTaskPerProject") : 15;
+    if (data.state.maxTaskTotal < allTask(data.conn)) {
+        g_print("Attention: maxTaskTotal in config.txt is lower than the number of tasks in the database.");
+        exit(EXIT_FAILURE);
+    }
+
     data.state.maxProject = readOneConfigValue("maxProject") > 0 ? readOneConfigValue("maxProject") : 10;
+    if (data.state.maxProject < allProject(data.conn)) {
+        g_print("Attention: maxProject in config.txt is lower than the number of projects in the database.");
+        exit(EXIT_FAILURE);
+    }
+
+    data.state.maxTaskPerProject = readOneConfigValue("maxTaskPerProject") > 0 ? readOneConfigValue("maxTaskPerProject") : 15;
+    if (data.state.maxTaskPerProject < maxTaskInAllProject(data.conn)) {
+        g_print("Attention: maxTaskPerProject in config.txt is lower than the number of tasks in the database.");
+        exit(EXIT_FAILURE);
+    }
+
     data.tools.addTask = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "addTask"));
     data.tools.addProject = GTK_BUTTON(gtk_builder_get_object(data.tools.builder, "addProject"));
     data.tools.boxV = GTK_BOX(gtk_builder_get_object(data.tools.builder, "boxV"));
