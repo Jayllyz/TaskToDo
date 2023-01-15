@@ -478,12 +478,19 @@ void addTasks(GtkWidget *task, struct Data *data, int presentTask, char *present
     }
 
     //Attribution de l'id
+    int tooMany = 1;
     if (data->state.repopulatedTask == 1) {
         for (data->state.i = 0; data->state.i < data->state.maxTaskTotal; data->state.i++) {
             if (data->state.taskNumber[data->state.i] != -1) {
+                tooMany = 0;
                 data->state.taskNumber[data->state.i] = -1;
                 break;
             }
+        }
+        if (tooMany != 0) {
+            free(getText);
+            free(projectName);
+            return;
         }
     }
     else if (data->state.repopulatedTask == 0) {
