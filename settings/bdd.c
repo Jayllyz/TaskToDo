@@ -77,9 +77,8 @@ int createTables(PGconn *conn, struct Data *data)
 
     FILE *file = fopen("settings/config.txt", "r+");
     if (file != NULL) {
-        char *line = NULL;
-        size_t len = 0;
-        while ((getline(&line, &len, file)) != -1) {
+        char line[200];
+        while (fgets(line, sizeof(line), file)) {
             if (strstr(line, "init db") != NULL) {
                 if (data->state.crlf == 1)
                     fseek(file, -3, SEEK_CUR); // -1 + '\r\n'

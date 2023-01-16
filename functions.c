@@ -131,14 +131,13 @@ void clearData(GtkWidget *button, struct Data *data)
 void checkEol(struct Data *data, const char *filename)
 {
     FILE *fp;
-    char *line = malloc(1000 * sizeof(char));
+    char line[200];
     if ((fp = fopen(filename, "r")) == NULL) {
         g_print("Error: unable to open file %s\n", filename);
-        free(line);
         return;
     }
 
-    while (fgets(line, sizeof(line), fp) != NULL) {
+    while (fgets(line, sizeof(line), fp)) {
         if (strchr(line, '\r') != NULL) {
             data->state.crlf = 1;
             break;
@@ -146,7 +145,6 @@ void checkEol(struct Data *data, const char *filename)
         if (strchr(line, '\n') != NULL)
             data->state.crlf = 0;
     }
-    free(line);
     fclose(fp);
 }
 
@@ -634,9 +632,8 @@ int readOneConfigValue(char *propName)
         g_print("Error: config file not found\n");
         return -1;
     }
-    char *line = NULL;
-    size_t len = 0;
-    while ((getline(&line, &len, file)) != -1) {
+    char line[200];
+    while (fgets(line, sizeof(line), file)) {
         if (strstr(line, propName) != NULL) {
             int i = 0;
             while (line[i] != ':') {
@@ -1548,10 +1545,9 @@ gchar *warningMessage(struct Data *data)
 int newConnectUpdate(char *day, char *month, int year, struct Data *data)
 {
     FILE *file = fopen("settings/config.txt", "r+");
-    char *line = NULL;
-    size_t len = 0;
     char insert[4];
-    while ((getline(&line, &len, file)) != -1) {
+    char line[200];
+    while (fgets(line, sizeof(line), file)) {
         if (strstr(line, "last connect day") != NULL) {
             if (data->state.crlf == 1)
                 fseek(file, -4, SEEK_CUR);
