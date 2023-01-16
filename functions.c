@@ -47,7 +47,10 @@ void openApp(GtkWidget *button, struct Data *data)
     for (int i = 0; i < data->state.maxProject; i++) {
         data->state.projectNumber[i] = i;
     }
+
     data->state.maxTaskPerProject = readOneConfigValue("maxTaskPerProject") > 0 ? readOneConfigValue("maxTaskPerProject") : 15;
+    data->state.maxTaskTotal = readOneConfigValue("maxTaskTotal") > 0 ? readOneConfigValue("maxTaskTotal") : 200;
+    data->state.maxProject = readOneConfigValue("maxProject") > 0 ? readOneConfigValue("maxProject") : 10;
 
     //Projects
     int queryResult = allProject(data->conn);
