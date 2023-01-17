@@ -100,6 +100,8 @@ int insertTask(PGconn *conn, int id, char *name, char *description, int priority
 {
     PGresult *res;
     char *query = malloc(sizeof(char) * 200);
+    replaceQuote(name);
+    replaceQuote(description);
     snprintf(query, 200,
         "INSERT INTO Task ( Id, Name, Description, Priority, Deadline, Status, DependGroup, ProjectName) VALUES ( %d,'%s', '%s', %d, '%s', %d, %d, '%s')", id, name,
         description, priority, deadline, status, dependGroup, projectName);
@@ -117,6 +119,7 @@ int insertProject(PGconn *conn, char *name)
 {
     PGresult *res;
     char *query = malloc(sizeof(char) * 100);
+    replaceQuote(name);
     snprintf(query, 100, "INSERT INTO Project ( Name) VALUES ('%s')", name);
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
@@ -130,6 +133,7 @@ int insertProject(PGconn *conn, char *name)
 
 int projectExist(PGconn *conn, const gchar *ProjectName)
 {
+    replaceQuote((char *)ProjectName);
     int size = strlen("SELECT Name FROM project WHERE Name = ''") + strlen(ProjectName) + 1;
     char *query = malloc(size * sizeof(char));
     snprintf(query, size, "SELECT Name FROM project WHERE Name = '%s'", ProjectName);
@@ -436,6 +440,7 @@ int updateDescription(PGconn *conn, const gchar *description, int id)
 {
     PGresult *res;
     char *query = malloc(sizeof(char) * 150);
+    replaceQuote((char *)description);
     snprintf(query, 150, "UPDATE Task SET description = '%s' WHERE id = '%d'", description, id);
     res = PQexec(conn, query);
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
@@ -734,4 +739,13 @@ int refreshTaskInGroup(PGconn *conn, int id, int dependGroup)
     free(queryUpdate);
     PQclear(res);
     return 0;
+}
+
+void replaceQuote(char *str)
+{
+    for (int i = 0; i < strlen(str); i++) {
+        if (str[i] == '\'')
+            str[i] = '"';
+    }
+    return;
 }

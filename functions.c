@@ -477,6 +477,7 @@ void addTasks(GtkWidget *task, struct Data *data, int presentTask, char *present
 
     getText = malloc(sizeof(gchar) * strlen(get_text_of_entry(entry)) + 1);
     strcpy(getText, get_text_of_entry(entry));
+    replaceQuote(getText);
 
     if (strcmp(getText, "") == 0 && data->state.repopulatedTask == 1) {
         free(getText);
@@ -605,7 +606,6 @@ void addTasks(GtkWidget *task, struct Data *data, int presentTask, char *present
     gtk_widget_hide(taskNumberMarker);
 
     gtk_entry_set_text(GTK_ENTRY(entry), "");
-
     if (data->state.repopulatedTask == 1) {
         int queryResult = insertTask(data->conn, data->state.i, getText, "", 1, deadlineDate, 0, -1, name); //insert in db
         if (queryResult == -1)
@@ -684,7 +684,7 @@ void addProject(GtkWidget *projet, gint clicked, struct Data *data, int presentP
                 gtk_widget_destroy(GTK_WIDGET(dialog));
                 return;
             }
-
+            replaceQuote(projectName);
             int queryResult = insertProject(data->conn, projectName);
             if (queryResult == -1) {
                 g_print("Error: insertProject failed\n");
