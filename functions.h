@@ -167,6 +167,7 @@ int selectDependGroup(PGconn *conn, int id);
 int AllDependGroup(PGconn *conn, int id, int dependGroup);
 int selectIdFromDependGroup(PGconn *conn, int row, int dependGroup, char *projectName);
 int refreshTaskInGroup(PGconn *conn, int id, int dependGroup);
+void replaceQuote(char *str);
 
 //calculator.c
 void btnClicked(GtkButton *button, struct Data *data);
