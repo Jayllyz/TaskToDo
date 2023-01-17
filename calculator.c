@@ -81,6 +81,10 @@ void addOperator(const char *op, struct Data *data)
 
 void calculate(struct Data *data)
 {
+    if (data->calc.firstNumber != -1 && data->calc.secondNumber == -1 && data->calc.op != '0') {
+        data->calc.result = data->calc.firstNumber;
+        return;
+    }
     switch (data->calc.op) {
     case '+':
         data->calc.result = data->calc.firstNumber + data->calc.secondNumber;
@@ -102,6 +106,9 @@ void calculate(struct Data *data)
         data->calc.result = 0;
         break;
     }
+
+    if (data->calc.firstNumber != -1 && data->calc.secondNumber == -1 && data->calc.op == '0')
+        data->calc.result = data->calc.firstNumber;
 }
 
 void clearCalc(struct Data *data)
